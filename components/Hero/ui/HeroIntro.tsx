@@ -61,17 +61,30 @@ export function HeroIntro({ copy, theme, language }: HeroIntroProps) {
         data-reveal
       >
         <a
-          className={`hero-action hero-action-primary inline-flex min-h-[42px] items-center justify-center gap-2.5 rounded-xl border px-4 text-[11px] font-[650] tracking-[.04em] transition-all duration-300 hover:-translate-y-0.5 max-[540px]:min-h-12 max-[540px]:w-full max-[540px]:min-w-0 max-[540px]:px-3 max-[540px]:text-[10.5px] max-[390px]:min-h-[46px] max-[390px]:text-[10px] ${
+          className={`hero-action hero-action-primary inline-flex min-h-[42px] items-center justify-center gap-2.5 rounded-[12px] border px-4 text-[11px] font-[650] tracking-[.04em] transition-[transform,border-color,background,box-shadow] duration-[250ms] ease-[ease] hover:-translate-y-0.5 max-[540px]:min-h-12 max-[540px]:w-full max-[540px]:min-w-0 max-[540px]:px-3 max-[540px]:text-[10.5px] max-[390px]:min-h-[46px] max-[390px]:text-[10px] ${
             rtl ? "[direction:rtl]" : ""
           } ${
             light
-              ? "border-[#324c7c]/20 [background:linear-gradient(135deg,rgba(30,43,69,.98),rgba(61,85,136,.95)_58%,rgba(91,77,151,.92))] text-white shadow-[0_14px_34px_rgba(50,70,113,.20),inset_0_1px_rgba(255,255,255,.23)] hover:shadow-[0_18px_38px_rgba(50,70,113,.25)]"
-              : "border-white/75 [background:linear-gradient(135deg,#f8fbff_0%,#cedcff_55%,#c9baff_100%)] text-[#090a0e] shadow-[0_10px_30px_rgba(113,135,255,.16),inset_0_1px_rgba(255,255,255,.75)] hover:shadow-[0_14px_34px_rgba(113,135,255,.26),inset_0_1px_rgba(255,255,255,.8)]"
+              ? "border-[rgba(39,57,93,.15)] [background:linear-gradient(135deg,rgba(23,37,61,.98),rgba(62,89,140,.95)_58%,rgba(101,82,165,.92))] !text-[#fbfdff] shadow-[0_18px_36px_rgba(47,68,112,.22),0_0_28px_rgba(38,145,188,.06),inset_0_1px_rgba(255,255,255,.22)] hover:shadow-[0_16px_36px_rgba(59,82,135,.28),0_0_26px_rgba(110,188,255,.08),inset_0_1px_rgba(255,255,255,.28)]"
+              : "border-[rgba(255,255,255,.75)] [background:linear-gradient(135deg,#f8fbff_0%,#cedcff_55%,#c9baff_100%)] !text-[#090a0e] shadow-[0_10px_30px_rgba(113,135,255,.16),inset_0_1px_rgba(255,255,255,.75)] hover:shadow-[0_14px_34px_rgba(113,135,255,.26),inset_0_1px_rgba(255,255,255,.8)]"
           }`}
           href="#work"
         >
-          <span>{copy.stage.primaryAction}</span>
-          <i className="text-sm not-italic" aria-hidden="true">↗</i>
+          <span className={light ? "text-[#fbfdff]" : "text-[#090a0e]"}>{copy.stage.primaryAction}</span>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 12 12"
+            className={`h-3 w-3 shrink-0 ${light ? "text-[#fbfdff]" : "text-[#090a0e]"}`}
+            fill="none"
+          >
+            <path
+              d="M3 9 9 3M4 3h5v5"
+              stroke="currentColor"
+              strokeWidth="1.65"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </a>
 
         <a
