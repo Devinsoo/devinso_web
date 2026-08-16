@@ -1,0 +1,26 @@
+export const ENTRY_COPY = {
+  en: {
+    eyebrow: "First visit",
+    title: "Set your experience",
+    description: "Choose your language and appearance before entering DEVINSO. You can change both later from Settings.",
+    language: "Language",
+    theme: "Theme",
+    dark: "Dark",
+    light: "Light",
+    enter: "Enter studio",
+    system: "Use system defaults",
+    saved: "Your choices are saved in this browser's cookies.",
+  },
+  fa: {
+    eyebrow: "ورود اول",
+    title: "تجربه‌ات را انتخاب کن",
+    description: "قبل از ورود به DEVINSO زبان و ظاهر دلخواهت را انتخاب کن. بعداً از تنظیمات هم می‌توانی هر دو را تغییر بدهی.",
+    language: "زبان",
+    theme: "تم",
+    dark: "تاریک",
+    light: "روشن",
+    enter: "ورود به استودیو",
+    system: "استفاده از تنظیمات سیستم",
+    saved: "انتخاب‌ها در کوکی‌های همین مرورگر ذخیره می‌شوند.",
+  },
+} as const;
