@@ -17,7 +17,7 @@ export function HeroBackground({ copy, theme }: HeroBackgroundProps) {
         className={`hero-grid absolute inset-0 z-0 ${
           light
             ? "opacity-50 [background-image:linear-gradient(rgba(58,77,111,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(58,77,111,.06)_1px,transparent_1px)] [background-size:60px_60px] [mask-image:radial-gradient(circle_at_58%_50%,#000_0%,rgba(0,0,0,.96)_58%,transparent_94%)]"
-            : "opacity-20 [background-image:linear-gradient(rgba(255,255,255,.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.02)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(circle_at_50%_50%,#000_0%,rgba(0,0,0,.84)_55%,transparent_90%)] max-[720px]:opacity-[.18] max-[720px]:[background-size:48px_48px]"
+            : "opacity-[.42] [background-image:linear-gradient(rgba(255,255,255,.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.045)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(circle_at_50%_50%,#000_0%,rgba(0,0,0,.88)_58%,transparent_92%)] max-[720px]:opacity-[.30] max-[720px]:[background-size:48px_48px]"
         }`}
         aria-hidden="true"
       />
