@@ -1,60 +1,25 @@
 @import "tailwindcss";
 
-.project-flow-line {
-  animation: project-flow 3.4s ease-in-out infinite;
+.case-flow-line {
+  animation: case-flow 3.4s ease-in-out infinite;
 }
 
-.project-orbit,
-.project-motion-orbit {
-  animation: project-orbit 16s linear infinite;
+.case-orbit {
+  animation: case-orbit 16s linear infinite;
 }
 
-.project-motion-orbit {
-  animation-duration: 12s;
-}
-
-.project-board-card {
-  animation: project-float 6s ease-in-out infinite;
-}
-
-.project-board-card:nth-of-type(2) {
-  animation-delay: -2s;
-}
-
-.project-board-card:nth-of-type(3) {
-  animation-delay: -4s;
-}
-
-.project-scan {
-  animation: project-scan 4.2s ease-in-out infinite;
-}
-
-@keyframes project-flow {
+@keyframes case-flow {
   0%, 100% { opacity: .28; transform: scaleX(.76); }
   50% { opacity: 1; transform: scaleX(1); }
 }
 
-@keyframes project-orbit {
+@keyframes case-orbit {
   to { transform: rotate(360deg); }
 }
 
-@keyframes project-float {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -8px; }
-}
-
-@keyframes project-scan {
-  0%, 100% { transform: translateY(-90px); opacity: 0; }
-  20%, 80% { opacity: .7; }
-  50% { transform: translateY(90px); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .project-flow-line,
-  .project-orbit,
-  .project-board-card,
-  .project-motion-orbit,
-  .project-scan {
+  .case-flow-line,
+  .case-orbit {
     animation: none !important;
   }
 }
