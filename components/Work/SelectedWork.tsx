@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLayoutEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -659,6 +660,16 @@ export function SelectedWork({ theme, language }: SelectedWorkProps) {
           {PROJECTS.map((project, index) => (
             <ProjectScene key={project.id} project={project} theme={theme} language={language} index={index} />
           ))}
+        </div>
+
+        <div className={`mt-8 flex justify-end border-t pt-7 ${light ? "border-[#294368]/10" : "border-white/[.07]"}`}>
+          <Link
+            href="/projects"
+            className={`group inline-flex min-h-[48px] items-center gap-3 rounded-full border px-5 text-[10px] font-[650] uppercase tracking-[.16em] transition-transform duration-300 hover:-translate-y-0.5 ${light ? "border-[#294368]/12 bg-white/60 text-[#17263d]" : "border-white/[.09] bg-white/[.03] text-white/82"}`}
+          >
+            {copy.viewAll}
+            <svg viewBox="0 0 12 12" className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true"><path d="M2.2 9.8 9.6 2.4M4 2.4h5.6V8" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
         </div>
       </div>
     </section>
