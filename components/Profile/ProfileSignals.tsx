@@ -3,8 +3,8 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Languages, Wrench, Workflow } from "lucide-react";
-import type { CollaborationArea, MemberTool, ProfileSignal, SpokenLanguage } from "@/components/Profile/types";
+import { GraduationCap, Languages, Wrench } from "lucide-react";
+import type { MemberEducation, MemberTool, ProfileSignal, SpokenLanguage } from "@/components/Profile/types";
 import type { ProfileCopy } from "@/components/Profile/copy";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -19,7 +19,7 @@ const LANGUAGE_WIDTH: Record<SpokenLanguage["proficiency"], number> = {
 type ProfileSignalsProps = {
   languages: SpokenLanguage[];
   tools: MemberTool[];
-  collaborationAreas: CollaborationArea[];
+  education: MemberEducation[];
   signals: ProfileSignal[];
   copy: ProfileCopy;
   language: "en" | "fa";
@@ -34,7 +34,7 @@ function PanelLabel({ icon, children }: { icon: React.ReactNode; children: React
   );
 }
 
-export function ProfileSignals({ languages, tools, collaborationAreas, signals, copy, language }: ProfileSignalsProps) {
+export function ProfileSignals({ languages, tools, education, signals, copy, language }: ProfileSignalsProps) {
   const rootRef = useRef<HTMLElement>(null);
   const isRTL = language === "fa";
 
@@ -90,7 +90,7 @@ export function ProfileSignals({ languages, tools, collaborationAreas, signals, 
     }, rootRef);
 
     return () => ctx.revert();
-  }, [languages, tools, collaborationAreas, signals]);
+  }, [languages, tools, education, signals]);
 
   return (
     <section
@@ -162,16 +162,22 @@ export function ProfileSignals({ languages, tools, collaborationAreas, signals, 
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[1.35fr_.65fr]">
         <div className="signal-panel rounded-[22px] border border-white/[.08] bg-white/[.018] p-6 sm:p-7">
-          <PanelLabel icon={<Workflow size={15} strokeWidth={1.6} />}>{copy.signalsSection.collaboration}</PanelLabel>
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {collaborationAreas.map((area, index) => {
-              const name = isRTL && area.nameFa ? area.nameFa : area.name;
-              const description = isRTL && area.descriptionFa ? area.descriptionFa : area.description;
+          <PanelLabel icon={<GraduationCap size={15} strokeWidth={1.6} />}>{copy.signalsSection.education}</PanelLabel>
+          <div className="mt-6 space-y-3">
+            {education.map((item, index) => {
+              const institution = isRTL && item.institutionFa ? item.institutionFa : item.institution;
+              const degree = isRTL && item.degreeFa ? item.degreeFa : item.degree;
+              const field = isRTL && item.fieldFa ? item.fieldFa : item.field;
+              const period = isRTL && item.periodFa ? item.periodFa : item.period;
               return (
-                <article key={area.id} className="group rounded-[16px] border border-white/[.07] bg-black/10 p-4 transition-colors hover:border-[rgba(var(--accent-a),.25)]">
-                  <div className="font-mono text-[9px] tracking-[.16em] text-white/24">0{index + 1}</div>
-                  <h3 className="mt-4 text-[13px] font-medium text-white/78 transition-colors group-hover:text-white">{name}</h3>
-                  <p className="mt-2 text-[11px] leading-[1.7] text-white/38">{description}</p>
+                <article key={item.id} className="group rounded-[16px] border border-white/[.07] bg-black/10 p-4 transition-colors hover:border-[rgba(var(--accent-a),.25)]">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="font-mono text-[9px] tracking-[.16em] text-white/24">0{index + 1}</div>
+                    <span className="font-mono text-[9px] uppercase tracking-[.13em] text-[rgba(var(--accent-a),.7)]">{period}</span>
+                  </div>
+                  <h3 className="mt-4 text-[13px] font-medium text-white/78 transition-colors group-hover:text-white">{institution}</h3>
+                  <p className="mt-2 font-mono text-[10px] uppercase tracking-[.1em] text-white/48">{degree}</p>
+                  <p className="mt-1.5 text-[11px] leading-[1.7] text-white/38">{field}</p>
                 </article>
               );
             })}

@@ -11,7 +11,6 @@ export type ProfileCopy = {
     linkedin: string;
     phone: string;
     location: string;
-    message: string;
     resume: string;
     currentFocus: string;
   };
@@ -33,7 +32,7 @@ export type ProfileCopy = {
     subtitle: string;
     languages: string;
     tools: string;
-    collaboration: string;
+    education: string;
     personalSignals: string;
     proficiencyLabels: Record<"NATIVE" | "PROFESSIONAL" | "CONVERSATIONAL" | "BASIC", string>;
   };
@@ -84,7 +83,6 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
       linkedin: "LINKEDIN",
       phone: "CALL",
       location: "BASE",
-      message: "START A CONVERSATION",
       resume: "VIEW CV",
       currentFocus: "CURRENT FOCUS",
     },
@@ -107,11 +105,11 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
     },
     signalsSection: {
       eyebrow: "04 / WORKING SIGNAL",
-      title: "LANGUAGE & TOOLCHAIN",
-      subtitle: "The communication range, tools and collaboration modes behind the output.",
+      title: "LANGUAGE, TOOLCHAIN & EDUCATION",
+      subtitle: "The communication range, tools and academic background behind the output.",
       languages: "SPOKEN LANGUAGES",
       tools: "CORE TOOLCHAIN",
-      collaboration: "COLLABORATION AREAS",
+      education: "EDUCATION",
       personalSignals: "WORKING PROTOCOL",
       proficiencyLabels: {
         NATIVE: "NATIVE",
@@ -169,7 +167,6 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
       linkedin: "لینکدین",
       phone: "تماس",
       location: "محل",
-      message: "شروع گفتگو",
       resume: "مشاهده رزومه",
       currentFocus: "تمرکز فعلی",
     },
@@ -192,11 +189,11 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
     },
     signalsSection: {
       eyebrow: "۰۴ / سیگنال کاری",
-      title: "زبان‌ها و ابزارها",
-      subtitle: "زبان‌های گفتاری، ابزارها و شیوه‌های همکاری پشت خروجی نهایی.",
+      title: "زبان‌ها، ابزارها و تحصیلات",
+      subtitle: "زبان‌های گفتاری، ابزارها و سوابق تحصیلی پشت خروجی نهایی.",
       languages: "زبان‌های گفتاری",
       tools: "ابزارهای اصلی",
-      collaboration: "حوزه‌های همکاری",
+      education: "تحصیلات",
       personalSignals: "پروتکل کاری",
       proficiencyLabels: {
         NATIVE: "زبان مادری",

@@ -76,12 +76,16 @@ export type MemberTool = {
   category: string;
 };
 
-export type CollaborationArea = {
+export type MemberEducation = {
   id: number;
-  name: string;
-  nameFa?: string;
-  description: string;
-  descriptionFa?: string;
+  institution: string;
+  institutionFa?: string;
+  degree: string;
+  degreeFa?: string;
+  field: string;
+  fieldFa?: string;
+  period: string;
+  periodFa?: string;
 };
 
 export type ProfileSignal = {
@@ -136,7 +140,7 @@ export type MemberProfileData = {
   skills: MemberSkill[];
   languages: SpokenLanguage[];
   tools: MemberTool[];
-  collaborationAreas: CollaborationArea[];
+  education: MemberEducation[];
   signals: ProfileSignal[];
   projects: MemberProject[];
 };

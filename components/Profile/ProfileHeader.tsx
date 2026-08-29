@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import gsap from "gsap";
-import { ArrowUpRight, FileText, Globe, Mail, MapPin, Phone } from "lucide-react";
+import { FileText, Globe, MapPin, Phone } from "lucide-react";
 import { GithubMark, LinkedinMark } from "@/components/Profile/BrandIcons";
 import type { MemberProfileData } from "@/components/Profile/types";
 import { ProfileIdentityFrame } from "@/components/Profile/ProfileIdentityFrame";
@@ -227,14 +227,6 @@ export function ProfileHeader({ data, copy, language }: ProfileHeaderProps) {
         </div>
 
         <div data-hero-reveal className="mt-7 flex flex-wrap items-center gap-2.5 max-[760px]:justify-center">
-          <a
-            href={`mailto:${user.email}?subject=Project inquiry for ${encodeURIComponent(displayName)}`}
-            className="group inline-flex h-10 items-center gap-2 rounded-full border border-[rgba(var(--accent-a),.48)] bg-[rgba(var(--accent-a),.1)] px-4 font-mono text-[10px] uppercase tracking-[.14em] text-[rgba(var(--accent-a),.95)] outline-none transition-[transform,background-color,border-color] duration-300 hover:-translate-y-0.5 hover:border-[rgba(var(--accent-a),.75)] hover:bg-[rgba(var(--accent-a),.15)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-a),.28)]"
-          >
-            <Mail size={13} strokeWidth={1.75} />
-            {copy.contact.message}
-            <ArrowUpRight size={12} strokeWidth={1.75} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-          </a>
           {profile.resumeUrl ? (
             <MagneticLink href={profile.resumeUrl}>
               <FileText size={13} strokeWidth={1.75} />

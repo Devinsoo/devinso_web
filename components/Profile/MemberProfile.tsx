@@ -199,7 +199,7 @@ export function MemberProfile({ data, language = "en" }: MemberProfileProps) {
       <ProfileSignals
         languages={data.languages}
         tools={data.tools}
-        collaborationAreas={data.collaborationAreas}
+        education={data.education}
         signals={data.signals}
         copy={copy}
         language={language}
