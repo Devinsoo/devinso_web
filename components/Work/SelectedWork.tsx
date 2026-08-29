@@ -574,7 +574,11 @@ export function SelectedWork({ theme, language }: SelectedWorkProps) {
   };
 
   return (
-    <section ref={rootRef} id="work" className="relative isolate overflow-hidden px-5 pb-20 pt-8 sm:px-6 lg:px-10">
+    <section
+      ref={rootRef}
+      id="work"
+      className={`relative isolate overflow-hidden px-5 pb-20 pt-8 transition-colors duration-300 sm:px-6 lg:px-10 ${light ? "bg-[#f4f7fb] text-[#182235]" : "bg-[#050508] text-[#f2f0ec]"}`}
+    >
       {/* Soft cross-fade at the Hero → Work seam. The Work atmosphere starts transparent
           and reaches full strength over ~160px, so the section boundary never reads as a hard line. */}
       <div
