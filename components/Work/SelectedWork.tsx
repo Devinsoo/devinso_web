@@ -166,11 +166,11 @@ const ACCENTS = {
 function AutomationPreview({ light }: { light: boolean }) {
   return (
     <div className="absolute inset-[7%] overflow-hidden rounded-[24px]">
-      <div className={`absolute inset-0 rounded-[24px] border ${light ? "border-[#4f4180]/10 bg-[#f9f8ff]" : "border-white/[.08] bg-[#090810]"}`} />
+      <div className={`absolute inset-0 rounded-[24px] border ${light ? "border-[#4f4180]/10 bg-[#f0f2f7]" : "border-white/[.08] bg-[#090810]"}`} />
       <div className={`absolute inset-0 opacity-70 ${light ? "[background-image:linear-gradient(rgba(80,63,126,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(80,63,126,.06)_1px,transparent_1px)]" : "[background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)]"} [background-size:32px_32px]`} />
       <div className="absolute inset-[8%] grid grid-cols-2 gap-4">
         {["SOURCE", "ROUTER", "FILTER", "OUTPUT"].map((item, index) => (
-          <div key={item} className={`rounded-2xl border p-4 ${light ? "border-[#695c96]/10 bg-white/88" : "border-white/[.075] bg-[#12111a]/88"}`}>
+          <div key={item} className={`rounded-2xl border p-4 ${light ? "border-[#695c96]/10 bg-[#edf0f5]/90" : "border-white/[.075] bg-[#12111a]/88"}`}>
             <div className="flex items-center gap-2">
               <i className={`h-2 w-2 rounded-full ${index === 3 ? (light ? "bg-[#725bc2]" : "bg-[#a996ff] shadow-[0_0_12px_rgba(169,150,255,.55)]") : light ? "bg-[#6d5b9d]/25" : "bg-white/14"}`} />
               <span className={`text-[8px] font-[650] tracking-[.17em] ${light ? "text-[#433760]/55" : "text-white/45"}`}>{item}</span>
@@ -182,7 +182,7 @@ function AutomationPreview({ light }: { light: boolean }) {
           </div>
         ))}
       </div>
-      <div className={`absolute bottom-[7%] left-[7%] rounded-full border px-3 py-2 text-[8px] uppercase tracking-[.16em] ${light ? "border-[#695c96]/10 bg-white/75 text-[#433760]/40" : "border-white/[.07] bg-white/[.025] text-white/30"}`}>
+      <div className={`absolute bottom-[7%] left-[7%] rounded-full border px-3 py-2 text-[8px] uppercase tracking-[.16em] ${light ? "border-[#695c96]/10 bg-[#edf0f5]/90 text-[#433760]/40" : "border-white/[.07] bg-white/[.025] text-white/30"}`}>
         4 NODES / LIVE FLOW / READY
       </div>
     </div>
@@ -192,7 +192,7 @@ function AutomationPreview({ light }: { light: boolean }) {
 function IdentityPreview({ light }: { light: boolean }) {
   return (
     <div className="absolute inset-[7%] overflow-hidden rounded-[24px]">
-      <div className={`absolute inset-0 rounded-[24px] border ${light ? "border-[#34527c]/10 bg-[#f8fbff]" : "border-white/[.075] bg-[#080b10]"}`} />
+      <div className={`absolute inset-0 rounded-[24px] border ${light ? "border-[#34527c]/10 bg-[#eef3f8]" : "border-white/[.075] bg-[#080b10]"}`} />
       <div className={`absolute inset-0 ${light ? "[background-image:linear-gradient(rgba(54,82,124,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(54,82,124,.055)_1px,transparent_1px)]" : "[background-image:linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)]"} [background-size:46px_46px]`} />
       <div className="absolute inset-[9%] flex flex-col justify-between">
         <div className="flex items-center justify-between">
@@ -267,10 +267,10 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
     <article
       data-project-scene
       data-morph-mode={project.morph}
-      className={`group relative isolate mt-16 first:mt-0 rounded-[34px] border px-[clamp(18px,2vw,28px)] py-[clamp(18px,2vw,28px)] ${light ? "border-[#294368]/8 bg-white/[.52]" : "border-white/[.055] bg-white/[.018]"}`}
+      className={`group relative isolate mt-16 first:mt-0 rounded-[34px] border px-[clamp(18px,2vw,28px)] py-[clamp(18px,2vw,28px)] ${light ? "border-[#294368]/10 bg-[#e5ecf4]/[.82]" : "border-white/[.055] bg-white/[.018]"}`}
       style={{ boxShadow: `0 32px 120px ${accent.soft}` }}
     >
-      <div className={`pointer-events-none absolute inset-0 rounded-[34px] ${light ? "bg-[linear-gradient(180deg,rgba(255,255,255,.55),rgba(244,248,252,.68))]" : "bg-[linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.012))]"}`} />
+      <div className={`pointer-events-none absolute inset-0 rounded-[34px] ${light ? "bg-[linear-gradient(180deg,rgba(255,255,255,.34),rgba(225,233,242,.72))]" : "bg-[linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.012))]"}`} />
       <div className="relative z-[1]">
         <div className={`mb-5 flex items-center justify-between gap-4 ${rtl ? "text-right" : "text-left"}`}>
           <div>
@@ -296,7 +296,7 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
           <div className={`${isStacked ? "order-1" : mediaFirst ? "lg:order-1" : "lg:order-2"}`}>
             <div
               data-project-visual
-              className={`relative aspect-[16/9] overflow-hidden rounded-[28px] border ${light ? "border-[#294368]/10 bg-[#f5f8fc]" : "border-white/[.08] bg-[#06080d]"}`}
+              className={`relative aspect-[16/9] overflow-hidden rounded-[28px] border ${light ? "border-[#294368]/10 bg-[#edf2f7]" : "border-white/[.08] bg-[#06080d]"}`}
             >
               <div className="absolute inset-0 opacity-70" style={{ background: accent.wash }} />
               <div className={`absolute inset-0 ${light ? "[background-image:linear-gradient(rgba(38,63,99,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(38,63,99,.05)_1px,transparent_1px)]" : "[background-image:linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)]"} [background-size:36px_36px]`} />
@@ -360,7 +360,7 @@ function SceneText({ project, theme, language }: { project: WorkProject; theme: 
 function InfoBox({ label, value, theme, accent }: { label: string; value: string; theme: DevinsoTheme; accent: string }) {
   const light = theme === "light";
   return (
-    <div data-project-detail className={`rounded-2xl border p-4 ${light ? "border-[#294368]/10 bg-white/75" : "border-white/[.065] bg-white/[.02]"}`}>
+    <div data-project-detail className={`rounded-2xl border p-4 ${light ? "border-[#294368]/10 bg-[#eef3f8]/[.86]" : "border-white/[.065] bg-white/[.02]"}`}>
       <div className={`text-[8px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/28"}`}>{label}</div>
       <div className={`mt-3 text-[13px] leading-6 ${light ? "text-[#17263d]" : "text-white/84"}`}>{value}</div>
       <div className="mt-4 h-px w-full" style={{ background: `linear-gradient(90deg, ${accent}33, transparent)` }} />
@@ -577,7 +577,7 @@ export function SelectedWork({ theme, language }: SelectedWorkProps) {
     <section
       ref={rootRef}
       id="work"
-      className={`relative isolate overflow-hidden px-5 pb-20 pt-8 transition-colors duration-300 sm:px-6 lg:px-10 ${light ? "bg-[#f4f7fb] text-[#182235]" : "bg-[#050508] text-[#f2f0ec]"}`}
+      className={`relative isolate overflow-hidden px-5 pb-20 pt-8 transition-colors duration-300 sm:px-6 lg:px-10 ${light ? "bg-[#e8eef5] text-[#182235]" : "bg-[#050508] text-[#f2f0ec]"}`}
     >
       {/* Soft cross-fade at the Hero → Work seam. The Work atmosphere starts transparent
           and reaches full strength over ~160px, so the section boundary never reads as a hard line. */}

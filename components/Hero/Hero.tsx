@@ -67,7 +67,7 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en" }: HeroProp
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
-    document.body.style.backgroundColor = theme === "light" ? "#f4f7fb" : "#050508";
+    document.body.style.backgroundColor = theme === "light" ? "#e8eef5" : "#050508";
     document.body.style.color = theme === "light" ? "#182235" : "#f2f0ec";
 
     return () => {
