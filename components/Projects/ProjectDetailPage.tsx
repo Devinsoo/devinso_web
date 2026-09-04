@@ -152,7 +152,7 @@ function typeLabel(type: ProjectType, language: DevinsoLanguage) {
 
 function MetaItem({ label, value, icon, light }: { label: string; value: string; icon: ReactNode; light: boolean }) {
   return (
-    <div className={`rounded-2xl border p-4 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}>
+    <div className={`project-interactive-card rounded-2xl border p-4 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}>
       <div className="flex items-center gap-2">{icon}<dt className={`font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>{label}</dt></div>
       <dd className={`mt-3 text-[12px] leading-6 ${light ? "text-[#17263d]/80" : "text-white/72"}`}>{value}</dd>
     </div>
@@ -160,9 +160,17 @@ function MetaItem({ label, value, icon, light }: { label: string; value: string;
 }
 
 function ProjectLinkCard({ href, label, unavailable, icon, accent, light }: { href: string | null; label: string; unavailable: string; icon: ReactNode; accent: string; light: boolean }) {
-  const className = `group relative flex min-h-[148px] items-end justify-between overflow-hidden rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`;
+  const className = `project-interactive-card group relative flex min-h-[148px] items-end justify-between overflow-hidden rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`;
   const content = <><div className="absolute right-5 top-5 opacity-55">{icon}</div><div><span className={`font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/36" : "text-white/28"}`}>{href ? "URL / AVAILABLE" : "URL / NULL"}</span><strong className={`mt-3 block text-[14px] font-medium ${href ? "" : light ? "text-[#17263d]/38" : "text-white/34"}`}>{href ? label : unavailable}</strong></div>{href && <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={1.4} />}<i className="absolute bottom-0 left-0 h-[2px] w-1/3 transition-[width] duration-500 group-hover:w-full" style={{ backgroundColor: accent }} /></>;
   return href ? <a href={href} target="_blank" rel="noreferrer" className={className}>{content}</a> : <div className={className}>{content}</div>;
+}
+
+function SectionAtmosphere({ accent, light }: { accent: string; light: boolean }) {
+  return <>
+    <div className={`pointer-events-none absolute inset-0 opacity-70 [background-size:42px_42px] ${light ? "[background-image:linear-gradient(rgba(41,67,104,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(41,67,104,.055)_1px,transparent_1px)]" : "[background-image:linear-gradient(rgba(255,255,255,.032)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.032)_1px,transparent_1px)]"}`} />
+    <div className="case-section-glow pointer-events-none absolute -right-[12%] -top-[42%] h-[78%] w-[54%] rounded-full blur-3xl" style={{ background: `radial-gradient(circle, ${accent}28 0%, transparent 68%)` }} />
+    <div className="pointer-events-none absolute bottom-[-34%] left-[8%] h-[58%] w-[42%] rounded-full blur-3xl" style={{ background: `radial-gradient(circle, ${accent}12 0%, transparent 70%)` }} />
+  </>;
 }
 
 function ProjectContent({ blocks, language, light, accent }: { blocks: ProjectContentBlock[]; language: DevinsoLanguage; light: boolean; accent: string }) {
@@ -232,15 +240,15 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
     const ctx = gsap.context(() => {
       gsap.fromTo("[data-project-intro]", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .76, stagger: .055, ease: "power2.out" });
       gsap.utils.toArray<HTMLElement>("[data-project-reveal]").forEach((element) => {
-        const timeline = gsap.timeline({ scrollTrigger: { trigger: element, start: "top 88%", end: "top 48%", scrub: 0.65, invalidateOnRefresh: true } });
-        timeline.fromTo(element, { opacity: 0, y: 34 }, { opacity: 1, y: 0, ease: "power3.out", duration: 0.8 });
+        const timeline = gsap.timeline({ scrollTrigger: { trigger: element, start: "top 92%", end: "top 30%", scrub: 1.1, invalidateOnRefresh: true } });
+        timeline.fromTo(element, { opacity: 0, y: 42 }, { opacity: 1, y: 0, ease: "power3.out", duration: 1.15 });
         const items = element.querySelectorAll<HTMLElement>("[data-project-item]");
         if (items.length) {
-          timeline.fromTo(items, { opacity: 0, y: 22 }, { opacity: 1, y: 0, ease: "power2.out", duration: 0.65, stagger: 0.12 }, "<0.18");
+          timeline.fromTo(items, { opacity: 0, y: 28 }, { opacity: 1, y: 0, ease: "power2.out", duration: 0.9, stagger: 0.2 }, "<0.3");
         }
         const nestedItems = element.querySelectorAll<HTMLElement>("[data-project-item] > div, [data-project-item] > article, [data-project-item] > a");
         if (nestedItems.length) {
-          timeline.fromTo(nestedItems, { opacity: 0, y: 16, scale: 0.985 }, { opacity: 1, y: 0, scale: 1, ease: "power2.out", duration: 0.55, stagger: 0.09 }, "<0.2");
+          timeline.fromTo(nestedItems, { opacity: 0, y: 20, scale: 0.975 }, { opacity: 1, y: 0, scale: 1, ease: "power2.out", duration: 0.8, stagger: 0.16 }, "<0.32");
         }
       });
     }, rootRef);
@@ -293,8 +301,9 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
           </div>
         </section>
 
-        <section data-project-reveal className={`border-y ${light ? "border-[#294368]/12 bg-[#e6edf5]/60" : "border-white/[.075] bg-[#0a0d15]/88"}`}>
-          <div className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
+        <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#294368]/12 bg-[#e6edf5]/60" : "border-white/[.075] bg-[#0a0d15]/88"}`}>
+          <SectionAtmosphere accent={project.accent} light={light} />
+          <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
           <div data-project-item><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>01 / ABOUT</span></div>
           <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
             <h2 data-project-item className="text-[clamp(32px,5vw,68px)] font-[560] leading-[.95] tracking-[-.055em]">{copy.about}</h2>
@@ -309,8 +318,9 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
           </div>
         </section>
 
-        <section data-project-reveal className={`border-b ${light ? "border-[#294368]/10 bg-[#f8fafc]/72" : "border-white/[.055] bg-[#070910]/72"}`}>
-          <div className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
+        <section data-project-reveal className={`relative overflow-hidden border-b ${light ? "border-[#294368]/10 bg-[#f8fafc]/72" : "border-white/[.055] bg-[#070910]/72"}`}>
+          <SectionAtmosphere accent={project.accent} light={light} />
+          <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
           <aside data-project-item className="self-start lg:sticky lg:top-[112px]"><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>02 / CONTENT</span><div className={`mt-5 rounded-[18px] border p-4 ${light ? "border-[#294368]/10 bg-white/50" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-end justify-between gap-3"><strong className="text-3xl font-[560] tracking-[-.06em]">{String(project.content.length).padStart(2, "0")}</strong><span className={`font-mono text-[7px] uppercase tracking-[.15em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>BLOCKS</span></div><div className={`mt-4 h-px ${light ? "bg-[#294368]/10" : "bg-white/[.08]"}`} /><div className={`mt-3 font-mono text-[7px] uppercase leading-6 tracking-[.12em] ${light ? "text-[#294368]/40" : "text-white/28"}`}>TEXT / IMAGE / MEDIA</div></div></aside>
           <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
             <h2 data-project-item className="text-[clamp(32px,5vw,68px)] font-[560] leading-[.95] tracking-[-.055em]">{copy.fullDescription}</h2>
@@ -319,26 +329,29 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
           </div>
         </section>
 
-        <section data-project-reveal className={`border-y ${light ? "border-[#294368]/10 bg-white/28" : "border-white/[.07] bg-white/[.012]"}`}>
-          <div className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-12 py-[clamp(72px,9vw,126px)] lg:grid-cols-[.72fr_1.28fr]">
+        <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#294368]/10 bg-white/28" : "border-white/[.07] bg-white/[.012]"}`}>
+          <SectionAtmosphere accent={project.accent} light={light} />
+          <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-12 py-[clamp(72px,9vw,126px)] lg:grid-cols-[.72fr_1.28fr]">
             <div data-project-item className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>03 / STACK</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.techStack}</h2></div>
-            <div data-project-item className="grid content-start gap-3 sm:grid-cols-2">{project.techStack.map((technology, index) => <div key={technology} className={`flex min-h-[82px] items-center justify-between rounded-2xl border px-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}><span className="text-[13px] font-medium">{technology}</span><span className="font-mono text-[8px]" style={{ color: project.accent }}>0{index + 1}</span></div>)}</div>
+            <div data-project-item className="grid content-start gap-3 sm:grid-cols-2">{project.techStack.map((technology, index) => <div key={technology} className={`project-interactive-card flex min-h-[82px] items-center justify-between rounded-2xl border px-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}><span className="text-[13px] font-medium">{technology}</span><span className="font-mono text-[8px]" style={{ color: project.accent }}>0{index + 1}</span></div>)}</div>
           </div>
         </section>
 
-        <section data-project-reveal className={`border-y ${light ? "border-[#294368]/10 bg-[#edf2f7]/72" : "border-white/[.06] bg-[#0b0d13]/72"}`}>
-          <div className="mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(90px,11vw,150px)]">
+        <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#294368]/10 bg-[#edf2f7]/72" : "border-white/[.06] bg-[#0b0d13]/72"}`}>
+          <SectionAtmosphere accent={project.accent} light={light} />
+          <div className="relative z-10 mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(90px,11vw,150px)]">
             <div data-project-item className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>04 / URLS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.links}</h2></div>
             <div data-project-item className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /></div>
           </div>
         </section>
 
-        <section data-project-reveal className={`border-y ${light ? "border-[#294368]/10 bg-white/28" : "border-white/[.07] bg-white/[.012]"}`}>
-          <div className="mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(80px,10vw,140px)]">
+        <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#294368]/10 bg-white/28" : "border-white/[.07] bg-white/[.012]"}`}>
+          <SectionAtmosphere accent={project.accent} light={light} />
+          <div className="relative z-10 mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(80px,10vw,140px)]">
             <div data-project-item className={`flex flex-col justify-between gap-5 border-b pb-7 md:flex-row md:items-end ${light ? "border-[#294368]/10" : "border-white/[.08]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>05 / MEMBERS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.team}</h2></div><p className={`max-w-[44ch] text-[13px] leading-7 ${light ? "text-[#243b59]/55" : "text-white/45"}`}>{copy.teamIntro}</p></div>
             <div data-project-item className="mt-7 grid gap-4 md:grid-cols-2">{project.members.map((member) => {
               const initials = member.fullName.split(" ").map((part) => part[0]).join("").slice(0, 2);
-              return <article key={member.id} className={`rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-start gap-4"><div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${project.accent}55`, backgroundColor: `${project.accent}18`, color: project.accent }}>{member.avatar ? <Image src={member.avatar} alt={member.fullName} width={56} height={56} className="h-full w-full object-cover" /> : initials}</div><div className={rtl ? "text-right [direction:rtl]" : "text-left"}><h3 className="text-[16px] font-[560]">{member.fullName}</h3><p className="mt-1 text-[10px] uppercase tracking-[.12em]" style={{ color: project.accent }}>{member.role}</p></div></div>{member.description && <p className={`mt-6 text-[12px] leading-7 ${light ? "text-[#243b59]/58" : "text-white/48"} ${rtl ? "text-right [direction:rtl]" : ""}`}>{member.description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></article>;
+              return <article key={member.id} className={`project-interactive-card rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-start gap-4"><div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${project.accent}55`, backgroundColor: `${project.accent}18`, color: project.accent }}>{member.avatar ? <Image src={member.avatar} alt={member.fullName} width={56} height={56} className="h-full w-full object-cover" /> : initials}</div><div className={rtl ? "text-right [direction:rtl]" : "text-left"}><h3 className="text-[16px] font-[560]">{member.fullName}</h3><p className="mt-1 text-[10px] uppercase tracking-[.12em]" style={{ color: project.accent }}>{member.role}</p></div></div>{member.description && <p className={`mt-6 text-[12px] leading-7 ${light ? "text-[#243b59]/58" : "text-white/48"} ${rtl ? "text-right [direction:rtl]" : ""}`}>{member.description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></article>;
             })}</div>
           </div>
         </section>

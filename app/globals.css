@@ -17,6 +17,20 @@ body {
   animation: case-orbit 16s linear infinite;
 }
 
+.case-section-glow {
+  animation: case-section-glow 9s ease-in-out infinite alternate;
+}
+
+.project-interactive-card {
+  transition: transform .65s cubic-bezier(.22, 1, .36, 1), border-color .45s ease, box-shadow .65s cubic-bezier(.22, 1, .36, 1), background-color .45s ease;
+}
+
+.project-interactive-card:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--project-accent) 58%, transparent);
+  box-shadow: 0 22px 58px color-mix(in srgb, var(--project-accent) 13%, transparent);
+}
+
 @keyframes case-flow {
   0%, 100% { opacity: .28; transform: scaleX(.76); }
   50% { opacity: 1; transform: scaleX(1); }
@@ -26,13 +40,28 @@ body {
   to { transform: rotate(360deg); }
 }
 
+@keyframes case-section-glow {
+  0% { transform: translate3d(-3%, -2%, 0) scale(.92); opacity: .42; }
+  100% { transform: translate3d(4%, 5%, 0) scale(1.08); opacity: .78; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
   .case-flow-line,
-  .case-orbit {
+  .case-orbit,
+  .case-section-glow {
     animation: none !important;
+  }
+
+  .project-interactive-card {
+    transition: none;
+  }
+
+  .project-interactive-card:hover {
+    transform: none;
+    box-shadow: none;
   }
 }
