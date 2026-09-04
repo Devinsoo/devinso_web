@@ -232,8 +232,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
     const ctx = gsap.context(() => {
       gsap.fromTo("[data-project-intro]", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .76, stagger: .055, ease: "power2.out" });
       gsap.utils.toArray<HTMLElement>("[data-project-reveal]").forEach((element) => {
-        const reveal = gsap.fromTo(element, { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: .78, paused: true, ease: "power3.out" });
-        ScrollTrigger.create({ trigger: element, start: "top 88%", onEnter: () => reveal.restart(), onEnterBack: () => reveal.restart(), onLeaveBack: () => reveal.reverse() });
+        gsap.fromTo(element, { opacity: 0, y: 34 }, { opacity: 1, y: 0, ease: "power3.out", scrollTrigger: { trigger: element, start: "top 88%", end: "top 58%", scrub: 0.7, invalidateOnRefresh: true } });
       });
     }, rootRef);
     return () => ctx.revert();
@@ -285,7 +284,8 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
           </div>
         </section>
 
-        <section data-project-reveal className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
+        <section data-project-reveal className={`border-y ${light ? "border-[#294368]/12 bg-[#e6edf5]/60" : "border-white/[.075] bg-[#0a0d15]/88"}`}>
+          <div className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
           <div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>01 / ABOUT</span></div>
           <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
             <h2 className="text-[clamp(32px,5vw,68px)] font-[560] leading-[.95] tracking-[-.055em]">{copy.about}</h2>
@@ -297,13 +297,16 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
               <MetaItem label={copy.updatedAt} value={formatDate(project.updatedAt, language)} icon={<CalendarDays className="h-3.5 w-3.5" strokeWidth={1.5} />} light={light} />
             </dl>
           </div>
+          </div>
         </section>
 
-        <section data-project-reveal className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
+        <section data-project-reveal className={`border-b ${light ? "border-[#294368]/10 bg-[#f8fafc]/72" : "border-white/[.055] bg-[#070910]/72"}`}>
+          <div className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
           <aside className="self-start lg:sticky lg:top-[112px]"><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>02 / CONTENT</span><div className={`mt-5 rounded-[18px] border p-4 ${light ? "border-[#294368]/10 bg-white/50" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-end justify-between gap-3"><strong className="text-3xl font-[560] tracking-[-.06em]">{String(project.content.length).padStart(2, "0")}</strong><span className={`font-mono text-[7px] uppercase tracking-[.15em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>BLOCKS</span></div><div className={`mt-4 h-px ${light ? "bg-[#294368]/10" : "bg-white/[.08]"}`} /><div className={`mt-3 font-mono text-[7px] uppercase leading-6 tracking-[.12em] ${light ? "text-[#294368]/40" : "text-white/28"}`}>TEXT / IMAGE / MEDIA</div></div></aside>
           <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
             <h2 className="text-[clamp(32px,5vw,68px)] font-[560] leading-[.95] tracking-[-.055em]">{copy.fullDescription}</h2>
             <div className="mt-9"><ProjectContent blocks={project.content} language={language} light={light} accent={project.accent} /></div>
+          </div>
           </div>
         </section>
 
@@ -314,9 +317,11 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
           </div>
         </section>
 
-        <section data-project-reveal className="mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(90px,11vw,150px)]">
-          <div className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>04 / URLS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.links}</h2></div>
-          <div className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /></div>
+        <section data-project-reveal className={`border-y ${light ? "border-[#294368]/10 bg-[#edf2f7]/72" : "border-white/[.06] bg-[#0b0d13]/72"}`}>
+          <div className="mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(90px,11vw,150px)]">
+            <div className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>04 / URLS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.links}</h2></div>
+            <div className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /></div>
+          </div>
         </section>
 
         <section data-project-reveal className={`border-y ${light ? "border-[#294368]/10 bg-white/28" : "border-white/[.07] bg-white/[.012]"}`}>

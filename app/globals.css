@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 92px;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
 .case-flow-line {
   animation: case-flow 3.4s ease-in-out infinite;
 }
@@ -18,6 +27,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .case-flow-line,
   .case-orbit {
     animation: none !important;
