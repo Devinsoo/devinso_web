@@ -21,6 +21,11 @@ body {
   animation: case-section-sweep 11s ease-in-out infinite alternate;
 }
 
+.case-section-sweep-content { animation-duration: 13s; animation-delay: -2.5s; }
+.case-section-sweep-stack { animation-duration: 9s; animation-delay: -1s; }
+.case-section-sweep-links { animation-duration: 15s; animation-delay: -5s; }
+.case-section-sweep-members { animation-duration: 12s; animation-delay: -7s; }
+
 .project-interactive-card {
   transition: transform .65s cubic-bezier(.22, 1, .36, 1), border-color .45s ease, box-shadow .65s cubic-bezier(.22, 1, .36, 1), background-color .45s ease;
 }
