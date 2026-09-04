@@ -167,8 +167,9 @@ function ProjectLinkCard({ href, label, unavailable, icon, accent, light }: { hr
 
 function SectionAtmosphere({ accent, light }: { accent: string; light: boolean }) {
   return <>
-    <div className="case-section-glow pointer-events-none absolute -right-[12%] -top-[42%] h-[78%] w-[54%] rounded-full blur-3xl" style={{ background: `radial-gradient(circle, ${accent}${light ? "26" : "32"} 0%, transparent 68%)` }} />
-    <div className="pointer-events-none absolute bottom-[-34%] left-[8%] h-[58%] w-[42%] rounded-full blur-3xl" style={{ background: `radial-gradient(circle, ${accent}${light ? "0f" : "18"} 0%, transparent 70%)` }} />
+    <div className="case-section-sweep pointer-events-none absolute -right-[8%] top-[-30%] h-[160%] w-[48%] rotate-[15deg] opacity-80" style={{ background: `linear-gradient(135deg, transparent 0%, ${accent}${light ? "18" : "24"} 48%, transparent 70%)`, clipPath: "polygon(24% 0,100% 0,76% 100%,0 100%)" }} />
+    <div className="pointer-events-none absolute left-[12%] top-[18%] h-px w-[34%] rotate-[-14deg]" style={{ background: `linear-gradient(90deg, transparent, ${accent}${light ? "55" : "88"}, transparent)` }} />
+    <div className="pointer-events-none absolute bottom-[12%] right-[16%] h-24 w-24 rotate-45 border" style={{ borderColor: `${accent}${light ? "2a" : "42"}` }} />
   </>;
 }
 
@@ -231,17 +232,21 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
 
   useLayoutEffect(() => {
     if (!rootRef.current) return;
+    const introItems = rootRef.current.querySelectorAll<HTMLElement>("[data-project-intro]");
+    const revealItems = rootRef.current.querySelectorAll<HTMLElement>("[data-project-reveal] [data-project-item]");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
-      gsap.set(rootRef.current.querySelectorAll("[data-project-intro], [data-project-reveal]"), { opacity: 1, y: 0 });
+      gsap.set(rootRef.current.querySelectorAll("[data-project-intro], [data-project-reveal], [data-project-item]"), { autoAlpha: 1, y: 0 });
       return;
     }
+    gsap.set(introItems, { autoAlpha: 0, y: 18 });
+    gsap.set(revealItems, { autoAlpha: 0, y: 34 });
     const ctx = gsap.context(() => {
-      gsap.fromTo("[data-project-intro]", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .76, stagger: .055, ease: "power2.out" });
+      gsap.fromTo("[data-project-intro]", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .9, stagger: .08, immediateRender: false, ease: "power2.out" });
       gsap.utils.toArray<HTMLElement>("[data-project-reveal]").forEach((element) => {
         const items = element.querySelectorAll<HTMLElement>("[data-project-item]");
         if (!items.length) return;
-        const reveal = gsap.fromTo(items, { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 1.15, stagger: 0.18, paused: true, ease: "power3.out" });
+        const reveal = gsap.fromTo(items, { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 1.15, stagger: 0.18, paused: true, immediateRender: false, ease: "power3.out" });
         ScrollTrigger.create({
           trigger: element,
           start: "top 82%",
@@ -268,6 +273,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
 
   return (
     <main ref={rootRef} className={`relative min-h-screen overflow-hidden transition-colors duration-500 ${light ? "bg-[#f4efe7] text-[#1c1a1b]" : "bg-[#101114] text-[#f1ede7]"}`} style={{ "--project-accent": project.accent } as CSSProperties}>
+      <div aria-hidden className={`project-backdrop-grid pointer-events-none fixed inset-0 z-0 ${light ? "opacity-[.52] [background-image:linear-gradient(rgba(74,61,53,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(74,61,53,.055)_1px,transparent_1px)]" : "opacity-[.62] [background-image:linear-gradient(rgba(255,255,255,.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.028)_1px,transparent_1px)]"} [background-size:48px_48px]`} />
       <div className="pointer-events-none absolute -right-[20vw] top-[-18vw] h-[58vw] w-[58vw] rounded-full blur-3xl" style={{ backgroundColor: project.accentSoft }} />
 
       <header className={`sticky top-0 z-50 border-b backdrop-blur-2xl ${light ? "border-[#3b3430]/14 bg-[#f4efe7]/88" : "border-white/[.08] bg-[#101114]/88"}`}>

@@ -17,8 +17,8 @@ body {
   animation: case-orbit 16s linear infinite;
 }
 
-.case-section-glow {
-  animation: case-section-glow 9s ease-in-out infinite alternate;
+.case-section-sweep {
+  animation: case-section-sweep 11s ease-in-out infinite alternate;
 }
 
 .project-interactive-card {
@@ -40,9 +40,9 @@ body {
   to { transform: rotate(360deg); }
 }
 
-@keyframes case-section-glow {
-  0% { transform: translate3d(-3%, -2%, 0) scale(.92); opacity: .42; }
-  100% { transform: translate3d(4%, 5%, 0) scale(1.08); opacity: .78; }
+@keyframes case-section-sweep {
+  0% { transform: translate3d(-3%, -2%, 0) rotate(15deg) scale(.94); opacity: .45; }
+  100% { transform: translate3d(4%, 4%, 0) rotate(19deg) scale(1.06); opacity: .82; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -52,7 +52,7 @@ body {
 
   .case-flow-line,
   .case-orbit,
-  .case-section-glow {
+  .case-section-sweep {
     animation: none !important;
   }
 
