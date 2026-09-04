@@ -172,34 +172,34 @@ function SectionAtmosphere({ accent, light, variant }: { accent: string; light: 
   if (variant === "about") {
     return <>
       <div className={`case-section-sweep case-section-sweep-${variant} pointer-events-none absolute -right-[8%] top-[-30%] h-[160%] w-[48%] rotate-[15deg] opacity-80`} style={{ background: `linear-gradient(135deg, transparent 0%, ${accent}${faint} 48%, transparent 70%)`, clipPath: "polygon(24% 0,100% 0,76% 100%,0 100%)" }} />
-      <div className="pointer-events-none absolute left-[12%] top-[18%] h-px w-[34%] rotate-[-14deg]" style={{ background: `linear-gradient(90deg, transparent, ${accent}${strong}, transparent)` }} />
+      <div className="case-shape-line pointer-events-none absolute left-[12%] top-[18%] h-px w-[34%] rotate-[-14deg]" style={{ background: `linear-gradient(90deg, transparent, ${accent}${strong}, transparent)` }} />
     </>;
   }
 
   if (variant === "content") {
     return <>
       <div className={`case-section-sweep case-section-sweep-${variant} pointer-events-none absolute -left-[14%] top-[8%] h-[76%] w-[58%] -rotate-[9deg] opacity-70`} style={{ background: `linear-gradient(90deg, transparent, ${accent}${faint}, transparent 76%)`, clipPath: "polygon(0 18%,100% 0,78% 82%,0 100%)" }} />
-      <div className="pointer-events-none absolute right-[12%] top-[22%] h-32 w-32 border-b border-r rotate-[-18deg]" style={{ borderColor: `${accent}${strong}` }} />
+      <div className="case-shape-frame pointer-events-none absolute right-[12%] top-[22%] h-32 w-32 border-b border-r rotate-[-18deg]" style={{ borderColor: `${accent}${strong}` }} />
     </>;
   }
 
   if (variant === "stack") {
     return <>
       <div className={`case-section-sweep case-section-sweep-${variant} pointer-events-none absolute right-[8%] top-[-18%] h-[138%] w-[28%] rotate-[24deg] opacity-75`} style={{ background: `linear-gradient(180deg, transparent, ${accent}${faint}, transparent)`, clipPath: "polygon(34% 0,100% 0,66% 100%,0 100%)" }} />
-      <div className="pointer-events-none absolute bottom-[16%] left-[12%] h-20 w-20 border" style={{ borderColor: `${accent}${strong}` }} />
+      <div className="case-shape-block pointer-events-none absolute bottom-[16%] left-[12%] h-20 w-20 border" style={{ borderColor: `${accent}${strong}` }} />
     </>;
   }
 
   if (variant === "links") {
     return <>
       <div className={`case-section-sweep case-section-sweep-${variant} pointer-events-none absolute left-[18%] top-[-36%] h-[170%] w-[22%] rotate-[48deg] opacity-65`} style={{ background: `linear-gradient(180deg, transparent, ${accent}${faint}, transparent)`, clipPath: "polygon(44% 0,100% 0,56% 100%,0 100%)" }} />
-      <div className="pointer-events-none absolute bottom-[18%] right-[12%] h-28 w-28 rounded-full border" style={{ borderColor: `${accent}${strong}` }} />
+      <div className="case-shape-ring pointer-events-none absolute bottom-[18%] right-[12%] h-28 w-28 rounded-full border" style={{ borderColor: `${accent}${strong}` }} />
     </>;
   }
 
   return <>
     <div className={`case-section-sweep case-section-sweep-${variant} pointer-events-none absolute -right-[10%] top-[5%] h-[120%] w-[44%] -rotate-[28deg] opacity-65`} style={{ background: `linear-gradient(135deg, transparent, ${accent}${faint}, transparent 72%)`, clipPath: "polygon(28% 0,100% 14%,72% 100%,0 86%)" }} />
-    <div className="pointer-events-none absolute left-[10%] bottom-[20%] h-24 w-24 rotate-45 border" style={{ borderColor: `${accent}${strong}` }} />
+    <div className="case-shape-frame pointer-events-none absolute left-[10%] bottom-[20%] h-24 w-24 rotate-45 border" style={{ borderColor: `${accent}${strong}` }} />
   </>;
 }
 

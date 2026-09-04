@@ -26,6 +26,19 @@ body {
 .case-section-sweep-links { animation-duration: 15s; animation-delay: -5s; }
 .case-section-sweep-members { animation-duration: 12s; animation-delay: -7s; }
 
+.case-shape-frame,
+.case-shape-ring,
+.case-shape-block,
+.case-shape-line {
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.case-shape-frame { animation: case-shape-frame 12s cubic-bezier(.45, 0, .25, 1) infinite alternate; }
+.case-shape-ring { animation: case-shape-ring 8s ease-in-out infinite; }
+.case-shape-block { animation: case-shape-block 10s cubic-bezier(.45, 0, .25, 1) infinite alternate; }
+.case-shape-line { animation: case-shape-line 6s ease-in-out infinite; }
+
 .project-interactive-card {
   transition: transform .65s cubic-bezier(.22, 1, .36, 1), border-color .45s ease, box-shadow .65s cubic-bezier(.22, 1, .36, 1), background-color .45s ease;
 }
@@ -50,6 +63,27 @@ body {
   100% { transform: translate3d(4%, 4%, 0) rotate(19deg) scale(1.06); opacity: .82; }
 }
 
+@keyframes case-shape-frame {
+  0% { transform: translate3d(0, 5px, 0) rotate(42deg) scale(.92); opacity: .42; }
+  50% { opacity: .75; }
+  100% { transform: translate3d(-9px, -7px, 0) rotate(50deg) scale(1.04); opacity: .9; }
+}
+
+@keyframes case-shape-ring {
+  0%, 100% { transform: scale(.9); opacity: .34; }
+  50% { transform: scale(1.12); opacity: .82; }
+}
+
+@keyframes case-shape-block {
+  0% { transform: translate3d(3px, 7px, 0) rotate(0deg); opacity: .38; }
+  100% { transform: translate3d(-8px, -5px, 0) rotate(8deg); opacity: .8; }
+}
+
+@keyframes case-shape-line {
+  0%, 100% { transform: translateX(-8%) scaleX(.72); opacity: .25; }
+  50% { transform: translateX(8%) scaleX(1); opacity: .76; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -57,7 +91,11 @@ body {
 
   .case-flow-line,
   .case-orbit,
-  .case-section-sweep {
+  .case-section-sweep,
+  .case-shape-frame,
+  .case-shape-ring,
+  .case-shape-block,
+  .case-shape-line {
     animation: none !important;
   }
 
