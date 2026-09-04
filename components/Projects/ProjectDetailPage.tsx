@@ -165,11 +165,41 @@ function ProjectLinkCard({ href, label, unavailable, icon, accent, light }: { hr
   return href ? <a href={href} target="_blank" rel="noreferrer" className={className}>{content}</a> : <div className={className}>{content}</div>;
 }
 
-function SectionAtmosphere({ accent, light }: { accent: string; light: boolean }) {
+function SectionAtmosphere({ accent, light, variant }: { accent: string; light: boolean; variant: "about" | "content" | "stack" | "links" | "members" }) {
+  const faint = light ? "18" : "28";
+  const strong = light ? "42" : "72";
+
+  if (variant === "about") {
+    return <>
+      <div className="case-section-sweep pointer-events-none absolute -right-[8%] top-[-30%] h-[160%] w-[48%] rotate-[15deg] opacity-80" style={{ background: `linear-gradient(135deg, transparent 0%, ${accent}${faint} 48%, transparent 70%)`, clipPath: "polygon(24% 0,100% 0,76% 100%,0 100%)" }} />
+      <div className="pointer-events-none absolute left-[12%] top-[18%] h-px w-[34%] rotate-[-14deg]" style={{ background: `linear-gradient(90deg, transparent, ${accent}${strong}, transparent)` }} />
+    </>;
+  }
+
+  if (variant === "content") {
+    return <>
+      <div className="case-section-sweep pointer-events-none absolute -left-[14%] top-[8%] h-[76%] w-[58%] -rotate-[9deg] opacity-70" style={{ background: `linear-gradient(90deg, transparent, ${accent}${faint}, transparent 76%)`, clipPath: "polygon(0 18%,100% 0,78% 82%,0 100%)" }} />
+      <div className="pointer-events-none absolute right-[12%] top-[22%] h-32 w-32 border-b border-r rotate-[-18deg]" style={{ borderColor: `${accent}${strong}` }} />
+    </>;
+  }
+
+  if (variant === "stack") {
+    return <>
+      <div className="case-section-sweep pointer-events-none absolute right-[8%] top-[-18%] h-[138%] w-[28%] rotate-[24deg] opacity-75" style={{ background: `linear-gradient(180deg, transparent, ${accent}${faint}, transparent)`, clipPath: "polygon(34% 0,100% 0,66% 100%,0 100%)" }} />
+      <div className="pointer-events-none absolute bottom-[16%] left-[12%] h-20 w-20 border" style={{ borderColor: `${accent}${strong}` }} />
+    </>;
+  }
+
+  if (variant === "links") {
+    return <>
+      <div className="case-section-sweep pointer-events-none absolute left-[18%] top-[-36%] h-[170%] w-[22%] rotate-[48deg] opacity-65" style={{ background: `linear-gradient(180deg, transparent, ${accent}${faint}, transparent)`, clipPath: "polygon(44% 0,100% 0,56% 100%,0 100%)" }} />
+      <div className="pointer-events-none absolute bottom-[18%] right-[12%] h-28 w-28 rounded-full border" style={{ borderColor: `${accent}${strong}` }} />
+    </>;
+  }
+
   return <>
-    <div className="case-section-sweep pointer-events-none absolute -right-[8%] top-[-30%] h-[160%] w-[48%] rotate-[15deg] opacity-80" style={{ background: `linear-gradient(135deg, transparent 0%, ${accent}${light ? "18" : "24"} 48%, transparent 70%)`, clipPath: "polygon(24% 0,100% 0,76% 100%,0 100%)" }} />
-    <div className="pointer-events-none absolute left-[12%] top-[18%] h-px w-[34%] rotate-[-14deg]" style={{ background: `linear-gradient(90deg, transparent, ${accent}${light ? "55" : "88"}, transparent)` }} />
-    <div className="pointer-events-none absolute bottom-[12%] right-[16%] h-24 w-24 rotate-45 border" style={{ borderColor: `${accent}${light ? "2a" : "42"}` }} />
+    <div className="case-section-sweep pointer-events-none absolute -right-[10%] top-[5%] h-[120%] w-[44%] -rotate-[28deg] opacity-65" style={{ background: `linear-gradient(135deg, transparent, ${accent}${faint}, transparent 72%)`, clipPath: "polygon(28% 0,100% 14%,72% 100%,0 86%)" }} />
+    <div className="pointer-events-none absolute left-[10%] bottom-[20%] h-24 w-24 rotate-45 border" style={{ borderColor: `${accent}${strong}` }} />
   </>;
 }
 
@@ -307,7 +337,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/16 bg-[#fff9ef]/92" : "border-white/[.09] bg-[#19181a]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} />
+          <SectionAtmosphere accent={project.accent} light={light} variant="about" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
           <div data-project-item><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>01 / ABOUT</span></div>
           <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
@@ -324,7 +354,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-b ${light ? "border-[#4a3d35]/14 bg-[#eee8df]/86" : "border-white/[.07] bg-[#121315]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} />
+          <SectionAtmosphere accent={project.accent} light={light} variant="content" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
           <aside data-project-item className="self-start lg:sticky lg:top-[112px]"><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>02 / CONTENT</span><div className={`mt-5 rounded-[18px] border p-4 ${light ? "border-[#294368]/10 bg-white/50" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-end justify-between gap-3"><strong className="text-3xl font-[560] tracking-[-.06em]">{String(project.content.length).padStart(2, "0")}</strong><span className={`font-mono text-[7px] uppercase tracking-[.15em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>BLOCKS</span></div><div className={`mt-4 h-px ${light ? "bg-[#294368]/10" : "bg-white/[.08]"}`} /><div className={`mt-3 font-mono text-[7px] uppercase leading-6 tracking-[.12em] ${light ? "text-[#294368]/40" : "text-white/28"}`}>TEXT / IMAGE / MEDIA</div></div></aside>
           <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
@@ -335,7 +365,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#e3dbd1]/66" : "border-white/[.08] bg-[#202125]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} />
+          <SectionAtmosphere accent={project.accent} light={light} variant="stack" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-12 py-[clamp(72px,9vw,126px)] lg:grid-cols-[.72fr_1.28fr]">
             <div data-project-item className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>03 / STACK</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.techStack}</h2></div>
             <div data-project-item className="grid content-start gap-3 sm:grid-cols-2">{project.techStack.map((technology, index) => <div key={technology} className={`project-interactive-card flex min-h-[82px] items-center justify-between rounded-2xl border px-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}><span className="text-[13px] font-medium">{technology}</span><span className="font-mono text-[8px]" style={{ color: project.accent }}>0{index + 1}</span></div>)}</div>
@@ -343,7 +373,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#f9f3eb]/92" : "border-white/[.08] bg-[#1a191c]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} />
+          <SectionAtmosphere accent={project.accent} light={light} variant="links" />
           <div className="relative z-10 mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(90px,11vw,150px)]">
             <div data-project-item className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>04 / URLS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.links}</h2></div>
             <div data-project-item className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /></div>
@@ -351,7 +381,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#dfd7ce]/64" : "border-white/[.08] bg-[#111214]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} />
+          <SectionAtmosphere accent={project.accent} light={light} variant="members" />
           <div className="relative z-10 mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(80px,10vw,140px)]">
             <div data-project-item className={`flex flex-col justify-between gap-5 border-b pb-7 md:flex-row md:items-end ${light ? "border-[#294368]/10" : "border-white/[.08]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>05 / MEMBERS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.team}</h2></div><p className={`max-w-[44ch] text-[13px] leading-7 ${light ? "text-[#243b59]/55" : "text-white/45"}`}>{copy.teamIntro}</p></div>
             <div data-project-item className="mt-7 grid gap-4 md:grid-cols-2">{project.members.map((member) => {
