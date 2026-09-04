@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import type { ProjectDetail, ProjectStatus, ProjectType } from "@/lib/project-details";
+import type { ProjectContentBlock, ProjectDetail, ProjectStatus, ProjectType } from "@/lib/project-details";
 import {
   DEVINSO_COOKIE,
   setCookie,
@@ -32,6 +32,10 @@ const COPY = {
     page: "PROJECT DETAIL",
     back: "BACK TO WORK",
     about: "ABOUT THE PROJECT",
+    fullDescription: "FULL PROJECT DESCRIPTION",
+    contentEmpty: "PROJECT CONTENT WILL APPEAR HERE",
+    videoPlaceholder: "VIDEO / MEDIA BLOCK",
+    embedPlaceholder: "EMBED / INTERACTIVE BLOCK",
     techStack: "TECH STACK",
     links: "PROJECT LINKS",
     liveProject: "LIVE PROJECT",
@@ -57,6 +61,10 @@ const COPY = {
     page: "جزئیات پروژه",
     back: "بازگشت به پروژه‌ها",
     about: "درباره پروژه",
+    fullDescription: "توضیحات کامل پروژه",
+    contentEmpty: "محتوای پروژه اینجا نمایش داده می‌شود",
+    videoPlaceholder: "ویدئو / بلوک رسانه",
+    embedPlaceholder: "امبد / بلوک تعاملی",
     techStack: "تکنولوژی‌ها",
     links: "لینک‌های پروژه",
     liveProject: "مشاهده پروژه",
@@ -157,6 +165,40 @@ function ProjectLinkCard({ href, label, unavailable, icon, accent, light }: { hr
   return href ? <a href={href} target="_blank" rel="noreferrer" className={className}>{content}</a> : <div className={className}>{content}</div>;
 }
 
+function ProjectContent({ blocks, language, light, accent }: { blocks: ProjectContentBlock[]; language: DevinsoLanguage; light: boolean; accent: string }) {
+  const copy = COPY[language];
+  const rtl = language === "fa";
+  const text = (en: string, fa: string) => language === "fa" ? fa : en;
+
+  if (!blocks.length) {
+    return <div className={`rounded-[22px] border border-dashed p-8 text-center font-mono text-[9px] uppercase tracking-[.16em] ${light ? "border-[#294368]/20 text-[#294368]/40" : "border-white/[.12] text-white/30"}`}>{copy.contentEmpty}</div>;
+  }
+
+  return <div className="space-y-10">
+    {blocks.map((block, index) => {
+      if (block.type === "heading") {
+        return <h3 key={`${block.type}-${index}`} className={`max-w-[18ch] text-[clamp(25px,3.8vw,48px)] font-[560] leading-[.95] tracking-[-.05em] ${rtl ? "text-right [direction:rtl]" : "text-left"}`}>{text(block.text, block.textFa)}</h3>;
+      }
+      if (block.type === "paragraph") {
+        return <p key={`${block.type}-${index}`} className={`max-w-[68ch] text-[clamp(14px,1.35vw,18px)] leading-[1.95] ${light ? "text-[#243b59]/64" : "text-white/55"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}>{text(block.text, block.textFa)}</p>;
+      }
+      if (block.type === "image") {
+        return <figure key={`${block.type}-${index}`} className={`overflow-hidden rounded-[24px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><div className="relative aspect-[16/9] overflow-hidden"><Image src={block.src} alt={language === "fa" ? block.altFa : block.alt} fill sizes="(max-width: 900px) 100vw, 900px" className="object-cover transition-transform duration-700 hover:scale-[1.02]" /></div>{(block.caption || block.captionFa) && <figcaption className={`border-t px-5 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}>{text(block.caption ?? "", block.captionFa ?? block.caption ?? "")}</figcaption>}</figure>;
+      }
+      if (block.type === "gallery") {
+        return <div key={`${block.type}-${index}`} className={`grid gap-4 ${block.images.length > 1 ? "sm:grid-cols-2" : ""}`}>{block.images.map((image, imageIndex) => <figure key={`${image.src}-${imageIndex}`} className={`overflow-hidden rounded-[20px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><div className="relative aspect-[4/3] overflow-hidden"><Image src={image.src} alt={language === "fa" ? image.altFa : image.alt} fill sizes="(max-width: 900px) 100vw, 600px" className="object-cover transition-transform duration-700 hover:scale-[1.02]" /></div>{(image.caption || image.captionFa) && <figcaption className={`border-t px-4 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}>{text(image.caption ?? "", image.captionFa ?? image.caption ?? "")}</figcaption>}</figure>)}</div>;
+      }
+      if (block.type === "quote") {
+        return <blockquote key={`${block.type}-${index}`} className={`relative overflow-hidden rounded-[22px] border p-[clamp(24px,4vw,42px)] ${light ? "border-[#294368]/10 bg-white/52" : "border-white/[.07] bg-white/[.018]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><i className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: accent }} /><p className="max-w-[48ch] text-[clamp(20px,2.7vw,34px)] font-[520] leading-[1.12] tracking-[-.035em]">“{text(block.text, block.textFa)}”</p>{(block.byline || block.bylineFa) && <cite className={`mt-6 block font-mono text-[8px] uppercase tracking-[.17em] not-italic ${light ? "text-[#294368]/40" : "text-white/30"}`}>{text(block.byline ?? "", block.bylineFa ?? block.byline ?? "")}</cite>}</blockquote>;
+      }
+      if (block.type === "video") {
+        return block.src ? <figure key={`${block.type}-${index}`} className={`overflow-hidden rounded-[24px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><video src={block.src} poster={block.poster} controls className="aspect-video w-full object-cover" />{(block.caption || block.captionFa) && <figcaption className={`border-t px-5 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"}`}>{text(block.caption ?? "", block.captionFa ?? block.caption ?? "")}</figcaption>}</figure> : <div key={`${block.type}-${index}`} className={`grid min-h-[220px] place-items-center rounded-[24px] border border-dashed font-mono text-[9px] uppercase tracking-[.16em] ${light ? "border-[#294368]/20 text-[#294368]/40" : "border-white/[.12] text-white/30"}`}>{copy.videoPlaceholder}</div>;
+      }
+      return block.url ? <a key={`${block.type}-${index}`} href={block.url} target="_blank" rel="noreferrer" className={`flex min-h-[110px] items-center justify-between rounded-[22px] border px-5 transition-transform hover:-translate-y-1 ${light ? "border-[#294368]/10 bg-white/52" : "border-white/[.07] bg-white/[.018]"}`}><span className="text-[13px] font-medium">{text(block.label, block.labelFa)}</span><ArrowUpRight className="h-5 w-5" strokeWidth={1.4} /></a> : <div key={`${block.type}-${index}`} className={`grid min-h-[110px] place-items-center rounded-[22px] border border-dashed font-mono text-[9px] uppercase tracking-[.16em] ${light ? "border-[#294368]/20 text-[#294368]/40" : "border-white/[.12] text-white/30"}`}>{copy.embedPlaceholder}</div>;
+    })}
+  </div>;
+}
+
 type ProjectDetailPageProps = {
   project: ProjectDetail;
   nextProject: ProjectDetail;
@@ -243,7 +285,15 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-reveal className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
-          <div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>01 / DESCRIPTION</span></div>
+          <div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>01 / CONTENT</span></div>
+          <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
+            <h2 className="text-[clamp(32px,5vw,68px)] font-[560] leading-[.95] tracking-[-.055em]">{copy.fullDescription}</h2>
+            <div className="mt-9"><ProjectContent blocks={project.content} language={language} light={light} accent={project.accent} /></div>
+          </div>
+        </section>
+
+        <section data-project-reveal className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
+          <div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>02 / RECORD</span></div>
           <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
             <h2 className="text-[clamp(32px,5vw,68px)] font-[560] leading-[.95] tracking-[-.055em]">{copy.about}</h2>
             <p className={`mt-8 max-w-[65ch] text-[clamp(15px,1.5vw,19px)] leading-[1.9] ${light ? "text-[#243b59]/64" : "text-white/55"}`}>{language === "fa" ? project.descriptionFa : project.description}</p>
@@ -258,19 +308,19 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
 
         <section data-project-reveal className={`border-y ${light ? "border-[#294368]/10 bg-white/28" : "border-white/[.07] bg-white/[.012]"}`}>
           <div className="mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-12 py-[clamp(72px,9vw,126px)] lg:grid-cols-[.72fr_1.28fr]">
-            <div className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>02 / STACK</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.techStack}</h2></div>
+            <div className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>03 / STACK</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.techStack}</h2></div>
             <div className="grid content-start gap-3 sm:grid-cols-2">{project.techStack.map((technology, index) => <div key={technology} className={`flex min-h-[82px] items-center justify-between rounded-2xl border px-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}><span className="text-[13px] font-medium">{technology}</span><span className="font-mono text-[8px]" style={{ color: project.accent }}>0{index + 1}</span></div>)}</div>
           </div>
         </section>
 
         <section data-project-reveal className="mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(90px,11vw,150px)]">
-          <div className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>03 / URLS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.links}</h2></div>
+          <div className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>04 / URLS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.links}</h2></div>
           <div className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /></div>
         </section>
 
         <section data-project-reveal className={`border-y ${light ? "border-[#294368]/10 bg-white/28" : "border-white/[.07] bg-white/[.012]"}`}>
           <div className="mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(80px,10vw,140px)]">
-            <div className={`flex flex-col justify-between gap-5 border-b pb-7 md:flex-row md:items-end ${light ? "border-[#294368]/10" : "border-white/[.08]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>04 / MEMBERS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.team}</h2></div><p className={`max-w-[44ch] text-[13px] leading-7 ${light ? "text-[#243b59]/55" : "text-white/45"}`}>{copy.teamIntro}</p></div>
+            <div className={`flex flex-col justify-between gap-5 border-b pb-7 md:flex-row md:items-end ${light ? "border-[#294368]/10" : "border-white/[.08]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>05 / MEMBERS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.team}</h2></div><p className={`max-w-[44ch] text-[13px] leading-7 ${light ? "text-[#243b59]/55" : "text-white/45"}`}>{copy.teamIntro}</p></div>
             <div className="mt-7 grid gap-4 md:grid-cols-2">{project.members.map((member) => {
               const initials = member.fullName.split(" ").map((part) => part[0]).join("").slice(0, 2);
               return <article key={member.id} className={`rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-start gap-4"><div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${project.accent}55`, backgroundColor: `${project.accent}18`, color: project.accent }}>{member.avatar ? <Image src={member.avatar} alt={member.fullName} width={56} height={56} className="h-full w-full object-cover" /> : initials}</div><div className={rtl ? "text-right [direction:rtl]" : "text-left"}><h3 className="text-[16px] font-[560]">{member.fullName}</h3><p className="mt-1 text-[10px] uppercase tracking-[.12em]" style={{ color: project.accent }}>{member.role}</p></div></div>{member.description && <p className={`mt-6 text-[12px] leading-7 ${light ? "text-[#243b59]/58" : "text-white/48"} ${rtl ? "text-right [direction:rtl]" : ""}`}>{member.description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></article>;
