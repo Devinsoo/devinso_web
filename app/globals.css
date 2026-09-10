@@ -58,6 +58,15 @@ body {
   box-shadow: 0 22px 58px color-mix(in srgb, var(--project-accent) 13%, transparent);
 }
 
+/* Home roster cards share the projects-page glass system. */
+.member-card {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+a.member-card:hover {
+  backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+}
+
 /* Glass reads only against a translucent fill, so keep the surface light. */
 .project-glass-header {
   backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));

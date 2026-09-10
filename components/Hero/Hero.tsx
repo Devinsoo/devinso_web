@@ -8,6 +8,7 @@ import { HeroIntro } from "@/components/Hero/ui/HeroIntro";
 import { HeroFooter } from "@/components/Hero/ui/HeroFooter";
 import { ConstructionStage } from "@/components/Hero/ui/ConstructionStage";
 import { SelectedWork } from "@/components/Work/SelectedWork";
+import { MembersSection } from "@/components/Members/MembersSection";
 import { CONSTRUCTION_SETTINGS, GRID_LINES } from "@/components/Hero/construction";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -863,6 +864,8 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en" }: HeroProp
       </section>
 
       <SelectedWork theme={theme} language={language} />
+
+      <MembersSection theme={theme} language={language} />
     </>
   );
 }
