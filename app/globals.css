@@ -39,14 +39,28 @@ body {
 .case-shape-block { animation: case-shape-block 10s cubic-bezier(.45, 0, .25, 1) infinite alternate; }
 .case-shape-line { animation: case-shape-line 6s ease-in-out infinite; }
 
+/* Glass surfaces. Tune the whole projects page from these two values. */
+:root {
+  --glass-blur: 13px;
+  --glass-blur-strong: 20px;
+  --glass-saturate: 165%;
+}
+
 .project-interactive-card {
-  transition: transform .65s cubic-bezier(.22, 1, .36, 1), border-color .45s ease, box-shadow .65s cubic-bezier(.22, 1, .36, 1), background-color .45s ease;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  transition: transform .65s cubic-bezier(.22, 1, .36, 1), border-color .45s ease, box-shadow .65s cubic-bezier(.22, 1, .36, 1), background-color .45s ease, backdrop-filter .45s ease;
 }
 
 .project-interactive-card:hover {
   transform: translateY(-6px);
+  backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
   border-color: color-mix(in srgb, var(--project-accent) 58%, transparent);
   box-shadow: 0 22px 58px color-mix(in srgb, var(--project-accent) 13%, transparent);
+}
+
+/* Glass reads only against a translucent fill, so keep the surface light. */
+.project-glass-header {
+  backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
 }
 
 @keyframes case-flow {

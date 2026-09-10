@@ -300,10 +300,26 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
   useLayoutEffect(() => {
     if (!rootRef.current) return;
     const introItems = rootRef.current.querySelectorAll<HTMLElement>("[data-project-intro]");
-    const revealItems = rootRef.current.querySelectorAll<HTMLElement>("[data-project-reveal] [data-project-item]");
+    // An ancestor with opacity < 1 forms a backdrop root, which blanks out the
+    // backdrop-filter on any glass card inside it until the tween lands. So fade
+    // the cards themselves rather than their wrapper, and keep the original
+    // rhythm by staggering on the wrapper index instead of the element index.
+    const revealTargets = (scope: ParentNode, selector: string) => {
+      const targets: HTMLElement[] = [];
+      const groupOf = new Map<HTMLElement, number>();
+      Array.from(scope.querySelectorAll<HTMLElement>(selector)).forEach((item, groupIndex) => {
+        const cards = Array.from(item.querySelectorAll<HTMLElement>(".project-interactive-card"));
+        (cards.length ? cards : [item]).forEach((node) => {
+          targets.push(node);
+          groupOf.set(node, groupIndex);
+        });
+      });
+      return { targets, groupOf };
+    };
+    const revealItems = revealTargets(rootRef.current, "[data-project-reveal] [data-project-item]").targets;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
-      gsap.set(rootRef.current.querySelectorAll("[data-project-intro], [data-project-reveal], [data-project-item]"), { autoAlpha: 1, y: 0 });
+      gsap.set(rootRef.current.querySelectorAll("[data-project-intro], [data-project-reveal], [data-project-item], .project-interactive-card"), { autoAlpha: 1, y: 0 });
       return;
     }
     gsap.set(introItems, { autoAlpha: 0, y: 18 });
@@ -311,9 +327,9 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
     const ctx = gsap.context(() => {
       gsap.fromTo("[data-project-intro]", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: .9, stagger: .08, immediateRender: false, ease: "power2.out" });
       gsap.utils.toArray<HTMLElement>("[data-project-reveal]").forEach((element) => {
-        const items = element.querySelectorAll<HTMLElement>("[data-project-item]");
+        const { targets: items, groupOf } = revealTargets(element, "[data-project-item]");
         if (!items.length) return;
-        const reveal = gsap.fromTo(items, { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 1.15, stagger: 0.18, paused: true, immediateRender: false, ease: "power3.out" });
+        const reveal = gsap.fromTo(items, { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 1.15, stagger: (_index, target: HTMLElement) => (groupOf.get(target) ?? 0) * 0.18, paused: true, immediateRender: false, ease: "power3.out" });
         ScrollTrigger.create({
           trigger: element,
           start: "top 82%",
@@ -343,7 +359,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
       <div aria-hidden className={`project-backdrop-grid pointer-events-none fixed inset-0 z-0 ${light ? "opacity-[.52] [background-image:linear-gradient(rgba(74,61,53,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(74,61,53,.055)_1px,transparent_1px)]" : "opacity-[.62] [background-image:linear-gradient(rgba(255,255,255,.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.028)_1px,transparent_1px)]"} [background-size:48px_48px]`} />
       <div className="pointer-events-none absolute -right-[20vw] top-[-18vw] h-[58vw] w-[58vw] rounded-full blur-3xl" style={{ backgroundColor: project.accentSoft }} />
 
-      <header className={`sticky top-0 z-50 border-b backdrop-blur-2xl ${light ? "border-[#3b3430]/14 bg-[#f4efe7]/88" : "border-white/[.08] bg-[#101114]/88"}`}>
+      <header className={`project-glass-header sticky top-0 z-50 border-b ${light ? "border-[#3b3430]/14 bg-[#f4efe7]/62" : "border-white/[.08] bg-[#101114]/58"}`}>
         <div className="mx-auto flex h-[74px] w-[min(1440px,calc(100%_-_clamp(28px,6vw,96px)))] items-center justify-between gap-4">
           <Link href="/" className="inline-flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[.17em]"><i className="h-[7px] w-[7px] rounded-full" style={{ backgroundColor: project.accent, boxShadow: `0 0 18px ${project.accent}` }} /><span>DEVINSO</span><span className={`hidden font-mono text-[8px] font-normal sm:inline ${light ? "text-[#294368]/38" : "text-white/25"}`}>{copy.page} / {String(project.id).padStart(2, "0")}</span></Link>
           <div className="flex items-center gap-2">
