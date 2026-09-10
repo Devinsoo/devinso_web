@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLayoutEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -16,6 +17,7 @@ type MorphMode = "expand" | "split" | "depth";
 
 type WorkProject = {
   id: string;
+  slug: string;
   number: string;
   title: string;
   titleFa: string;
@@ -38,6 +40,7 @@ type WorkProject = {
 const PROJECTS: WorkProject[] = [
   {
     id: "dark-zero-returns",
+    slug: "allixro-red-profile",
     number: "01",
     title: "ALLIXRO / RED PROFILE",
     titleFa: "الیکسرو / پروفایل قرمز",
@@ -59,6 +62,7 @@ const PROJECTS: WorkProject[] = [
   },
   {
     id: "automation-platform",
+    slug: "automation-platform",
     number: "02",
     title: "AUTOMATION PLATFORM",
     titleFa: "پلتفرم اتوماسیون",
@@ -79,6 +83,7 @@ const PROJECTS: WorkProject[] = [
   },
   {
     id: "identity-system",
+    slug: "identity-system",
     number: "03",
     title: "IDENTITY SYSTEM",
     titleFa: "سیستم هویت",
@@ -111,7 +116,6 @@ const COPY = {
     year: "YEAR",
     morph: "MORPH",
     viewCase: "VIEW CASE",
-    viewAll: "VIEW ALL PROJECTS",
     signal: "CURATED / RECENT / TEAM",
     coverSpec: "COVER SPEC / 1920 × 1080 / 16:9",
     mode: {
@@ -131,7 +135,6 @@ const COPY = {
     year: "سال",
     morph: "مورف",
     viewCase: "مشاهده پروژه",
-    viewAll: "مشاهده همه پروژه‌ها",
     signal: "منتخب / جدید / تیمی",
     coverSpec: "استاندارد کاور / 1920 × 1080 / 16:9",
     mode: {
@@ -270,7 +273,14 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
       className={`group relative isolate mt-16 first:mt-0 rounded-[34px] border px-[clamp(18px,2vw,28px)] py-[clamp(18px,2vw,28px)] ${light ? "border-[#294368]/10 bg-[#e5ecf4]/[.82]" : "border-white/[.055] bg-white/[.018]"}`}
       style={{ boxShadow: `0 32px 120px ${accent.soft}` }}
     >
-      <div className={`pointer-events-none absolute inset-0 rounded-[34px] ${light ? "bg-[linear-gradient(180deg,rgba(255,255,255,.34),rgba(225,233,242,.72))]" : "bg-[linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.012))]"}`} />
+      <div className={`pointer-events-none absolute inset-0 rounded-[34px] ${light ? "bg-[linear-gradient(180deg,rgba(255,255,255,.55),rgba(244,248,252,.68))]" : "bg-[linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.012))]"}`} />
+      <Link
+        href={`/projects/${project.slug}`}
+        aria-label={`${copy.viewCase}: ${language === "fa" ? project.titleFa : project.title}`}
+        className="absolute inset-0 z-20 rounded-[34px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8be7ff]"
+      >ژ
+        <span className="sr-only">{copy.viewCase}</span>
+      </Link>
       <div className="relative z-[1]">
         <div className={`mb-5 flex items-center justify-between gap-4 ${rtl ? "text-right" : "text-left"}`}>
           <div>
@@ -344,10 +354,10 @@ function SceneText({ project, theme, language }: { project: WorkProject; theme: 
         <InfoBox label={copy.year} value={project.year} theme={theme} accent={accent.strong} />
       </div>
       <div data-project-detail className="flex flex-wrap items-center gap-3 pt-1">
-        <a href="#" className={`inline-flex min-h-[46px] items-center gap-2 rounded-full border px-5 text-[11px] font-[650] uppercase tracking-[.16em] transition-transform duration-300 hover:-translate-y-0.5 ${light ? "border-[#294368]/12 bg-white text-[#17263d]" : "border-white/[.085] bg-white/[.03] text-white/88"}`}>
+        <span className={`inline-flex min-h-[46px] items-center gap-2 rounded-full border px-5 text-[11px] font-[650] uppercase tracking-[.16em] transition-transform duration-300 group-hover:-translate-y-0.5 ${light ? "border-[#294368]/12 bg-white text-[#17263d]" : "border-white/[.085] bg-white/[.03] text-white/88"}`}>
           {copy.viewCase}
           <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden="true"><path d="M2.2 9.8 9.6 2.4M4 2.4h5.6V8" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </a>
+        </span>
         <div className={`inline-flex items-center gap-2 text-[9px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/30"}`}>
           <i className="h-2 w-2 rounded-full" style={{ backgroundColor: accent.strong, boxShadow: `0 0 16px ${accent.strong}` }} />
           {copy.signal}
@@ -664,6 +674,7 @@ export function SelectedWork({ theme, language }: SelectedWorkProps) {
             <ProjectScene key={project.id} project={project} theme={theme} language={language} index={index} />
           ))}
         </div>
+
       </div>
     </section>
   );

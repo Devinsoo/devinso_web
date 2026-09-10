@@ -1,1 +1,124 @@
 @import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 92px;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
+.case-flow-line {
+  animation: case-flow 3.4s ease-in-out infinite;
+}
+
+.case-orbit {
+  animation: case-orbit 16s linear infinite;
+}
+
+.case-section-sweep {
+  animation: case-section-sweep 11s ease-in-out infinite alternate;
+}
+
+.case-section-sweep-content { animation-duration: 13s; animation-delay: -2.5s; }
+.case-section-sweep-stack { animation-duration: 9s; animation-delay: -1s; }
+.case-section-sweep-links { animation-duration: 15s; animation-delay: -5s; }
+.case-section-sweep-members { animation-duration: 12s; animation-delay: -7s; }
+
+.case-shape-frame,
+.case-shape-ring,
+.case-shape-block,
+.case-shape-line {
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.case-shape-frame { animation: case-shape-frame 12s cubic-bezier(.45, 0, .25, 1) infinite alternate; }
+.case-shape-ring { animation: case-shape-ring 8s ease-in-out infinite; }
+.case-shape-block { animation: case-shape-block 10s cubic-bezier(.45, 0, .25, 1) infinite alternate; }
+.case-shape-line { animation: case-shape-line 6s ease-in-out infinite; }
+
+/* Glass surfaces. Tune the whole projects page from these two values. */
+:root {
+  --glass-blur: 13px;
+  --glass-blur-strong: 20px;
+  --glass-saturate: 165%;
+}
+
+.project-interactive-card {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  transition: transform .65s cubic-bezier(.22, 1, .36, 1), border-color .45s ease, box-shadow .65s cubic-bezier(.22, 1, .36, 1), background-color .45s ease, backdrop-filter .45s ease;
+}
+
+.project-interactive-card:hover {
+  transform: translateY(-6px);
+  backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+  border-color: color-mix(in srgb, var(--project-accent) 58%, transparent);
+  box-shadow: 0 22px 58px color-mix(in srgb, var(--project-accent) 13%, transparent);
+}
+
+/* Glass reads only against a translucent fill, so keep the surface light. */
+.project-glass-header {
+  backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+}
+
+@keyframes case-flow {
+  0%, 100% { opacity: .28; transform: scaleX(.76); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes case-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes case-section-sweep {
+  0% { transform: translate3d(-3%, -2%, 0) rotate(15deg) scale(.94); opacity: .45; }
+  100% { transform: translate3d(4%, 4%, 0) rotate(19deg) scale(1.06); opacity: .82; }
+}
+
+@keyframes case-shape-frame {
+  0% { transform: translate3d(0, 5px, 0) rotate(42deg) scale(.92); opacity: .42; }
+  50% { opacity: .75; }
+  100% { transform: translate3d(-9px, -7px, 0) rotate(50deg) scale(1.04); opacity: .9; }
+}
+
+@keyframes case-shape-ring {
+  0%, 100% { transform: scale(.9); opacity: .34; }
+  50% { transform: scale(1.12); opacity: .82; }
+}
+
+@keyframes case-shape-block {
+  0% { transform: translate3d(3px, 7px, 0) rotate(0deg); opacity: .38; }
+  100% { transform: translate3d(-8px, -5px, 0) rotate(8deg); opacity: .8; }
+}
+
+@keyframes case-shape-line {
+  0%, 100% { transform: translateX(-8%) scaleX(.72); opacity: .25; }
+  50% { transform: translateX(8%) scaleX(1); opacity: .76; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .case-flow-line,
+  .case-orbit,
+  .case-section-sweep,
+  .case-shape-frame,
+  .case-shape-ring,
+  .case-shape-block,
+  .case-shape-line {
+    animation: none !important;
+  }
+
+  .project-interactive-card {
+    transition: none;
+  }
+
+  .project-interactive-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
