@@ -1,6 +1,12 @@
 export type ProjectType = "PERSONAL" | "TEAM";
 export type ProjectStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 export type ProjectPreviewKind = "allixro" | "automation" | "identity";
+export type ProjectMemberRole =
+  | "LEAD"
+  | "DEVELOPER"
+  | "DESIGNER"
+  | "STRATEGY"
+  | "CONTRIBUTOR";
 
 export type ProjectContentBlock =
   | { type: "heading"; text: string; textFa: string }
@@ -14,6 +20,9 @@ export type ProjectContentBlock =
 export type ProjectMember = {
   id: number;
   fullName: string;
+  /** Structured role used for the badge on the member card. */
+  roleType: ProjectMemberRole;
+  /** Free-text job title shown under the member name. */
   role: string;
   description: string | null;
   avatar: string | null;
@@ -50,6 +59,7 @@ export type ProjectDetail = {
 const ARMAN: ProjectMember = {
   id: 1,
   fullName: "Arman Kian",
+  roleType: "LEAD",
   role: "Creative Full-Stack Engineer",
   description: "Product architecture, interaction development, and implementation.",
   avatar: null,
@@ -139,7 +149,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     status: "PUBLISHED",
     createdBy: { id: 1, fullName: "Arman Kian" },
     members: [
-      { ...ARMAN, role: "System Design + Development" },
+      { ...ARMAN, roleType: "DEVELOPER", role: "System Design + Development" },
     ],
     createdAt: "2026-02-06",
     updatedAt: "2026-08-18",
@@ -179,7 +189,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     status: "PUBLISHED",
     createdBy: { id: 1, fullName: "Arman Kian" },
     members: [
-      { ...ARMAN, role: "Identity + Creative Development" },
+      { ...ARMAN, roleType: "DESIGNER", role: "Identity + Creative Development" },
     ],
     createdAt: "2026-03-12",
     updatedAt: "2026-08-22",

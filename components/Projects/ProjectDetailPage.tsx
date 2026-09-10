@@ -17,7 +17,13 @@ import {
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import type { ProjectContentBlock, ProjectDetail, ProjectStatus, ProjectType } from "@/lib/project-details";
+import type {
+  ProjectContentBlock,
+  ProjectDetail,
+  ProjectMemberRole,
+  ProjectStatus,
+  ProjectType,
+} from "@/lib/project-details";
 import {
   DEVINSO_COOKIE,
   setCookie,
@@ -43,6 +49,13 @@ const COPY = {
     unavailable: "NOT PUBLISHED YET",
     team: "PROJECT MEMBERS",
     teamIntro: "People attached to this project and the role each member owns.",
+    roles: {
+      LEAD: "PROJECT LEAD",
+      DEVELOPER: "DEVELOPER",
+      DESIGNER: "DESIGNER",
+      STRATEGY: "STRATEGY",
+      CONTRIBUTOR: "CONTRIBUTOR",
+    },
     createdBy: "CREATED BY",
     type: "PROJECT TYPE",
     status: "STATUS",
@@ -72,6 +85,13 @@ const COPY = {
     unavailable: "هنوز منتشر نشده",
     team: "اعضای پروژه",
     teamIntro: "افرادی که در این پروژه حضور دارند و مسئولیت هر عضو.",
+    roles: {
+      LEAD: "سرپرست پروژه",
+      DEVELOPER: "توسعه‌دهنده",
+      DESIGNER: "طراح",
+      STRATEGY: "استراتژی",
+      CONTRIBUTOR: "همکار",
+    },
     createdBy: "ایجادکننده",
     type: "نوع پروژه",
     status: "وضعیت",
@@ -156,6 +176,23 @@ function MetaItem({ label, value, icon, light }: { label: string; value: string;
       <div className="flex items-center gap-2">{icon}<dt className={`font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>{label}</dt></div>
       <dd className={`mt-3 text-[12px] leading-6 ${light ? "text-[#17263d]/80" : "text-white/72"}`}>{value}</dd>
     </div>
+  );
+}
+
+function MemberRoleBadge({ roleType, label, accent, light }: { roleType: ProjectMemberRole; label: string; accent: string; light: boolean }) {
+  const lead = roleType === "LEAD";
+  const style: CSSProperties | undefined = lead
+    ? { borderColor: `${accent}66`, backgroundColor: `${accent}1f`, color: accent }
+    : undefined;
+  const fallback = light ? "border-[#294368]/14 bg-[#294368]/[.045] text-[#294368]/60" : "border-white/[.10] bg-white/[.04] text-white/50";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[7px] uppercase tracking-[.18em] ${lead ? "" : fallback}`}
+      style={style}
+    >
+      <i className="h-1 w-1 rounded-full" style={{ backgroundColor: lead ? accent : "currentColor" }} />
+      {label}
+    </span>
   );
 }
 
@@ -386,7 +423,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
             <div data-project-item className={`flex flex-col justify-between gap-5 border-b pb-7 md:flex-row md:items-end ${light ? "border-[#294368]/10" : "border-white/[.08]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>05 / MEMBERS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.team}</h2></div><p className={`max-w-[44ch] text-[13px] leading-7 ${light ? "text-[#243b59]/55" : "text-white/45"}`}>{copy.teamIntro}</p></div>
             <div data-project-item className="mt-7 grid gap-4 md:grid-cols-2">{project.members.map((member) => {
               const initials = member.fullName.split(" ").map((part) => part[0]).join("").slice(0, 2);
-              return <article key={member.id} className={`project-interactive-card rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-start gap-4"><div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${project.accent}55`, backgroundColor: `${project.accent}18`, color: project.accent }}>{member.avatar ? <Image src={member.avatar} alt={member.fullName} width={56} height={56} className="h-full w-full object-cover" /> : initials}</div><div className={rtl ? "text-right [direction:rtl]" : "text-left"}><h3 className="text-[16px] font-[560]">{member.fullName}</h3><p className="mt-1 text-[10px] uppercase tracking-[.12em]" style={{ color: project.accent }}>{member.role}</p></div></div>{member.description && <p className={`mt-6 text-[12px] leading-7 ${light ? "text-[#243b59]/58" : "text-white/48"} ${rtl ? "text-right [direction:rtl]" : ""}`}>{member.description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></article>;
+              return <article key={member.id} className={`project-interactive-card rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-start gap-4"><div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${project.accent}55`, backgroundColor: `${project.accent}18`, color: project.accent }}>{member.avatar ? <Image src={member.avatar} alt={member.fullName} width={56} height={56} className="h-full w-full object-cover" /> : initials}</div><div className={rtl ? "text-right [direction:rtl]" : "text-left"}><h3 className="text-[16px] font-[560]">{member.fullName}</h3><p className="mt-1 text-[10px] uppercase tracking-[.12em]" style={{ color: project.accent }}>{member.role}</p><div className="mt-2.5"><MemberRoleBadge roleType={member.roleType} label={copy.roles[member.roleType]} accent={project.accent} light={light} /></div></div></div>{member.description && <p className={`mt-6 text-[12px] leading-7 ${light ? "text-[#243b59]/58" : "text-white/48"} ${rtl ? "text-right [direction:rtl]" : ""}`}>{member.description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></article>;
             })}</div>
           </div>
         </section>
