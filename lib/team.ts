@@ -1,20 +1,22 @@
-// Roster for the home page members section.
+// Roster for the home page member registry.
 //
-// This is deliberately a lean projection — only what a roster card renders.
-// The full profile behind an active member lives in `components/Profile/data.ts`
-// (keyed by the same `username`, which is also the `/member/[username]` route
-// segment), so that module stays the source of truth for profile content.
+// This is deliberately a lean projection — only what the registry console
+// renders. The full profile behind an active member lives in
+// `components/Profile/data.ts` (keyed by the same `username`, which is also the
+// `/member/[username]` route segment), so that module stays the source of truth
+// for profile content.
 //
-// Open slots are placeholders: no username, no focus areas, and the section
+// Open slots are placeholders: no username, no focus areas, and the console
 // renders them as vacant rather than as people. Fill one in by giving it a real
 // name and title and pointing `username` at its profile record.
 
 export type TeamAccent = "crimson" | "violet" | "ice";
 export type TeamSlotStatus = "ACTIVE" | "OPEN";
+export type TeamAvailability = "AVAILABLE" | "LIMITED" | "UNAVAILABLE";
 
 export type TeamMember = {
   id: number;
-  /** Two-digit slot label shown in the card chrome. */
+  /** Two-digit slot label shown in the index rail and frame chrome. */
   slot: string;
   /** Profile route segment, or null while the slot is unfilled. */
   username: string | null;
@@ -27,6 +29,10 @@ export type TeamMember = {
   avatar: string | null;
   accent: TeamAccent;
   status: TeamSlotStatus;
+  /** Null on open slots — there is nobody to be available. */
+  availability: TeamAvailability | null;
+  /** Year the member joined, or null on open slots. */
+  since: string | null;
 };
 
 export const TEAM_ROSTER: TeamMember[] = [
@@ -38,11 +44,13 @@ export const TEAM_ROSTER: TeamMember[] = [
     fullNameFa: "آرمان کیان",
     title: "Creative Full-Stack Engineer",
     titleFa: "مهندس خلاق فول‌استک",
-    focus: ["Interaction systems", "Realtime interfaces"],
-    focusFa: ["سیستم‌های تعاملی", "رابط‌های بلادرنگ"],
+    focus: ["Interaction systems", "Realtime interfaces", "Creative infrastructure"],
+    focusFa: ["سیستم‌های تعاملی", "رابط‌های بلادرنگ", "زیرساخت خلاق"],
     avatar: null,
     accent: "crimson",
     status: "ACTIVE",
+    availability: "AVAILABLE",
+    since: "2024",
   },
   {
     id: 2,
@@ -57,6 +65,8 @@ export const TEAM_ROSTER: TeamMember[] = [
     avatar: null,
     accent: "violet",
     status: "OPEN",
+    availability: null,
+    since: null,
   },
   {
     id: 3,
@@ -71,6 +81,8 @@ export const TEAM_ROSTER: TeamMember[] = [
     avatar: null,
     accent: "ice",
     status: "OPEN",
+    availability: null,
+    since: null,
   },
   {
     id: 4,
@@ -85,6 +97,8 @@ export const TEAM_ROSTER: TeamMember[] = [
     avatar: null,
     accent: "violet",
     status: "OPEN",
+    availability: null,
+    since: null,
   },
 ];
 

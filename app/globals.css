@@ -58,13 +58,37 @@ body {
   box-shadow: 0 22px 58px color-mix(in srgb, var(--project-accent) 13%, transparent);
 }
 
-/* Home roster cards share the projects-page glass system. */
-.member-card {
+/* Member registry console. Shares the projects-page glass system. */
+.registry-surface {
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
 
-a.member-card:hover {
+.registry-frame {
   backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+}
+
+/* Rotating ring around the monogram. Reuses the projects-page orbit keyframes. */
+.registry-orbit {
+  animation: case-orbit 22s linear infinite;
+}
+
+.registry-orbit-reverse {
+  animation: case-orbit 34s linear infinite reverse;
+}
+
+/* Slow breathing pulse on an unfilled slot's empty centre. */
+.registry-vacancy {
+  animation: registry-vacancy 3.6s ease-in-out infinite;
+}
+
+/* Row marker easing, kept in CSS so hover stays responsive without JS. */
+.registry-row {
+  transition: transform .5s cubic-bezier(.22, 1, .36, 1), color .35s ease, opacity .35s ease;
+}
+
+@keyframes registry-vacancy {
+  0%, 100% { opacity: .28; transform: scale(.94); }
+  50% { opacity: .72; transform: scale(1.04); }
 }
 
 /* Glass reads only against a translucent fill, so keep the surface light. */
@@ -114,6 +138,9 @@ a.member-card:hover {
 
   .case-flow-line,
   .case-orbit,
+  .registry-orbit,
+  .registry-orbit-reverse,
+  .registry-vacancy,
   .case-section-sweep,
   .case-shape-frame,
   .case-shape-ring,
@@ -129,5 +156,9 @@ a.member-card:hover {
   .project-interactive-card:hover {
     transform: none;
     box-shadow: none;
+  }
+
+  .registry-row {
+    transition: none;
   }
 }
