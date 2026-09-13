@@ -20,6 +20,48 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Running against the API
+
+This site reads its content from the Devinso API (`Devinso.Api`, in the backend
+repo). Two processes, started independently:
+
+```bash
+# backend repo
+dotnet run --project Devinso.Api      # http://localhost:5225, Swagger at /swagger
+
+# this repo
+npm run dev                           # http://localhost:4000
+```
+
+`npm run check:api` answers whether the API is up and whether this app is
+pointed at it, without starting Next.
+
+### Configuration
+
+Copy `.env.example` to `.env.local` and adjust if your ports differ:
+
+| Variable | Purpose |
+| --- | --- |
+| `DEVINSO_API_URL` | API origin. Server-side only. Use the HTTP profile — Node rejects the ASP.NET dev certificate. |
+| `DEVINSO_MEDIA_URL` | Origin serving uploaded images (the admin app's wwwroot). Must match the API's `Media:BaseUrl`. |
+| `DEVINSO_API_TIMEOUT_MS` | How long one call may take before the page gives up on it. |
+
+### How the two talk
+
+Server components call the API origin directly, so the URL never reaches the
+client bundle. Browser calls go to `/api/devinso/*` on this origin, which
+`next.config.ts` rewrites onto the API — no CORS preflight in dev. Reads happen
+on the server today; the proxy matters for the form posts.
+
+**The site renders without the API.** Every read falls back to the bundled
+content in `lib/` and `components/Profile/data.ts`, so frontend-only work needs
+no backend running. A warning in the dev console names the call that fell back.
+A 500 from the API is not swallowed — that is a real bug worth seeing.
+
+Uploaded images are loaded straight from the admin app over HTTPS, so trust the
+ASP.NET dev certificate (`dotnet dev-certs https --trust`) or avatars and covers
+will not render.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

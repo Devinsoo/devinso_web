@@ -58,6 +58,8 @@ export type ApiMemberSummary = {
   availability: ApiAvailability;
   accent: ApiAccent;
   focus: ApiLocalizedText[];
+  /** ISO date the member joined; the registry shows the year. */
+  createdAt: string;
 };
 
 export type ApiMemberProfile = ApiMemberSummary & {

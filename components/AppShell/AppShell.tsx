@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { EntryGate } from "@/components/Entry/EntryGate";
 import { Hero } from "@/components/Hero/Hero";
+import type { TeamMember } from "@/lib/team";
 import { markEntryComplete, savePreferences, type DevinsoLanguage, type DevinsoTheme } from "@/lib/preferences";
 
 type Screen = "entry" | "site";
 
 type AppShellProps = {
+  /** Registry rows fetched on the server and handed to the members section. */
+  members?: TeamMember[];
   initialEntryComplete: boolean;
   initialTheme?: DevinsoTheme;
   initialLanguage?: DevinsoLanguage;
@@ -21,7 +24,7 @@ function getBrowserLanguage(): DevinsoLanguage {
   return window.navigator.language?.toLowerCase().startsWith("fa") ? "fa" : "en";
 }
 
-export function AppShell({ initialEntryComplete, initialTheme, initialLanguage }: AppShellProps) {
+export function AppShell({ initialEntryComplete, initialTheme, initialLanguage, members }: AppShellProps) {
   const [screen, setScreen] = useState<Screen>(initialEntryComplete ? "site" : "entry");
   const [theme, setTheme] = useState<DevinsoTheme>(initialTheme ?? "dark");
   const [language, setLanguage] = useState<DevinsoLanguage>(initialLanguage ?? "en");
@@ -51,7 +54,7 @@ export function AppShell({ initialEntryComplete, initialTheme, initialLanguage }
   };
 
   if (screen === "site") {
-    return <Hero initialTheme={theme} initialLanguage={language} />;
+    return <Hero initialTheme={theme} initialLanguage={language} members={members} />;
   }
 
   return (

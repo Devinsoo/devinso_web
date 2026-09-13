@@ -6,12 +6,17 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { TEAM_ROSTER, initialsOf, type TeamAccent } from "@/lib/team";
+import { TEAM_ROSTER, initialsOf, type TeamAccent, type TeamMember } from "@/lib/team";
 import type { DevinsoLanguage, DevinsoTheme } from "@/lib/preferences";
 
 gsap.registerPlugin(ScrollTrigger);
 
 type MembersSectionProps = {
+  /**
+   * The registry to render. Supplied by the server from the API; falls back to
+   * the bundled roster so the section still works without one.
+   */
+  members?: TeamMember[];
   theme: DevinsoTheme;
   language: DevinsoLanguage;
 };
@@ -81,7 +86,8 @@ const ACCENTS: Record<TeamAccent, { strong: string; soft: string; glow: string }
   ice: { strong: "#a7ceff", soft: "rgba(167,206,255,.12)", glow: "rgba(150,195,255,.18)" },
 };
 
-export function MembersSection({ theme, language }: MembersSectionProps) {
+export function MembersSection({ theme, language, members }: MembersSectionProps) {
+  const roster = members && members.length > 0 ? members : TEAM_ROSTER;
   const rootRef = useRef<HTMLElement>(null);
   const monogramRef = useRef<HTMLDivElement>(null);
   const scanRef = useRef<HTMLDivElement>(null);
@@ -96,7 +102,7 @@ export function MembersSection({ theme, language }: MembersSectionProps) {
   const rtl = language === "fa";
   const copy = COPY[language];
 
-  const member = TEAM_ROSTER[active];
+  const member = roster[active];
   const accent = ACCENTS[member.accent];
   const open = member.status === "OPEN";
   const name = rtl ? member.fullNameFa : member.fullName;
@@ -113,7 +119,7 @@ export function MembersSection({ theme, language }: MembersSectionProps) {
     if (locked) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = window.setInterval(
-      () => setActive((current) => (current + 1) % TEAM_ROSTER.length),
+      () => setActive((current) => (current + 1) % roster.length),
       AUTO_ADVANCE_MS,
     );
     return () => window.clearInterval(id);
@@ -200,16 +206,16 @@ export function MembersSection({ theme, language }: MembersSectionProps) {
     const back = rtl ? "ArrowRight" : "ArrowLeft";
     if (event.key === "ArrowDown" || event.key === forward) {
       event.preventDefault();
-      select((active + 1) % TEAM_ROSTER.length);
+      select((active + 1) % roster.length);
     } else if (event.key === "ArrowUp" || event.key === back) {
       event.preventDefault();
-      select((active - 1 + TEAM_ROSTER.length) % TEAM_ROSTER.length);
+      select((active - 1 + roster.length) % roster.length);
     } else if (event.key === "Home") {
       event.preventDefault();
       select(0);
     } else if (event.key === "End") {
       event.preventDefault();
-      select(TEAM_ROSTER.length - 1);
+      select(roster.length - 1);
     }
   };
 
@@ -281,7 +287,7 @@ export function MembersSection({ theme, language }: MembersSectionProps) {
             >
               <span>{copy.indexLabel}</span>
               <span style={{ color: accent.strong }}>
-                {member.slot} {copy.of} {String(TEAM_ROSTER.length).padStart(2, "0")}
+                {member.slot} {copy.of} {String(roster.length).padStart(2, "0")}
               </span>
             </div>
             <div className={`mx-2.5 h-px ${hairline}`} />
@@ -293,7 +299,7 @@ export function MembersSection({ theme, language }: MembersSectionProps) {
               onKeyDown={onIndexKeyDown}
               className="mt-2 flex flex-col"
             >
-              {TEAM_ROSTER.map((row, index) => {
+              {roster.map((row, index) => {
                 const rowAccent = ACCENTS[row.accent];
                 const isActive = index === active;
                 const rowOpen = row.status === "OPEN";
@@ -448,7 +454,7 @@ export function MembersSection({ theme, language }: MembersSectionProps) {
                   className={`absolute bottom-0 left-0 ${frameChrome}`}
                   style={rtl ? { left: "auto", right: 0 } : undefined}
                 >
-                  {copy.registry} / {member.slot} {copy.of} {String(TEAM_ROSTER.length).padStart(2, "0")}
+                  {copy.registry} / {member.slot} {copy.of} {String(roster.length).padStart(2, "0")}
                 </span>
               </div>
 

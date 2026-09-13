@@ -9,6 +9,7 @@ import { HeroFooter } from "@/components/Hero/ui/HeroFooter";
 import { ConstructionStage } from "@/components/Hero/ui/ConstructionStage";
 import { SelectedWork } from "@/components/Work/SelectedWork";
 import { MembersSection } from "@/components/Members/MembersSection";
+import type { TeamMember } from "@/lib/team";
 import { CONSTRUCTION_SETTINGS, GRID_LINES } from "@/components/Hero/construction";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -45,9 +46,11 @@ function distanceToSegment(
 type HeroProps = {
   initialTheme?: DevinsoTheme;
   initialLanguage?: Language;
+  /** Registry rows fetched on the server; the section falls back without them. */
+  members?: TeamMember[];
 };
 
-export function Hero({ initialTheme = "dark", initialLanguage = "en" }: HeroProps) {
+export function Hero({ initialTheme = "dark", initialLanguage = "en", members }: HeroProps) {
   const rootRef = useRef<HTMLElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const morphCoverRef = useRef<HTMLDivElement>(null);
@@ -865,7 +868,7 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en" }: HeroProp
 
       <SelectedWork theme={theme} language={language} />
 
-      <MembersSection theme={theme} language={language} />
+      <MembersSection theme={theme} language={language} members={members} />
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { AppShell } from "@/components/AppShell/AppShell";
+import { loadRoster } from "@/lib/content/members";
 import {
   DEVINSO_COOKIE,
   type DevinsoLanguage,
@@ -24,8 +25,13 @@ export async function ScrollExperience() {
   const initialLanguage: DevinsoLanguage | undefined =
     rawLanguage === "en" || rawLanguage === "fa" ? rawLanguage : undefined;
 
+  // Fetched here rather than in the section itself: the registry lives inside
+  // client components, and this is the last server boundary above it.
+  const members = await loadRoster();
+
   return (
     <AppShell
+      members={members}
       initialEntryComplete={entryComplete}
       initialTheme={initialTheme}
       initialLanguage={initialLanguage}

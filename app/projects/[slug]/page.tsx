@@ -5,20 +5,49 @@ import { ProjectDetailPage } from "@/components/Projects/ProjectDetailPage";
 import {
   PROJECT_DETAILS,
   getProjectDetail,
+  type ProjectDetail,
 } from "@/lib/project-details";
 import {
   DEVINSO_COOKIE,
   type DevinsoLanguage,
   type DevinsoTheme,
 } from "@/lib/preferences";
+import { loadAccentsByUsername } from "@/lib/content/members";
+import { loadProjectDetail } from "@/lib/content/projects";
+import { loadNextProject } from "@/lib/content/navigation";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+/**
+ * Live project first, bundled project second — same rule as the member page, so
+ * the site keeps rendering while the API is stopped.
+ *
+ * A project carries no accent colour of its own, so the lead member's accent is
+ * used; that is why the roster is fetched alongside it.
+ */
+async function resolveProject(slug: string): Promise<ProjectDetail | undefined> {
+  const accents = await loadAccentsByUsername();
+  const live = await loadProjectDetail(slug, accents);
+
+  return live ?? getProjectDetail(slug);
+}
+
+async function resolveNextProject(slug: string, current: ProjectDetail): Promise<ProjectDetail> {
+  const live = await loadNextProject(slug);
+  if (live) return live;
+
+  // Bundled fallback: the next entry in the bundled list, wrapping around.
+  const index = PROJECT_DETAILS.findIndex((item) => item.slug === slug);
+  if (index < 0) return current;
+
+  return PROJECT_DETAILS[(index + 1) % PROJECT_DETAILS.length];
+}
+
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectDetail(slug);
+  const project = await resolveProject(slug);
 
   if (!project) {
     return { title: "Project not found | Devinso" };
@@ -44,8 +73,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const projectIndex = PROJECT_DETAILS.findIndex((item) => item.slug === slug);
-  const project = PROJECT_DETAILS[projectIndex];
+  const project = await resolveProject(slug);
 
   if (!project) notFound();
 
@@ -54,7 +82,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const rawLanguage = cookieStore.get(DEVINSO_COOKIE.language)?.value;
   const initialTheme: DevinsoTheme = rawTheme === "light" ? "light" : "dark";
   const initialLanguage: DevinsoLanguage = rawLanguage === "fa" ? "fa" : "en";
-  const nextProject = PROJECT_DETAILS[(projectIndex + 1) % PROJECT_DETAILS.length];
+
+  const nextProject = await resolveNextProject(slug, project);
 
   return (
     <ProjectDetailPage
