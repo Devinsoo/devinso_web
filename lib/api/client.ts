@@ -1,0 +1,128 @@
+import { API_TIMEOUT_MS, apiBase, isDev } from "@/lib/api/config";
+
+/** A non-2xx answer, or a request that never got one. */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly path: string,
+    readonly body?: string,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+
+  /** True when the resource is simply absent — an unpublished slug, say. */
+  get isNotFound() {
+    return this.status === 404;
+  }
+
+  /** True when the API could not be reached at all (down, wrong port, DNS). */
+  get isUnreachable() {
+    return this.status === 0;
+  }
+}
+
+type RequestOptions = {
+  /** Query string values; null and undefined entries are dropped. */
+  query?: Record<string, string | number | boolean | null | undefined>;
+  /** Seconds to cache a GET in production. Ignored in dev, which never caches. */
+  revalidate?: number;
+  signal?: AbortSignal;
+};
+
+/**
+ * Dev always refetches: with the admin panel open in another tab, a cached
+ * response is a stale page you cannot explain. Production caches for a minute
+ * unless the caller says otherwise.
+ */
+function cachePolicy(revalidate?: number): RequestInit {
+  if (isDev) return { cache: "no-store" };
+  return { next: { revalidate: revalidate ?? 60 } } as RequestInit;
+}
+
+function buildUrl(path: string, query?: RequestOptions["query"]): string {
+  const base = apiBase();
+  const url = `${base}${path.startsWith("/") ? path : `/${path}`}`;
+
+  if (!query) return url;
+
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== null && value !== undefined) params.set(key, String(value));
+  }
+
+  const qs = params.toString();
+  return qs ? `${url}?${qs}` : url;
+}
+
+async function request<T>(path: string, init: RequestInit, options: RequestOptions = {}): Promise<T> {
+  const url = buildUrl(path, options.query);
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...init,
+      headers: { Accept: "application/json", ...(init.headers ?? {}) },
+      // A hung API must not hang the page render with it.
+      signal: options.signal ?? AbortSignal.timeout(API_TIMEOUT_MS),
+    });
+  } catch (cause) {
+    // Status 0 distinguishes "never reached the API" from anything it answered.
+    throw new ApiError(
+      `Could not reach the Devinso API at ${url}: ${(cause as Error).message}`,
+      0,
+      path,
+    );
+  }
+
+  if (!response.ok) {
+    // ProblemDetails bodies are small; keeping one makes a 400 debuggable.
+    const body = await response.text().catch(() => undefined);
+    throw new ApiError(`${response.status} ${response.statusText} for ${url}`, response.status, path, body);
+  }
+
+  if (response.status === 204) return undefined as T;
+
+  return (await response.json()) as T;
+}
+
+export function apiGet<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  return request<T>(path, { method: "GET", ...cachePolicy(options.revalidate) }, options);
+}
+
+export function apiPost<T>(path: string, body: unknown, options: RequestOptions = {}): Promise<T> {
+  return request<T>(
+    path,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    },
+    options,
+  );
+}
+
+/**
+ * A GET that degrades instead of throwing: null when the API is unreachable or
+ * answers 404. Pages use this to fall back to their bundled content, so the
+ * site still renders with the API stopped — which during local development it
+ * often is.
+ *
+ * Anything else (a 500, a malformed body) is re-thrown: that is a real bug and
+ * hiding it behind placeholder content would waste an afternoon.
+ */
+export async function apiGetOrNull<T>(path: string, options: RequestOptions = {}): Promise<T | null> {
+  try {
+    return await apiGet<T>(path, options);
+  } catch (error) {
+    if (error instanceof ApiError && (error.isUnreachable || error.isNotFound)) {
+      if (isDev) {
+        console.warn(`[devinso-api] ${error.message} — falling back to bundled content.`);
+      }
+      return null;
+    }
+    throw error;
+  }
+}
