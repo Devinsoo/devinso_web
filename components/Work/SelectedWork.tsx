@@ -11,11 +11,16 @@ gsap.registerPlugin(ScrollTrigger);
 type SelectedWorkProps = {
   theme: DevinsoTheme;
   language: DevinsoLanguage;
+  /**
+   * Published team projects from the API. Falls back to the bundled rail when
+   * the API is unreachable, so the section is never empty.
+   */
+  projects?: WorkProject[];
 };
 
 type MorphMode = "expand" | "split" | "depth";
 
-type WorkProject = {
+export type WorkProject = {
   id: string;
   slug: string;
   number: string;
@@ -106,7 +111,7 @@ const PROJECTS: WorkProject[] = [
 
 const COPY = {
   en: {
-    eyebrow: "SELECTED WORK / 01—03",
+    eyebrowLabel: "SELECTED WORK",
     titleA: "SELECTED",
     titleB: "WORK",
     intro: "A continuous project rail where each cover morphs with a different behavior to keep the section alive and non-repetitive.",
@@ -125,7 +130,7 @@ const COPY = {
     },
   },
   fa: {
-    eyebrow: "نمونه‌کارهای منتخب / ۰۱—۰۳",
+    eyebrowLabel: "نمونه‌کارهای منتخب",
     titleA: "SELECTED",
     titleB: "WORK",
     intro: "یک ریل پروژه‌ای پیوسته که هر کاور با رفتاری متفاوت مورف می‌شود تا سکشن زنده بماند و تکراری نشود.",
@@ -278,7 +283,7 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
         href={`/projects/${project.slug}`}
         aria-label={`${copy.viewCase}: ${language === "fa" ? project.titleFa : project.title}`}
         className="absolute inset-0 z-20 rounded-[34px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8be7ff]"
-      >ژ
+      >
         <span className="sr-only">{copy.viewCase}</span>
       </Link>
       <div className="relative z-[1]">
@@ -378,11 +383,15 @@ function InfoBox({ label, value, theme, accent }: { label: string; value: string
   );
 }
 
-export function SelectedWork({ theme, language }: SelectedWorkProps) {
+export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
   const rootRef = useRef<HTMLElement>(null);
   const light = theme === "light";
   const rtl = language === "fa";
   const copy = COPY[language];
+  const rail = projects && projects.length > 0 ? projects : PROJECTS;
+
+  // The rail no longer has a fixed length, so the eyebrow counts it.
+  const eyebrow = `${copy.eyebrowLabel} / 01—${String(rail.length).padStart(2, "0")}`;
 
   useLayoutEffect(() => {
     if (!rootRef.current) return;
@@ -622,7 +631,7 @@ export function SelectedWork({ theme, language }: SelectedWorkProps) {
                 data-work-dock-label
                 className={`font-mono text-[10px] uppercase tracking-[.22em] ${light ? "text-[#294368]/38" : "text-white/30"}`}
               >
-                {copy.eyebrow}
+                {eyebrow}
               </div>
               <div
                 data-work-dock-title
@@ -670,7 +679,7 @@ export function SelectedWork({ theme, language }: SelectedWorkProps) {
           <div data-work-cursor className={`pointer-events-none fixed left-0 top-0 z-50 hidden min-h-[74px] min-w-[74px] -translate-x-1/2 -translate-y-1/2 scale-[.82] items-center justify-center rounded-full border px-4 text-center text-[9px] uppercase tracking-[.16em] opacity-0 transition-opacity duration-200 md:flex ${light ? "border-[#294368]/12 bg-white/92 text-[#17263d] shadow-[0_18px_40px_rgba(18,31,53,.12)]" : "border-white/[.12] bg-[#090d14]/92 text-white/82 shadow-[0_18px_50px_rgba(0,0,0,.35)]"}`}>
             {copy.viewCase}
           </div>
-          {PROJECTS.map((project, index) => (
+          {rail.map((project, index) => (
             <ProjectScene key={project.id} project={project} theme={theme} language={language} index={index} />
           ))}
         </div>

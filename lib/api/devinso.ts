@@ -12,6 +12,7 @@ import type {
   ApiOpeningSummary,
   ApiProjectDetail,
   ApiProjectSummary,
+  ApiProjectType,
   ApiSiteSettings,
   JoinApplicationSubmission,
   ProjectRequestSubmission,
@@ -40,9 +41,9 @@ export function fetchMemberProjects(handle: string) {
   return apiGetOrNull<ApiMemberProject[]>(`/members/${encodeURIComponent(handle)}/projects`);
 }
 
-export function fetchProjects(options: { featured?: boolean } = {}) {
+export function fetchProjects(options: { featured?: boolean; type?: ApiProjectType } = {}) {
   return apiGetOrNull<ApiProjectSummary[]>("/projects", {
-    query: { featured: options.featured },
+    query: { featured: options.featured, type: options.type },
   });
 }
 

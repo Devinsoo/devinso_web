@@ -136,8 +136,17 @@ export type ApiProjectSummary = {
   isFeatured: boolean;
   memberCount: number;
   coverImageUrl?: string;
+  description?: string;
+  descriptionFa?: string;
+  projectUrl?: string;
+  repositoryUrl?: string;
+  techStack: ApiNamedCategory[];
+  /** Distinct roles credited on the project, each with its Persian label. */
+  roles: ApiProjectRoleLabel[];
   createdAt: string;
 };
+
+export type ApiProjectRoleLabel = { role: ApiProjectRole; roleFa: string };
 
 export type ApiProjectDetail = ApiProjectSummary & {
   description?: string;
