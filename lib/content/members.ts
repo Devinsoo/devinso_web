@@ -3,6 +3,7 @@ import type { ApiAccent, ApiMemberProfile, ApiMemberSummary, ApiSkillLevel } fro
 import { TEAM_ROSTER, type TeamAccent, type TeamAvailability, type TeamMember } from "@/lib/team";
 import type { MemberProfileData, SkillLevel } from "@/components/Profile/types";
 import { toMemberProjects } from "@/lib/content/projects";
+import { toDateOnly } from "@/lib/content/dates";
 
 /**
  * Maps the API onto the shapes the member UI already speaks, so the components
@@ -122,7 +123,7 @@ function toProfileData(member: ApiMemberProfile): MemberProfileData {
       id: 1,
       role: "MEMBER",
       status: "ACTIVE",
-      createdAt: member.createdAt,
+      createdAt: toDateOnly(member.createdAt),
     },
 
     profile: {

@@ -1,5 +1,6 @@
 import { fetchProjects } from "@/lib/api/devinso";
 import type { ProjectDetail } from "@/lib/project-details";
+import { toDateOnly } from "@/lib/content/dates";
 
 /**
  * The "next project" teaser at the bottom of a project page reads four fields:
@@ -35,8 +36,8 @@ export async function loadNextProject(currentSlug: string): Promise<ProjectDetai
     status: "PUBLISHED",
     createdBy: { id: 0, fullName: "" },
     members: [],
-    createdAt: next.createdAt,
-    updatedAt: next.createdAt,
+    createdAt: toDateOnly(next.createdAt),
+    updatedAt: toDateOnly(next.createdAt),
     accent: "#ff5147",
     accentSoft: "rgba(255,81,71,.16)",
     preview: "identity",

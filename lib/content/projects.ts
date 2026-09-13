@@ -7,6 +7,7 @@ import type {
   ApiProjectRole,
 } from "@/lib/api/types";
 import type { MemberProject } from "@/components/Profile/types";
+import { toDateOnly } from "@/lib/content/dates";
 import type {
   ProjectContentBlock,
   ProjectDetail,
@@ -146,8 +147,8 @@ function toProjectDetail(project: ApiProjectDetail, accentKey: keyof typeof ACCE
 
     createdBy: { id: 0, fullName: lead?.fullName ?? "" },
     members: project.members.map(memberFor),
-    createdAt: project.createdAt,
-    updatedAt: project.updatedAt ?? project.createdAt,
+    createdAt: toDateOnly(project.createdAt),
+    updatedAt: toDateOnly(project.updatedAt ?? project.createdAt),
     accent: palette.accent,
     accentSoft: palette.accentSoft,
     preview: previewFor(project.slug),
@@ -168,7 +169,7 @@ export function toMemberProjects(projects: ApiMemberProject[]): MemberProject[] 
     techStack: project.techStack.map((tool) => tool.name),
     type: project.type === "Personal" ? "PERSONAL" : "TEAM",
     status: "PUBLISHED",
-    createdAt: project.createdAt,
+    createdAt: toDateOnly(project.createdAt),
     membership: {
       role: project.membership.role ?? "",
       roleFa: project.membership.roleFa,
