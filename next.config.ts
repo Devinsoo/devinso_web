@@ -6,8 +6,26 @@ import type { NextConfig } from "next";
  */
 const API_ORIGIN = (process.env.DEVINSO_API_URL ?? "http://localhost:5200").replace(/\/$/, "");
 
-/** Origin serving uploaded images (the admin app's wwwroot). */
-const MEDIA_ORIGIN = process.env.DEVINSO_MEDIA_URL ?? "https://localhost:7100";
+/**
+ * Origin serving uploaded images (the admin app's wwwroot).
+ *
+ * HTTP in development: next/image optimises a remote image by fetching it from
+ * the Next server, and Node rejects the ASP.NET self-signed certificate, so an
+ * https origin fails there even once it is allow-listed.
+ */
+const MEDIA_ORIGIN = (process.env.DEVINSO_MEDIA_URL ?? "http://localhost:5100").replace(/\/$/, "");
+
+/** Uploads live under /uploads; nothing else on those origins is an image. */
+function uploadsPattern(origin: string) {
+  const url = new URL(origin);
+
+  return {
+    protocol: url.protocol.replace(":", "") as "http" | "https",
+    hostname: url.hostname,
+    port: url.port,
+    pathname: "/uploads/**",
+  };
+}
 
 const nextConfig: NextConfig = {
   async rewrites() {
@@ -23,12 +41,20 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    // Uploads are served by the admin app, not from /public, so next/image
-    // needs both dev origins named before it will optimise them.
-    remotePatterns: [
-      new URL(`${MEDIA_ORIGIN}/uploads/**`),
-      new URL(`${API_ORIGIN}/uploads/**`),
-    ],
+    // Uploads are served by the admin app rather than from /public, so
+    // next/image refuses them ("url" parameter is not allowed) until the origin
+    // is named here.
+    remotePatterns: [uploadsPattern(MEDIA_ORIGIN), uploadsPattern(API_ORIGIN)],
+
+    // Next 16 refuses to optimise a remote image served from a local IP, which
+    // in development is every upload, since the admin app runs on localhost.
+    // The refusal looks identical to a missing pattern - 400, "url" parameter
+    // is not allowed - so allow-listing the origin alone is not enough.
+    //
+    // Development only. In production the media origin is a real host, and the
+    // default (false) is what keeps the optimiser from being pointed at
+    // anything on the deploy target's own network.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
   },
 };
 

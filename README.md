@@ -58,9 +58,20 @@ content in `lib/` and `components/Profile/data.ts`, so frontend-only work needs
 no backend running. A warning in the dev console names the call that fell back.
 A 500 from the API is not swallowed — that is a real bug worth seeing.
 
-Uploaded images are loaded straight from the admin app over HTTPS, so trust the
-ASP.NET dev certificate (`dotnet dev-certs https --trust`) or avatars and covers
-will not render.
+### Images
+
+Uploads are served by the admin app, not from `/public`, so `next.config.ts`
+allow-lists that origin under `images.remotePatterns` - without it `next/image`
+answers 400 with `"url" parameter is not allowed`.
+
+Next 16 also refuses to optimise remote images served from a local IP, which in
+development is every upload. That refusal looks identical to a missing pattern,
+so `dangerouslyAllowLocalIP` is enabled for development only; production keeps
+the default.
+
+Both the API and the media origin are read over HTTP locally, because
+`next/image` fetches remote images from the Next server, where Node rejects the
+ASP.NET dev certificate.
 
 ## Learn More
 
