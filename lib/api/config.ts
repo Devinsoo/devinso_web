@@ -15,7 +15,7 @@
  */
 
 /** API origin used for server-side fetches. No trailing slash. */
-export const API_ORIGIN = (process.env.DEVINSO_API_URL ?? "http://localhost:5225").replace(/\/$/, "");
+export const API_ORIGIN = (process.env.DEVINSO_API_URL ?? "http://localhost:5200").replace(/\/$/, "");
 
 /** Same-origin prefix the browser uses; rewritten onto `API_ORIGIN/api/v1`. */
 export const API_BROWSER_PATH = "/api/devinso";

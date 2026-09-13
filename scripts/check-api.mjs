@@ -28,7 +28,7 @@ function loadEnvFile(path) {
 }
 
 const fileEnv = { ...loadEnvFile(".env.example"), ...loadEnvFile(".env.local") };
-const apiOrigin = (process.env.DEVINSO_API_URL ?? fileEnv.DEVINSO_API_URL ?? "http://localhost:5225").replace(/\/$/, "");
+const apiOrigin = (process.env.DEVINSO_API_URL ?? fileEnv.DEVINSO_API_URL ?? "http://localhost:5200").replace(/\/$/, "");
 const mediaOrigin = (process.env.DEVINSO_MEDIA_URL ?? fileEnv.DEVINSO_MEDIA_URL ?? "").replace(/\/$/, "");
 
 const checks = [

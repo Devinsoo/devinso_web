@@ -4,10 +4,10 @@ import type { NextConfig } from "next";
  * The API origin is read here as well as in `lib/api/config.ts`, because a
  * rewrite is evaluated by the Next server rather than by our client module.
  */
-const API_ORIGIN = (process.env.DEVINSO_API_URL ?? "http://localhost:5225").replace(/\/$/, "");
+const API_ORIGIN = (process.env.DEVINSO_API_URL ?? "http://localhost:5200").replace(/\/$/, "");
 
 /** Origin serving uploaded images (the admin app's wwwroot). */
-const MEDIA_ORIGIN = process.env.DEVINSO_MEDIA_URL ?? "https://localhost:7019";
+const MEDIA_ORIGIN = process.env.DEVINSO_MEDIA_URL ?? "https://localhost:7100";
 
 const nextConfig: NextConfig = {
   async rewrites() {

@@ -27,7 +27,7 @@ repo). Two processes, started independently:
 
 ```bash
 # backend repo
-dotnet run --project Devinso.Api      # http://localhost:5225, Swagger at /swagger
+./tools/run-dev.ps1                   # admin :5100, api :5200 (Swagger at /swagger)
 
 # this repo
 npm run dev                           # http://localhost:4000
