@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { RichText } from "@/components/Projects/RichText";
 import Link from "next/link";
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
@@ -256,7 +257,7 @@ function ProjectContent({ blocks, language, light, accent }: { blocks: ProjectCo
         return <div key={`${block.type}-${index}`} data-project-item className={`border-t pt-5 ${light ? "border-[#294368]/12" : "border-white/[.09]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><span className={`font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/27"}`}>BLOCK / {blockNumber} / HEADING</span><h3 className="mt-5 max-w-[18ch] text-[clamp(25px,3.8vw,48px)] font-[560] leading-[.95] tracking-[-.05em]">{text(block.text, block.textFa)}</h3></div>;
       }
       if (block.type === "paragraph") {
-        return <div key={`${block.type}-${index}`} data-project-item className={`border-l pl-5 ${light ? "border-[#294368]/12" : "border-white/[.09]"} ${rtl ? "border-l-0 border-r pr-5 text-right [direction:rtl]" : "text-left"}`}><span className={`mb-3 block font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/30" : "text-white/24"}`}>BLOCK / {blockNumber} / TEXT</span><p className={`max-w-[68ch] text-[clamp(14px,1.35vw,18px)] leading-[1.95] ${light ? "text-[#243b59]/64" : "text-white/55"}`}>{text(block.text, block.textFa)}</p></div>;
+        return <div key={`${block.type}-${index}`} data-project-item className={`border-l pl-5 ${light ? "border-[#294368]/12" : "border-white/[.09]"} ${rtl ? "border-l-0 border-r pr-5 text-right [direction:rtl]" : "text-left"}`}><span className={`mb-3 block font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/30" : "text-white/24"}`}>BLOCK / {blockNumber} / TEXT</span><RichText html={text(block.text, block.textFa)} className={`max-w-[68ch] text-[clamp(14px,1.35vw,18px)] leading-[1.95] ${light ? "text-[#243b59]/64" : "text-white/55"}`} /></div>;
       }
       if (block.type === "image") {
         return <figure key={`${block.type}-${index}`} data-project-item className={`mx-auto w-full max-w-[920px] overflow-hidden rounded-[24px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><div className="relative aspect-[16/9] overflow-hidden"><Image src={block.src} alt={language === "fa" ? block.altFa : block.alt} fill sizes="(max-width: 900px) 100vw, 900px" className="object-cover transition-transform duration-700 hover:scale-[1.02]" /></div><figcaption className={`flex items-center justify-between gap-4 border-t px-5 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><span>{text(block.caption ?? `IMAGE / ${blockNumber}`, block.captionFa ?? block.caption ?? `IMAGE / ${blockNumber}`)}</span><span className="shrink-0 opacity-60">IMAGE / {blockNumber}</span></figcaption></figure>;
