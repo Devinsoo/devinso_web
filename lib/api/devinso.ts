@@ -3,6 +3,7 @@
  * in `lib/content/*`, so this module stays a faithful mirror of the API.
  */
 import { ApiError, apiGetOrNull, apiPost } from "@/lib/api/client";
+import { CACHE_TAG, CACHE_TTL } from "@/lib/api/cache";
 import { API_ORIGIN, API_TIMEOUT_MS } from "@/lib/api/config";
 import type {
   ApiMemberProfile,
@@ -20,13 +21,24 @@ import type {
 } from "@/lib/api/types";
 
 // ----------------------------------------------------------------- reads ---
+//
+// Every read is cached and tagged; `lib/api/cache.ts` explains the layers and
+// holds the lifetimes. A read tagged both `members` and `member:<handle>` can
+// be dropped by the collection or on its own, so editing one profile in the
+// admin panel need not expire the whole roster.
 
 export function fetchSiteSettings() {
-  return apiGetOrNull<ApiSiteSettings>("/site");
+  return apiGetOrNull<ApiSiteSettings>("/site", {
+    revalidate: CACHE_TTL.site,
+    tags: [CACHE_TAG.site],
+  });
 }
 
 export function fetchMembers() {
-  return apiGetOrNull<ApiMemberSummary[]>("/members");
+  return apiGetOrNull<ApiMemberSummary[]>("/members", {
+    revalidate: CACHE_TTL.members,
+    tags: [CACHE_TAG.members],
+  });
 }
 
 /**
@@ -34,29 +46,49 @@ export function fetchMembers() {
  * member is unpublished, unknown, or the API is down.
  */
 export function fetchMember(handle: string) {
-  return apiGetOrNull<ApiMemberProfile>(`/members/${encodeURIComponent(handle)}`);
+  return apiGetOrNull<ApiMemberProfile>(`/members/${encodeURIComponent(handle)}`, {
+    revalidate: CACHE_TTL.members,
+    tags: [CACHE_TAG.members, CACHE_TAG.member(handle)],
+  });
 }
 
 export function fetchMemberProjects(handle: string) {
-  return apiGetOrNull<ApiMemberProject[]>(`/members/${encodeURIComponent(handle)}/projects`);
+  return apiGetOrNull<ApiMemberProject[]>(`/members/${encodeURIComponent(handle)}/projects`, {
+    revalidate: CACHE_TTL.memberProjects,
+    // Tagged with projects too: publishing a project changes this list.
+    tags: [CACHE_TAG.members, CACHE_TAG.member(handle), CACHE_TAG.projects],
+  });
 }
 
 export function fetchProjects(options: { featured?: boolean; type?: ApiProjectType } = {}) {
   return apiGetOrNull<ApiProjectSummary[]>("/projects", {
     query: { featured: options.featured, type: options.type },
+    revalidate: CACHE_TTL.projects,
+    // The filters are part of the cache key, so each variant caches separately
+    // while one tag still clears all of them.
+    tags: [CACHE_TAG.projects],
   });
 }
 
 export function fetchProject(slug: string) {
-  return apiGetOrNull<ApiProjectDetail>(`/projects/${encodeURIComponent(slug)}`);
+  return apiGetOrNull<ApiProjectDetail>(`/projects/${encodeURIComponent(slug)}`, {
+    revalidate: CACHE_TTL.project,
+    tags: [CACHE_TAG.projects, CACHE_TAG.project(slug)],
+  });
 }
 
 export function fetchOpenings() {
-  return apiGetOrNull<ApiOpeningSummary[]>("/openings");
+  return apiGetOrNull<ApiOpeningSummary[]>("/openings", {
+    revalidate: CACHE_TTL.openings,
+    tags: [CACHE_TAG.openings],
+  });
 }
 
 export function fetchOpening(id: string) {
-  return apiGetOrNull<ApiOpeningDetail>(`/openings/${encodeURIComponent(id)}`);
+  return apiGetOrNull<ApiOpeningDetail>(`/openings/${encodeURIComponent(id)}`, {
+    revalidate: CACHE_TTL.opening,
+    tags: [CACHE_TAG.openings, CACHE_TAG.opening(id)],
+  });
 }
 
 // ---------------------------------------------------------------- writes ---

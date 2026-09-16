@@ -424,17 +424,44 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
                 </div>
 
                 <div ref={monogramRef} className="relative grid place-items-center">
-                  {member.avatar ? (
-                    <Image
-                      src={member.avatar}
-                      alt={name}
-                      width={168}
-                      height={168}
-                      className="h-[clamp(96px,14vw,168px)] w-[clamp(96px,14vw,168px)] rounded-full object-cover"
-                    />
-                  ) : open ? (
+                  {/*
+                    Every avatar in the roster stays mounted, stacked in one
+                    grid cell, with all but the active one hidden.
+
+                    Rendering only the active member unmounts the <Image> on
+                    each slot change, and a remount is a fresh request — which
+                    on a registry the visitor clicks through is a round trip per
+                    member, every time they come back to one. Kept mounted, a
+                    switch is a CSS change and touches the network never.
+
+                    `invisible` rather than `hidden`: visibility:hidden keeps
+                    the image loaded and decoded, which is the entire point.
+                    The cost is that all avatars load with the section instead
+                    of on demand — fine at this size (the bundled roster has
+                    none, so this is one image per published member), and it
+                    doubles as a preload so the first switch is instant too.
+                  */}
+                  {roster.map((row, index) =>
+                    row.avatar ? (
+                      <Image
+                        key={row.id}
+                        src={row.avatar}
+                        alt={rtl ? row.fullNameFa : row.fullName}
+                        width={168}
+                        height={168}
+                        aria-hidden={index !== active}
+                        className={`col-start-1 row-start-1 h-[clamp(96px,14vw,168px)] w-[clamp(96px,14vw,168px)] rounded-full object-cover ${
+                          index === active ? "" : "invisible"
+                        }`}
+                      />
+                    ) : null,
+                  )}
+
+                  {/* The vacancy dial and the initials fall back to the active
+                      member only: neither costs a request. */}
+                  {member.avatar ? null : open ? (
                     <div
-                      className={`registry-vacancy grid h-[clamp(88px,12vw,140px)] w-[clamp(88px,12vw,140px)] place-items-center rounded-full border border-dashed ${
+                      className={`registry-vacancy col-start-1 row-start-1 grid h-[clamp(88px,12vw,140px)] w-[clamp(88px,12vw,140px)] place-items-center rounded-full border border-dashed ${
                         light ? "border-[#294368]/22 text-[#294368]/30" : "border-white/[.14] text-white/22"
                       }`}
                     >
@@ -442,7 +469,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
                     </div>
                   ) : (
                     <span
-                      className="text-[clamp(64px,11vw,132px)] font-[600] leading-none tracking-[-.09em]"
+                      className="col-start-1 row-start-1 text-[clamp(64px,11vw,132px)] font-[600] leading-none tracking-[-.09em]"
                       style={{ color: accent.strong }}
                     >
                       {initialsOf(member.fullName)}

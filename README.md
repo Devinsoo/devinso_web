@@ -45,6 +45,10 @@ Copy `.env.example` to `.env.local` and adjust if your ports differ:
 | `DEVINSO_API_URL` | API origin. Server-side only. Use the HTTP profile — Node rejects the ASP.NET dev certificate. |
 | `DEVINSO_MEDIA_URL` | Origin serving uploaded images (the admin app's wwwroot). Must match the API's `Media:BaseUrl`. |
 | `DEVINSO_API_TIMEOUT_MS` | How long one call may take before the page gives up on it. |
+| `DEVINSO_API_CACHE` | Set to `off` to bypass every cache layer. |
+| `DEVINSO_API_DEV_TTL_SECONDS` | Ceiling on any cached read in development. Default 15. |
+| `DEVINSO_API_ERROR_TTL_SECONDS` | How long a failed read is remembered. Default 10. |
+| `DEVINSO_REVALIDATE_SECRET` | Shared secret for `POST /api/revalidate`. The route refuses everything until it is set. |
 
 ### How the two talk
 
@@ -57,6 +61,30 @@ on the server today; the proxy matters for the form posts.
 content in `lib/` and `components/Profile/data.ts`, so frontend-only work needs
 no backend running. A warning in the dev console names the call that fell back.
 A 500 from the API is not swallowed — that is a real bug worth seeing.
+
+### Caching
+
+Reads are cached; `lib/api/cache.ts` holds the layers and the lifetimes. In
+short: identical reads inside one render share a single request, a repeated
+read inside its TTL never leaves the process, and production additionally puts
+the fetch through Next's tagged data cache. Development clamps every TTL to
+`DEVINSO_API_DEV_TTL_SECONDS` so an admin-panel edit shows up on a refresh
+rather than a coffee break.
+
+Every read is tagged, so a publish can drop exactly what it changed:
+
+```bash
+curl -X POST http://localhost:4000/api/revalidate \
+  -H 'authorization: Bearer <DEVINSO_REVALIDATE_SECRET>' \
+  -H 'content-type: application/json' \
+  -d '{"tags":["projects"]}'
+```
+
+`tags` accepts the short names `all`, `site`, `members`, `projects`, `openings`
+or a specific one like `devinso:project:atlas`; omitting it clears everything.
+A `GET` on the same route, with the same secret, dumps what is cached and the
+hit/miss counts — the first thing to look at when a page shows something you
+did not expect.
 
 ### Images
 

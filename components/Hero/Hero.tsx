@@ -709,7 +709,18 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
           duration: 0.18,
           ease: "power2.in",
         }, 0.10)
-        .to(stageRef.current, {
+        // fromTo, not to: the stage is also a [data-reveal] element, so the
+        // intro timeline owns its opacity too and starts it at 0. A plain .to()
+        // records whatever is on the element when it first renders, and
+        // invalidateOnRefresh re-records it on every refresh. Loading the page
+        // scrolled down renders this scrub at the far end while the intro still
+        // has the stage at 0, so 0 gets recorded as the resting value and
+        // scrolling back to the top restores the stage to invisible. Stating
+        // the start explicitly keeps the two timelines from trading values.
+        .fromTo(stageRef.current, {
+          scale: 1,
+          opacity: 1,
+        }, {
           scale: 0.985,
           opacity: 0.68,
           duration: 0.28,

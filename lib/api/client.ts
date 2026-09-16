@@ -1,4 +1,5 @@
 import { API_TIMEOUT_MS, apiBase, isDev } from "@/lib/api/config";
+import { CACHE_TAG, type CacheOptions, cached } from "@/lib/api/cache";
 
 /** A non-2xx answer, or a request that never got one. */
 export class ApiError extends Error {
@@ -26,19 +27,44 @@ export class ApiError extends Error {
 type RequestOptions = {
   /** Query string values; null and undefined entries are dropped. */
   query?: Record<string, string | number | boolean | null | undefined>;
-  /** Seconds to cache a GET in production. Ignored in dev, which never caches. */
+  /** Seconds a GET stays fresh. See `CACHE_TTL` in `lib/api/cache.ts`. */
   revalidate?: number;
+  /**
+   * Cache tags for this read, so the admin panel can drop exactly what it
+   * changed. `CACHE_TAG.all` is added for free — never list it here.
+   */
+  tags?: readonly string[];
   signal?: AbortSignal;
 };
 
+const DEFAULT_REVALIDATE_SECONDS = 60;
+
+function cacheOptions(options: RequestOptions): CacheOptions {
+  return {
+    ttlSeconds: options.revalidate ?? DEFAULT_REVALIDATE_SECONDS,
+    tags: [CACHE_TAG.all, ...(options.tags ?? [])],
+  };
+}
+
 /**
- * Dev always refetches: with the admin panel open in another tab, a cached
- * response is a stale page you cannot explain. Production caches for a minute
- * unless the caller says otherwise.
+ * What the *fetch* does about caching, which is a separate question from what
+ * `lib/api/cache.ts` does about it.
+ *
+ * Production hands the read to Next's data cache, tagged, so it is shared
+ * across the whole server and survives a restart. Development has no data
+ * cache to hand it to, so the fetch is unconditional and the memory layer in
+ * `lib/api/cache.ts` — deliberately short-lived there — is the only thing
+ * standing between a render and the API.
  */
-function cachePolicy(revalidate?: number): RequestInit {
+function cachePolicy(options: RequestOptions): RequestInit {
   if (isDev) return { cache: "no-store" };
-  return { next: { revalidate: revalidate ?? 60 } } as RequestInit;
+
+  return {
+    next: {
+      revalidate: options.revalidate ?? DEFAULT_REVALIDATE_SECONDS,
+      tags: [CACHE_TAG.all, ...(options.tags ?? [])],
+    },
+  } as RequestInit;
 }
 
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
@@ -87,8 +113,20 @@ async function request<T>(path: string, init: RequestInit, options: RequestOptio
   return (await response.json()) as T;
 }
 
+/**
+ * A cached GET. Identical reads inside one render share a single request, and a
+ * read repeated within its TTL does not reach the API at all.
+ *
+ * A caller supplying its own `signal` owns the request lifetime, so that one
+ * skips the cache rather than handing a later caller a result whose abort
+ * signal it never saw.
+ */
 export function apiGet<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  return request<T>(path, { method: "GET", ...cachePolicy(options.revalidate) }, options);
+  const send = () => request<T>(path, { method: "GET", ...cachePolicy(options) }, options);
+
+  if (options.signal) return send();
+
+  return cached<T>(`GET ${buildUrl(path, options.query)}`, cacheOptions(options), send);
 }
 
 export function apiPost<T>(path: string, body: unknown, options: RequestOptions = {}): Promise<T> {

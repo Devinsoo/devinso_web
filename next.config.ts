@@ -46,6 +46,16 @@ const nextConfig: NextConfig = {
     // is named here.
     remotePatterns: [uploadsPattern(MEDIA_ORIGIN), uploadsPattern(API_ORIGIN)],
 
+    // Uploads are content-addressed by the admin app — a new upload is a new
+    // GUID filename — so an optimised copy never goes stale and there is no
+    // reason to re-fetch and re-encode it from the media origin. A year is the
+    // same lifetime the admin app now sends on the originals.
+    //
+    // Safe precisely because the URL changes when the image does; the usual
+    // warning about keeping this low applies to origins that overwrite files
+    // in place, which this one does not.
+    minimumCacheTTL: 31536000,
+
     // Next 16 refuses to optimise a remote image served from a local IP, which
     // in development is every upload, since the admin app runs on localhost.
     // The refusal looks identical to a missing pattern - 400, "url" parameter

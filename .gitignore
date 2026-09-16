@@ -55,3 +55,7 @@ Thumbs.db
 devinso-hero-v1/
 
 next-env.d.ts
+
+# Playwright
+/test-results/
+/playwright-report/
