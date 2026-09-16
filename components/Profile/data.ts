@@ -128,6 +128,7 @@ const MEMBERS: Record<string, MemberProfileData> = {
       {
         id: 21,
         title: "ALLIXRO / RED PROFILE",
+        slug: "allixro-red-profile",
         description:
           "Art direction and cover system built around a fixed 16:9 media frame for member-replaceable covers.",
         descriptionFa: "آرت دایرکشن و سیستم کاور بر پایه یک قاب رسانه‌ای ثابت 16:9 برای جایگزینی آسان توسط اعضا.",
@@ -146,6 +147,7 @@ const MEMBERS: Record<string, MemberProfileData> = {
       {
         id: 22,
         title: "Automation Platform",
+        slug: "automation-platform",
         description:
           "Modular control surface for orchestrating flows and monitoring nodes while keeping technical clarity intact.",
         descriptionFa: "سطح کنترل ماژولار برای مدیریت جریان‌ها و مانیتور نودها بدون از بین رفتن وضوح فنی.",

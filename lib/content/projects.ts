@@ -160,6 +160,7 @@ export function toMemberProjects(projects: ApiMemberProject[]): MemberProject[] 
   return projects.map((project, index) => ({
     id: index + 1,
     title: project.title,
+    slug: project.slug,
     description: project.description ?? "",
     descriptionFa: project.descriptionFa,
     featured: project.isFeatured,

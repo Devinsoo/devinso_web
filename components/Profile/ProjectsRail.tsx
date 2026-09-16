@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLayoutEffect, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -165,7 +166,21 @@ function ProjectCard({
         </div>
 
         <div className="relative mt-5 flex flex-1 items-end gap-4 border-t border-white/[.07] pt-4">
-          {project.projectUrl ? (
+          {/*
+            Opens the project's own page rather than its external URL: the detail
+            page carries the full case and surfaces the live link and the repo
+            itself. Falls back to the external URL only for a project that has no
+            detail page behind it.
+          */}
+          {project.slug ? (
+            <Link
+              href={`/projects/${project.slug}`}
+              className="inline-flex items-center gap-1.5 rounded-sm font-mono text-[9.5px] uppercase tracking-[.14em] text-white/60 outline-none transition-colors duration-300 hover:text-white focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-a),.3)]"
+            >
+              {copy.projectsSection.viewProject}
+              <ArrowUpRight size={12} strokeWidth={1.75} />
+            </Link>
+          ) : project.projectUrl ? (
             <a
               href={project.projectUrl}
               target="_blank"
