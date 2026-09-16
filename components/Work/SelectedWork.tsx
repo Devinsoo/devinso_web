@@ -526,8 +526,8 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
           }, 0.1)
           .to(details, { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.62, stagger: 0.055, ease: "power3.out" }, mode === "split" ? 0.16 : 0.22)
           .to(asset, { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.48, ease: "power2.out" }, 0.4)
-          .fromTo(scan, { yPercent: -150, opacity: 0 }, { yPercent: 150, opacity: 0.82, duration: 0.72, ease: "power2.inOut" }, 0.36)
-          .to(scan, { opacity: 0, duration: 0.18 }, 0.98);
+          .fromTo(scan, { yPercent: -150, opacity: 0 }, { yPercent: 500, opacity: 0.82, duration: 0.9, ease: "power1.inOut" }, 0.36)
+          .to(scan, { opacity: 0, duration: 0.3, ease: "power1.in" }, 0.96);
 
         if (mode === "split") {
           tl.to(shutterLeft, { xPercent: -102, duration: 0.78, ease: "power3.inOut" }, 0)

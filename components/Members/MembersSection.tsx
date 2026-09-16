@@ -173,11 +173,18 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
 
     const ctx = gsap.context(() => {
       if (scanRef.current) {
-        gsap.fromTo(
-          scanRef.current,
-          { yPercent: -120, autoAlpha: 0 },
-          { yPercent: 120, autoAlpha: 1, duration: 0.82, ease: "power2.inOut" },
-        );
+        // The strip is 22% of the frame, so it needs ~455% of its own height to
+        // clear the bottom edge. It fades up on entry and back out as it leaves
+        // rather than parking mid-frame at full strength.
+        gsap
+          .timeline()
+          .fromTo(
+            scanRef.current,
+            { yPercent: -120, autoAlpha: 0 },
+            { yPercent: 520, autoAlpha: 1, duration: 1.05, ease: "power1.inOut" },
+            0,
+          )
+          .to(scanRef.current, { autoAlpha: 0, duration: 0.3, ease: "power1.in" }, 0.75);
       }
       if (monogramRef.current) {
         gsap.fromTo(

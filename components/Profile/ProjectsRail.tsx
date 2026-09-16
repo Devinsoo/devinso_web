@@ -52,7 +52,7 @@ function ProjectCover({
           className="project-cover-image h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(2,4,8,.55))]" />
-        <div className="project-cover-scan pointer-events-none absolute left-0 top-0 h-[24%] w-full -translate-y-[140%] bg-[linear-gradient(180deg,transparent,rgba(255,255,255,.28),rgba(110,188,255,.1),transparent)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="project-cover-scan pointer-events-none absolute left-0 top-0 h-[24%] w-full bg-[linear-gradient(180deg,transparent,rgba(255,255,255,.28),rgba(110,188,255,.1),transparent)]" />
       </div>
     );
   }
@@ -70,7 +70,7 @@ function ProjectCover({
       <span className="absolute -bottom-3 right-2 select-none font-mono text-[64px] font-bold leading-none text-white/[.06]">
         {String(index + 1).padStart(2, "0")}
       </span>
-      <div className="project-cover-scan pointer-events-none absolute left-0 top-0 h-[30%] w-full -translate-y-[140%] bg-[linear-gradient(180deg,transparent,rgba(255,255,255,.14),transparent)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="project-cover-scan pointer-events-none absolute left-0 top-0 h-[30%] w-full bg-[linear-gradient(180deg,transparent,rgba(255,255,255,.14),transparent)]" />
     </div>
   );
 }

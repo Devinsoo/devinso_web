@@ -780,10 +780,10 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
         .fromTo(
           "[data-morph-scan]",
           { yPercent: -160, opacity: 0 },
-          { yPercent: 180, opacity: 0.8, duration: 0.22, ease: "power2.inOut" },
+          { yPercent: 700, opacity: 0.8, duration: 0.3, ease: "power1.inOut" },
           0.64,
         )
-        .to("[data-morph-scan]", { opacity: 0, duration: 0.08 }, 0.84)
+        .to("[data-morph-scan]", { opacity: 0, duration: 0.12 }, 0.84)
         .to(".hero-grid-light", { opacity: 0.24, duration: 0.34, ease: "power1.inOut" }, 0.42);
     }, root);
 

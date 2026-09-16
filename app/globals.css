@@ -88,6 +88,17 @@ body {
 .case-section-sweep-links { animation-duration: 15s; animation-delay: -5s; }
 .case-section-sweep-members { animation-duration: 12s; animation-delay: -7s; }
 
+/* Cover strips stay parked above the frame and only travel on hover. */
+.project-cover-scan {
+  opacity: 0;
+  transform: translate3d(0, -140%, 0);
+}
+
+.group:hover .project-cover-scan,
+.project-cover:hover .project-cover-scan {
+  animation: project-cover-scan 1.15s ease-in-out;
+}
+
 .case-shape-frame,
 .case-shape-ring,
 .case-shape-block,
@@ -172,6 +183,13 @@ body {
   100% { transform: translate3d(4%, 4%, 0) rotate(19deg) scale(1.06); opacity: .82; }
 }
 
+@keyframes project-cover-scan {
+  0% { transform: translate3d(0, -140%, 0); opacity: 0; }
+  18% { opacity: 1; }
+  78% { opacity: 1; }
+  100% { transform: translate3d(0, 420%, 0); opacity: 0; }
+}
+
 @keyframes case-shape-frame {
   0% { transform: translate3d(0, 5px, 0) rotate(42deg) scale(.92); opacity: .42; }
   50% { opacity: .75; }
@@ -204,6 +222,7 @@ body {
   .registry-orbit-reverse,
   .registry-vacancy,
   .case-section-sweep,
+  .project-cover-scan,
   .case-shape-frame,
   .case-shape-ring,
   .case-shape-block,
