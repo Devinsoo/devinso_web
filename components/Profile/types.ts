@@ -13,7 +13,11 @@ export type LanguageProficiency = "NATIVE" | "PROFESSIONAL" | "CONVERSATIONAL" |
 // users
 export type MemberUser = {
   id: number;
-  email: string;
+  /**
+   * Optional: the public API does not expose account emails, and nothing on a
+   * public profile renders one.
+   */
+  email?: string;
   role: UserRole;
   status: UserStatus;
   createdAt: string; // ISO date

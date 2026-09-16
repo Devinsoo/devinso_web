@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import { AppShell } from "@/components/AppShell/AppShell";
+import { loadRoster } from "@/lib/content/members";
+import { loadSelectedWork } from "@/lib/content/work";
 import {
   DEVINSO_COOKIE,
   type DevinsoLanguage,
@@ -24,8 +26,15 @@ export async function ScrollExperience() {
   const initialLanguage: DevinsoLanguage | undefined =
     rawLanguage === "en" || rawLanguage === "fa" ? rawLanguage : undefined;
 
+  // Fetched here rather than in the sections themselves: both live inside
+  // client components, and this is the last server boundary above them. The
+  // two calls are independent, so they go out together.
+  const [members, work] = await Promise.all([loadRoster(), loadSelectedWork()]);
+
   return (
     <AppShell
+      members={members}
+      work={work ?? undefined}
       initialEntryComplete={entryComplete}
       initialTheme={initialTheme}
       initialLanguage={initialLanguage}
