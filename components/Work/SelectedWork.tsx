@@ -150,6 +150,9 @@ const COPY = {
   },
 } as const;
 
+/** Resting transform for the follower pill: off-screen, slightly shrunk. */
+const CURSOR_PARKED = "translate3d(-100px, -100px, 0) translate(-50%, -50%) scale(.82)";
+
 const ACCENTS = {
   crimson: {
     glow: "rgba(255,65,92,.18)",
@@ -385,6 +388,7 @@ function InfoBox({ label, value, theme, accent }: { label: string; value: string
 
 export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
   const rootRef = useRef<HTMLElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
   const light = theme === "light";
   const rtl = language === "fa";
   const copy = COPY[language];
@@ -573,23 +577,42 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
     return () => ctx.revert();
   }, [theme, language]);
 
-  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === "touch") return;
-    const target = event.currentTarget;
-    const cursor = target.querySelector<HTMLElement>("[data-work-cursor]");
+  // `cursor: none` is keyed off this attribute rather than being baked into the
+  // markup: before hydration the pill is not being driven yet, and hiding the
+  // native cursor then would leave the cards with no pointer at all.
+  const hideCursor = (cursor: HTMLElement | null) => {
     if (!cursor) return;
-    const rect = target.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    cursor.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) scale(1)`;
+    cursor.style.opacity = "0";
+    cursor.style.transform = CURSOR_PARKED;
+    railRef.current?.removeAttribute("data-cursor-active");
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const cursor = event.currentTarget.querySelector<HTMLElement>("[data-work-cursor]");
+    if (!cursor) return;
+    // Coarse pointers never get the follower: there is no hover state to track
+    // and the pill would just stick where the last tap landed.
+    if (event.pointerType === "touch" || event.pointerType === "pen") {
+      hideCursor(cursor);
+      return;
+    }
+    // The pill only makes sense over a card — the gaps between scenes are not
+    // clickable, so lighting it up there promises a target that is not for real.
+    const overScene = (event.target as HTMLElement | null)?.closest("[data-project-scene]");
+    if (!overScene) {
+      hideCursor(cursor);
+      return;
+    }
+    // The pill is position:fixed, so it is placed in viewport coordinates.
+    // Offsetting by the container rect pushed it off-screen once the section
+    // scrolled past the top edge (rect.top goes negative).
+    cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%) scale(1)`;
     cursor.style.opacity = "1";
+    event.currentTarget.setAttribute("data-cursor-active", "");
   };
 
   const handlePointerLeave = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const cursor = event.currentTarget.querySelector<HTMLElement>("[data-work-cursor]");
-    if (!cursor) return;
-    cursor.style.opacity = "0";
-    cursor.style.transform = "translate3d(50%, 50%, 0) translate(-50%, -50%) scale(.82)";
+    hideCursor(event.currentTarget.querySelector<HTMLElement>("[data-work-cursor]"));
   };
 
   return (
@@ -675,8 +698,18 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
           </div>
         </div>
 
-        <div className="space-y-8" onPointerMove={handlePointerMove} onPointerLeave={handlePointerLeave}>
-          <div data-work-cursor className={`pointer-events-none fixed left-0 top-0 z-50 hidden min-h-[74px] min-w-[74px] -translate-x-1/2 -translate-y-1/2 scale-[.82] items-center justify-center rounded-full border px-4 text-center text-[9px] uppercase tracking-[.16em] opacity-0 transition-opacity duration-200 md:flex ${light ? "border-[#294368]/12 bg-white/92 text-[#17263d] shadow-[0_18px_40px_rgba(18,31,53,.12)]" : "border-white/[.12] bg-[#090d14]/92 text-white/82 shadow-[0_18px_50px_rgba(0,0,0,.35)]"}`}>
+        <div ref={railRef} className="work-rail space-y-8" onPointerMove={handlePointerMove} onPointerLeave={handlePointerLeave}>
+          <div
+            data-work-cursor
+            /* No translate/scale utilities here on purpose. Tailwind emits those
+               as the standalone `translate` and `scale` CSS properties, which
+               compose *before* `transform` — so they would scale and re-offset
+               the position written below, throwing the pill further off the
+               pointer the further it travels. Centering and rest-scale are part
+               of the inline transform instead, driven from one place. */
+            style={{ transform: CURSOR_PARKED }}
+            className={`pointer-events-none fixed left-0 top-0 z-50 hidden min-h-[74px] min-w-[74px] items-center justify-center rounded-full border px-4 text-center text-[9px] uppercase tracking-[.16em] opacity-0 transition-opacity duration-200 md:flex ${light ? "border-[#294368]/12 bg-white/92 text-[#17263d] shadow-[0_18px_40px_rgba(18,31,53,.12)]" : "border-white/[.12] bg-[#090d14]/92 text-white/82 shadow-[0_18px_50px_rgba(0,0,0,.35)]"}`}
+          >
             {copy.viewCase}
           </div>
           {rail.map((project, index) => (

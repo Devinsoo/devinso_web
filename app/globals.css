@@ -88,6 +88,17 @@ body {
 .case-section-sweep-links { animation-duration: 15s; animation-delay: -5s; }
 .case-section-sweep-members { animation-duration: 12s; animation-delay: -7s; }
 
+/* The Work rail draws its own "VIEW CASE" pill as the pointer, so the native
+   cursor is hidden over the cards. Scoped to fine pointers at md and up, which
+   is exactly where the pill is rendered (it is `hidden md:flex`); anywhere else
+   the ordinary link pointer stays. */
+@media (min-width: 768px) and (pointer: fine) {
+  .work-rail[data-cursor-active] [data-project-scene],
+  .work-rail[data-cursor-active] [data-project-scene] a[href] {
+    cursor: none;
+  }
+}
+
 /* Cover strips stay parked above the frame and only travel on hover. */
 .project-cover-scan {
   opacity: 0;
