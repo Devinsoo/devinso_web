@@ -18,7 +18,6 @@ export async function ScrollExperience() {
 
   const rawTheme = cookieStore.get(DEVINSO_COOKIE.theme)?.value;
   const rawLanguage = cookieStore.get(DEVINSO_COOKIE.language)?.value;
-  const entryComplete = cookieStore.get(DEVINSO_COOKIE.entry)?.value === "1";
 
   const initialTheme: DevinsoTheme | undefined =
     rawTheme === "dark" || rawTheme === "light" ? rawTheme : undefined;
@@ -35,7 +34,6 @@ export async function ScrollExperience() {
     <AppShell
       members={members}
       work={work ?? undefined}
-      initialEntryComplete={entryComplete}
       initialTheme={initialTheme}
       initialLanguage={initialLanguage}
     />

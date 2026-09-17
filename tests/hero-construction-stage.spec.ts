@@ -11,7 +11,6 @@ const ORIGIN = "http://localhost:4000";
 
 async function seedPreferences(page: Page) {
   await page.context().addCookies([
-    { name: "devinso_entry", value: "1", url: ORIGIN },
     { name: "devinso_theme", value: "dark", url: ORIGIN },
     { name: "devinso_language", value: "en", url: ORIGIN },
   ]);
