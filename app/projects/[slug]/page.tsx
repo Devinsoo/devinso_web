@@ -28,14 +28,19 @@ type ProjectPageProps = {
  * used; that is why the roster is fetched alongside it.
  */
 async function resolveProject(slug: string): Promise<ProjectDetail | undefined> {
-  const accents = await loadAccentsByUsername();
-  const live = await loadProjectDetail(slug, accents);
+  // The roster read is started without awaiting it, so it overlaps the project
+  // read rather than queueing behind it; `loadProjectDetail` awaits both.
+  const live = await loadProjectDetail(slug, loadAccentsByUsername());
 
   return live ?? getProjectDetail(slug);
 }
 
-async function resolveNextProject(slug: string, current: ProjectDetail): Promise<ProjectDetail> {
-  const live = await loadNextProject(slug);
+/** Picks the teaser from an already-resolved live answer, or the bundled list. */
+function pickNextProject(
+  slug: string,
+  current: ProjectDetail,
+  live: ProjectDetail | null,
+): ProjectDetail {
   if (live) return live;
 
   // Bundled fallback: the next entry in the bundled list, wrapping around.
@@ -73,17 +78,25 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = await resolveProject(slug);
+
+  // The project, the teaser's project list and the cookies are independent of
+  // one another, so all three are started together. Previously each awaited the
+  // one before it, making the page cost the sum of the round trips rather than
+  // the slowest of them.
+  const [project, liveNextProject, cookieStore] = await Promise.all([
+    resolveProject(slug),
+    loadNextProject(slug),
+    cookies(),
+  ]);
 
   if (!project) notFound();
 
-  const cookieStore = await cookies();
   const rawTheme = cookieStore.get(DEVINSO_COOKIE.theme)?.value;
   const rawLanguage = cookieStore.get(DEVINSO_COOKIE.language)?.value;
   const initialTheme: DevinsoTheme = rawTheme === "light" ? "light" : "dark";
   const initialLanguage: DevinsoLanguage = rawLanguage === "fa" ? "fa" : "en";
 
-  const nextProject = await resolveNextProject(slug, project);
+  const nextProject = pickNextProject(slug, project, liveNextProject);
 
   return (
     <ProjectDetailPage

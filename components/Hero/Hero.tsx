@@ -76,6 +76,13 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
     document.body.style.backgroundColor = theme === "light" ? "#e8eef5" : "#050508";
     document.body.style.color = theme === "light" ? "#182235" : "#f2f0ec";
 
+    // A theme swap repaints colours; it can also nudge box sizes (light mode
+    // gives a few chrome elements a border and padding), which moves the points
+    // the scroll timelines are pinned to. Recomputing those positions is all
+    // that is needed — the timelines themselves animate numbers and selectors
+    // and contain no colour, so rebuilding them would be pure waste.
+    ScrollTrigger.refresh();
+
     return () => {
       document.body.style.removeProperty("background-color");
       document.body.style.removeProperty("color");
@@ -788,7 +795,12 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
     }, root);
 
     return () => ctx.revert();
-  }, [theme, language]);
+    // Deliberately not keyed on `theme`: nothing in this timeline reads a
+    // colour, so a theme swap would tear down and rebuild every tween and
+    // ScrollTrigger for no visual difference. The effect above refreshes the
+    // trigger positions instead. `language` stays, because Persian changes the
+    // grid order and the copy lengths, which really does move the layout.
+  }, [language]);
 
   const heroThemeClass = theme === "light"
     ? "[background:radial-gradient(ellipse_58%_52%_at_72%_44%,rgba(79,132,228,.15),transparent_66%),radial-gradient(ellipse_48%_42%_at_42%_78%,rgba(123,102,214,.10),transparent_64%),radial-gradient(circle_at_15%_22%,rgba(37,171,203,.10),transparent_26%),radial-gradient(circle_at_83%_12%,rgba(255,255,255,.98),transparent_22%),linear-gradient(135deg,#fbfdff_0%,#eff4fa_42%,#e8eef7_100%)] text-[#182235]"

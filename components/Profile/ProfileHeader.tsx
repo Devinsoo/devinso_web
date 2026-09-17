@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { useLayoutEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import gsap from "gsap";
 import { FileText, Globe, MapPin, Phone } from "lucide-react";
@@ -142,8 +144,15 @@ export function ProfileHeader({ data, copy, language }: ProfileHeaderProps) {
         >
           <div className="absolute inset-0 rounded-[26px] opacity-70 [background:radial-gradient(circle_at_30%_20%,rgba(var(--accent-a),.16),transparent_60%)]" />
           {profile.avatar ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.avatar} alt={displayName} className="absolute inset-0 h-full w-full rounded-[26px] object-cover" />
+            <Image
+              src={profile.avatar}
+              alt={displayName}
+              fill
+              // The box is a fixed 132px (104px on small screens), so the
+              // optimiser can serve a thumbnail instead of the full upload.
+              sizes="132px"
+              className="rounded-[26px] object-cover"
+            />
           ) : (
             <span className="relative">{initialsFrom(displayName)}</span>
           )}

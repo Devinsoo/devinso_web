@@ -97,6 +97,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
 
   const [active, setActive] = useState(0);
   const [locked, setLocked] = useState(false);
+  const [inView, setInView] = useState(false);
 
   const light = theme === "light";
   const rtl = language === "fa";
@@ -114,16 +115,51 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
     setActive(index);
   }, []);
 
-  // Idle auto-advance keeps the frame alive until the visitor takes over.
+  // The registry sits well below the fold, so track whether it is actually on
+  // screen. Advancing a frame nobody is looking at still re-renders this whole
+  // section and runs a GSAP timeline over its elements.
   useEffect(() => {
-    if (locked) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = window.setInterval(
-      () => setActive((current) => (current + 1) % roster.length),
-      AUTO_ADVANCE_MS,
+    const element = rootRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      // A little margin so the rotation is already running by the time the
+      // section is scrolled to, rather than starting under the visitor's eyes.
+      { rootMargin: "200px" },
     );
-    return () => window.clearInterval(id);
-  }, [locked]);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Idle auto-advance keeps the frame alive until the visitor takes over.
+  // Paused while the section is off screen or the tab is in the background:
+  // both are states in which the advance cannot be seen, and a background tab
+  // throttles the timer into bursts of catch-up renders on return.
+  useEffect(() => {
+    if (locked || !inView) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let id = 0;
+    const advance = () => setActive((current) => (current + 1) % roster.length);
+    const start = () => {
+      if (!id) id = window.setInterval(advance, AUTO_ADVANCE_MS);
+    };
+    const stop = () => {
+      if (id) window.clearInterval(id);
+      id = 0;
+    };
+    const onVisibilityChange = () => (document.hidden ? stop() : start());
+
+    if (!document.hidden) start();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [locked, inView, roster.length]);
 
   // On-enter reveal. Targets leaf elements rather than a wrapper: an ancestor
   // with opacity < 1 forms a backdrop root and would blank out the glass blur
@@ -163,7 +199,10 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
     }, rootRef);
 
     return () => ctx.revert();
-  }, [theme, language]);
+    // Not keyed on `theme`: this timeline animates positions and opacities
+    // only, so a theme swap used to rebuild every tween and ScrollTrigger here
+    // for no visual change. Hero refreshes the trigger positions instead.
+  }, [language]);
 
   // Transition choreography when the active slot changes: a scan line wipes the
   // frame, the monogram blurs through, the record lines stagger back in.

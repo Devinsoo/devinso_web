@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useLayoutEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -236,11 +237,13 @@ function ProjectPreview({ project, light }: { project: WorkProject; light: boole
   if (project.coverImage) {
     return (
       <div className={`absolute inset-[3.2%] overflow-hidden rounded-[22px] border ${light ? "border-[#294368]/10 bg-[#e8eef6]" : "border-white/[.075] bg-[#080a0f]"}`}>
-        <img
+        <Image
           data-project-image
           src={project.coverImage}
           alt={project.coverAlt ?? project.title}
-          className="h-full w-full scale-[1.08] object-cover object-center [will-change:transform,filter,opacity]"
+          fill
+          sizes="(max-width: 1024px) 100vw, 60vw"
+          className="scale-[1.08] object-cover object-center [will-change:transform,filter,opacity]"
           draggable={false}
         />
         <div className={`pointer-events-none absolute inset-0 ${light ? "bg-[linear-gradient(180deg,rgba(6,17,34,.08),transparent_30%,rgba(11,25,45,.18)_100%)]" : "bg-[linear-gradient(180deg,rgba(2,4,8,.14),transparent_32%,rgba(2,4,8,.34)_100%)]"}`} />
@@ -575,7 +578,10 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
     }, rootRef);
 
     return () => ctx.revert();
-  }, [theme, language]);
+    // Not keyed on `theme`: this timeline animates positions and opacities
+    // only, so a theme swap used to rebuild every tween and ScrollTrigger here
+    // for no visual change. Hero refreshes the trigger positions instead.
+  }, [language]);
 
   // `cursor: none` is keyed off this attribute rather than being baked into the
   // markup: before hydration the pill is not being driven yet, and hiding the

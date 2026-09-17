@@ -186,15 +186,20 @@ export function toMemberProjects(projects: ApiMemberProject[]): MemberProject[] 
  */
 export async function loadProjectDetail(
   slug: string,
-  accentByUsername: Map<string, keyof typeof ACCENT_PALETTE> = new Map(),
+  accentByUsername:
+    | Map<string, keyof typeof ACCENT_PALETTE>
+    | Promise<Map<string, keyof typeof ACCENT_PALETTE>> = new Map(),
 ): Promise<ProjectDetail | null> {
-  const project = await fetchProject(slug);
+  // The roster is only needed to pick the accent, so it does not have to wait
+  // for the project. Accepting a promise lets the caller start both reads at
+  // once and turns two serial round trips into one.
+  const [project, accents] = await Promise.all([fetchProject(slug), accentByUsername]);
   if (!project) return null;
 
   const lead = project.members.find((member) => member.role === "Lead" || member.role === "Creator")
     ?? project.members[0];
 
-  const accentKey = (lead?.username && accentByUsername.get(lead.username)) || "crimson";
+  const accentKey = (lead?.username && accents.get(lead.username)) || "crimson";
 
   return toProjectDetail(project, accentKey);
 }

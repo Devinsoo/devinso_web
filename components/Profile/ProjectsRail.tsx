@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import Link from "next/link";
 import { useLayoutEffect, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import gsap from "gsap";
@@ -46,11 +48,12 @@ function ProjectCover({
   if (project.coverImage) {
     return (
       <div className="project-cover relative aspect-[16/10] w-full overflow-hidden rounded-[16px] border border-white/[.07]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={project.coverImage}
           alt={project.title}
-          className="project-cover-image h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+          fill
+          sizes="(max-width: 900px) 100vw, 420px"
+          className="project-cover-image object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(2,4,8,.55))]" />
         <div className="project-cover-scan pointer-events-none absolute left-0 top-0 h-[24%] w-full bg-[linear-gradient(180deg,transparent,rgba(255,255,255,.28),rgba(110,188,255,.1),transparent)]" />
