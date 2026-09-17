@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { FitTitle } from "@/components/Projects/FitTitle";
 import { RichText } from "@/components/Projects/RichText";
 import Link from "next/link";
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
@@ -375,7 +376,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         <section className="mx-auto grid w-[min(1440px,calc(100%_-_clamp(28px,6vw,96px)))] gap-12 pb-[clamp(48px,7vw,96px)] pt-[clamp(68px,9vw,130px)] lg:grid-cols-[1.25fr_.75fr] lg:items-end">
           <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
             <div data-project-intro className="flex items-center gap-3"><span className="rounded-full border px-3 py-2 font-mono text-[7px] tracking-[.16em]" style={{ borderColor: `${project.accent}55`, color: project.accent }}>{statusLabel(project.status, language)}</span><span className={`font-mono text-[8px] uppercase tracking-[.18em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>{typeLabel(project.type, language)} / ID {project.id}</span></div>
-            <h1 data-project-intro className="mt-7 max-w-[11ch] text-[clamp(52px,8.3vw,122px)] font-[570] leading-[.82] tracking-[-.075em] [direction:ltr]">{project.title}</h1>
+            <FitTitle data-project-intro text={project.title} min={34} max={122} maxLines={3} leading={0.86} className="mt-7 font-[570] tracking-[-.075em] [direction:ltr]" />
           </div>
           <div data-project-intro className={rtl ? "text-right [direction:rtl]" : "text-left"}>
             <p className={`max-w-[58ch] text-[14px] leading-8 ${light ? "text-[#243b59]/62" : "text-white/52"}`}>{language === "fa" ? project.descriptionFa : project.description}</p>
