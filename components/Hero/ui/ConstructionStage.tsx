@@ -67,10 +67,16 @@ export function ConstructionStage({
   } max-[540px]:hidden`;
 
   return (
+    // Deliberately not [data-reveal]: the hero's scrubbed timeline owns this
+    // element's opacity, and the intro's reveal of the [data-reveal] group
+    // fights it for ownership. Whichever writes last wins, which left the
+    // stage invisible after a reload partway down the page, and — once that
+    // was fixed — stuck at full opacity, never dimming across the hero again.
+    // Nothing is lost visually: everything inside the stage (the logo, code
+    // panels, grid lines and captions) animates in on its own.
     <div
       ref={stageRef}
       className={`hero-logo-stage relative z-10 grid min-h-[620px] ${rtl ? "min-[961px]:order-1" : "min-[961px]:order-2"} min-w-0 place-items-center [perspective:1600px] [isolation:isolate] max-[1240px]:min-h-[560px] max-[960px]:w-full max-[960px]:min-h-[clamp(480px,64vw,560px)] max-[540px]:mt-3 max-[540px]:flex max-[540px]:min-h-0 max-[540px]:flex-col max-[540px]:items-center max-[540px]:justify-start max-[540px]:gap-4 max-[540px]:overflow-visible max-[540px]:[perspective:none] max-[390px]:mt-2.5 max-[390px]:gap-3.5`}
-      data-reveal
     >
       {light && (
         <>

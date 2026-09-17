@@ -4,7 +4,6 @@ export type DevinsoLanguage = "en" | "fa";
 export const DEVINSO_COOKIE = {
   theme: "devinso_theme",
   language: "devinso_language",
-  entry: "devinso_entry",
 } as const;
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
@@ -42,17 +41,4 @@ export function getSavedTheme(): DevinsoTheme | undefined {
 export function getSavedLanguage(): DevinsoLanguage | undefined {
   const value = getCookie(DEVINSO_COOKIE.language);
   return value === "en" || value === "fa" ? value : undefined;
-}
-
-export function isEntryComplete(): boolean {
-  return getCookie(DEVINSO_COOKIE.entry) === "1";
-}
-
-export function savePreferences(theme: DevinsoTheme, language: DevinsoLanguage): void {
-  setCookie(DEVINSO_COOKIE.theme, theme);
-  setCookie(DEVINSO_COOKIE.language, language);
-}
-
-export function markEntryComplete(): void {
-  setCookie(DEVINSO_COOKIE.entry, "1");
 }

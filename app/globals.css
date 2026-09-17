@@ -1,1 +1,256 @@
 @import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 92px;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
+/*
+ * Description text boxes, which store HTML from the admin editor. Tailwind's
+ * reset flattens <strong>, <em> and lists, so the small tag set the API's
+ * sanitizer allows (p, br, strong, em, u, s, ul, ol, li) is restyled here -
+ * otherwise bold text renders identically to plain text and a list loses its
+ * markers. Colour and size come from the caller, so a box inherits whatever
+ * the surrounding section sets.
+ */
+.rich-text > :first-child {
+  margin-top: 0;
+}
+
+.rich-text > :last-child {
+  margin-bottom: 0;
+}
+
+.rich-text p {
+  margin-block: 0.85em;
+}
+
+.rich-text strong {
+  font-weight: 640;
+  color: color-mix(in oklab, currentColor 100%, white 22%);
+}
+
+.rich-text em {
+  font-style: italic;
+}
+
+.rich-text u {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rich-text s {
+  text-decoration: line-through;
+  opacity: 0.72;
+}
+
+.rich-text ul,
+.rich-text ol {
+  margin-block: 0.85em;
+  padding-inline-start: 1.4em;
+}
+
+.rich-text ul {
+  list-style: disc;
+}
+
+.rich-text ol {
+  list-style: decimal;
+}
+
+.rich-text li {
+  margin-block: 0.35em;
+}
+
+.rich-text li::marker {
+  color: currentColor;
+  opacity: 0.55;
+}
+
+.case-flow-line {
+  animation: case-flow 3.4s ease-in-out infinite;
+}
+
+.case-orbit {
+  animation: case-orbit 16s linear infinite;
+}
+
+.case-section-sweep {
+  animation: case-section-sweep 11s ease-in-out infinite alternate;
+}
+
+.case-section-sweep-content { animation-duration: 13s; animation-delay: -2.5s; }
+.case-section-sweep-stack { animation-duration: 9s; animation-delay: -1s; }
+.case-section-sweep-links { animation-duration: 15s; animation-delay: -5s; }
+.case-section-sweep-members { animation-duration: 12s; animation-delay: -7s; }
+
+/* The Work rail draws its own "VIEW CASE" pill as the pointer, so the native
+   cursor is hidden over the cards. Scoped to fine pointers at md and up, which
+   is exactly where the pill is rendered (it is `hidden md:flex`); anywhere else
+   the ordinary link pointer stays. */
+@media (min-width: 768px) and (pointer: fine) {
+  .work-rail[data-cursor-active] [data-project-scene],
+  .work-rail[data-cursor-active] [data-project-scene] a[href] {
+    cursor: none;
+  }
+}
+
+/* Cover strips stay parked above the frame and only travel on hover. */
+.project-cover-scan {
+  opacity: 0;
+  transform: translate3d(0, -140%, 0);
+}
+
+.group:hover .project-cover-scan,
+.project-cover:hover .project-cover-scan {
+  animation: project-cover-scan 1.15s ease-in-out;
+}
+
+.case-shape-frame,
+.case-shape-ring,
+.case-shape-block,
+.case-shape-line {
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.case-shape-frame { animation: case-shape-frame 12s cubic-bezier(.45, 0, .25, 1) infinite alternate; }
+.case-shape-ring { animation: case-shape-ring 8s ease-in-out infinite; }
+.case-shape-block { animation: case-shape-block 10s cubic-bezier(.45, 0, .25, 1) infinite alternate; }
+.case-shape-line { animation: case-shape-line 6s ease-in-out infinite; }
+
+/* Glass surfaces. Tune the whole projects page from these two values. */
+:root {
+  --glass-blur: 13px;
+  --glass-blur-strong: 20px;
+  --glass-saturate: 165%;
+}
+
+.project-interactive-card {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  transition: transform .65s cubic-bezier(.22, 1, .36, 1), border-color .45s ease, box-shadow .65s cubic-bezier(.22, 1, .36, 1), background-color .45s ease, backdrop-filter .45s ease;
+}
+
+.project-interactive-card:hover {
+  transform: translateY(-6px);
+  backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+  border-color: color-mix(in srgb, var(--project-accent) 58%, transparent);
+  box-shadow: 0 22px 58px color-mix(in srgb, var(--project-accent) 13%, transparent);
+}
+
+/* Member registry console. Shares the projects-page glass system. */
+.registry-surface {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.registry-frame {
+  backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+}
+
+/* Rotating ring around the monogram. Reuses the projects-page orbit keyframes. */
+.registry-orbit {
+  animation: case-orbit 22s linear infinite;
+}
+
+.registry-orbit-reverse {
+  animation: case-orbit 34s linear infinite reverse;
+}
+
+/* Slow breathing pulse on an unfilled slot's empty centre. */
+.registry-vacancy {
+  animation: registry-vacancy 3.6s ease-in-out infinite;
+}
+
+/* Row marker easing, kept in CSS so hover stays responsive without JS. */
+.registry-row {
+  transition: transform .5s cubic-bezier(.22, 1, .36, 1), color .35s ease, opacity .35s ease;
+}
+
+@keyframes registry-vacancy {
+  0%, 100% { opacity: .28; transform: scale(.94); }
+  50% { opacity: .72; transform: scale(1.04); }
+}
+
+/* Glass reads only against a translucent fill, so keep the surface light. */
+.project-glass-header {
+  backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
+}
+
+@keyframes case-flow {
+  0%, 100% { opacity: .28; transform: scaleX(.76); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes case-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes case-section-sweep {
+  0% { transform: translate3d(-3%, -2%, 0) rotate(15deg) scale(.94); opacity: .45; }
+  100% { transform: translate3d(4%, 4%, 0) rotate(19deg) scale(1.06); opacity: .82; }
+}
+
+@keyframes project-cover-scan {
+  0% { transform: translate3d(0, -140%, 0); opacity: 0; }
+  18% { opacity: 1; }
+  78% { opacity: 1; }
+  100% { transform: translate3d(0, 420%, 0); opacity: 0; }
+}
+
+@keyframes case-shape-frame {
+  0% { transform: translate3d(0, 5px, 0) rotate(42deg) scale(.92); opacity: .42; }
+  50% { opacity: .75; }
+  100% { transform: translate3d(-9px, -7px, 0) rotate(50deg) scale(1.04); opacity: .9; }
+}
+
+@keyframes case-shape-ring {
+  0%, 100% { transform: scale(.9); opacity: .34; }
+  50% { transform: scale(1.12); opacity: .82; }
+}
+
+@keyframes case-shape-block {
+  0% { transform: translate3d(3px, 7px, 0) rotate(0deg); opacity: .38; }
+  100% { transform: translate3d(-8px, -5px, 0) rotate(8deg); opacity: .8; }
+}
+
+@keyframes case-shape-line {
+  0%, 100% { transform: translateX(-8%) scaleX(.72); opacity: .25; }
+  50% { transform: translateX(8%) scaleX(1); opacity: .76; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .case-flow-line,
+  .case-orbit,
+  .registry-orbit,
+  .registry-orbit-reverse,
+  .registry-vacancy,
+  .case-section-sweep,
+  .project-cover-scan,
+  .case-shape-frame,
+  .case-shape-ring,
+  .case-shape-block,
+  .case-shape-line {
+    animation: none !important;
+  }
+
+  .project-interactive-card {
+    transition: none;
+  }
+
+  .project-interactive-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .registry-row {
+    transition: none;
+  }
+}
