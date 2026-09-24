@@ -9,6 +9,8 @@ import { HeroFooter } from "@/components/Hero/ui/HeroFooter";
 import { ConstructionStage } from "@/components/Hero/ui/ConstructionStage";
 import { SelectedWork, type WorkProject } from "@/components/Work/SelectedWork";
 import { MembersSection } from "@/components/Members/MembersSection";
+import { SiteFooter } from "@/components/Footer/SiteFooter";
+import type { ApiSiteSettings } from "@/lib/api/types";
 import type { TeamMember } from "@/lib/team";
 import { CONSTRUCTION_SETTINGS, GRID_LINES } from "@/components/Hero/construction";
 import gsap from "gsap";
@@ -50,13 +52,13 @@ type HeroProps = {
   members?: TeamMember[];
   /** Team projects fetched on the server; the rail falls back without them. */
   work?: WorkProject[];
+  /** Site-wide settings (contact, social, identity) rendered by the footer. */
+  settings?: ApiSiteSettings | null;
 };
 
-export function Hero({ initialTheme = "dark", initialLanguage = "en", members, work }: HeroProps) {
+export function Hero({ initialTheme = "dark", initialLanguage = "en", members, work, settings }: HeroProps) {
   const rootRef = useRef<HTMLElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
-  const morphCoverRef = useRef<HTMLDivElement>(null);
-  const morphImageRef = useRef<HTMLImageElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const [theme, setTheme] = useState<"dark" | "light">(initialTheme);
   const [language, setLanguage] = useState<Language>(initialLanguage);
@@ -628,63 +630,17 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
   }, []);
 
   useLayoutEffect(() => {
-    if (!rootRef.current || !stickyRef.current || !coreRef.current || !morphCoverRef.current || !morphImageRef.current) return;
+    if (!rootRef.current || !coreRef.current) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) return;
 
     const root = rootRef.current;
-    const sticky = stickyRef.current;
-    const morphCover = morphCoverRef.current;
-    const morphImage = morphImageRef.current;
-
-    const getStart = () => {
-      const stickyRect = sticky.getBoundingClientRect();
-      const coreRect = coreRef.current!.getBoundingClientRect();
-      return {
-        x: coreRect.left - stickyRect.left + coreRect.width * 0.065,
-        y: coreRect.top - stickyRect.top + coreRect.height * 0.075,
-        width: coreRect.width * 0.87,
-        height: coreRect.height * 0.85,
-      };
-    };
-
-    const getEnd = () => {
-      const width = sticky.clientWidth;
-      const height = sticky.clientHeight;
-      const mobile = width < 760;
-      const compact = width < 1080;
-      const finalWidth = mobile
-        ? width - 28
-        : Math.min(width * (compact ? 0.58 : 0.56), 900);
-      const finalHeight = finalWidth * 9 / 16;
-      return {
-        x: mobile ? 14 : width - finalWidth - Math.max(32, width * 0.055),
-        y: mobile ? Math.max(300, height * 0.42) : Math.max(150, (height - finalHeight) * 0.53),
-        width: finalWidth,
-        height: finalHeight,
-      };
-    };
 
     const ctx = gsap.context(() => {
-      const start = getStart();
-      gsap.set(morphCover, {
-        x: start.x,
-        y: start.y,
-        width: start.width,
-        height: start.height,
-        opacity: 0,
-        borderRadius: 28,
-      });
-      gsap.set(morphImage, {
-        opacity: 0,
-        scale: 1.16,
-        filter: "blur(12px) brightness(.62)",
-        clipPath: "inset(49% 0% 49% 0% round 22px)",
-      });
       gsap.set("[data-morph-work-heading]", { y: 58, opacity: 0, filter: "blur(9px)" });
       gsap.set("[data-morph-meta]", { y: 12, opacity: 0 });
-      gsap.set("[data-morph-scan]", { yPercent: -160, opacity: 0 });
+      gsap.set("[data-morph-scroll-cue]", { y: 20, opacity: 0 });
 
       const timeline = gsap.timeline({
         scrollTrigger: {
@@ -740,36 +696,16 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
           duration: 0.46,
           ease: "power2.inOut",
         }, 0.15)
-        .fromTo(
-          morphCover,
-          {
-            x: () => getStart().x,
-            y: () => getStart().y,
-            width: () => getStart().width,
-            height: () => getStart().height,
-            opacity: 0,
-            borderRadius: 30,
-          },
-          {
-            x: () => getEnd().x,
-            y: () => getEnd().y,
-            width: () => getEnd().width,
-            height: () => getEnd().height,
-            opacity: 1,
-            borderRadius: 24,
-            duration: 0.62,
-            ease: "power3.inOut",
-          },
-          0.13,
-        )
-        .to(morphImage, {
-          opacity: 1,
-          scale: 1.04,
-          filter: "blur(0px) brightness(1)",
-          clipPath: "inset(0% 0% 0% 0% round 18px)",
-          duration: 0.42,
-          ease: "power3.out",
-        }, 0.42)
+        // The code panels used to sit beside the cover card. With the title now
+        // centred over them they read as clutter behind the type, so they clear
+        // out with the rest of the hero furniture instead of lingering.
+        .to(".code-atmosphere", {
+          opacity: 0,
+          y: -16,
+          filter: "blur(7px)",
+          duration: 0.30,
+          ease: "power2.in",
+        }, 0.12)
         .to("[data-morph-work-heading]", {
           y: 0,
           opacity: 1,
@@ -784,14 +720,30 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
           stagger: 0.04,
           ease: "power2.out",
         }, 0.62)
-        .fromTo(
-          "[data-morph-scan]",
-          { yPercent: -160, opacity: 0 },
-          { yPercent: 700, opacity: 0.8, duration: 0.3, ease: "power1.inOut" },
-          0.64,
-        )
-        .to("[data-morph-scan]", { opacity: 0, duration: 0.12 }, 0.84)
+        .to("[data-morph-scroll-cue]", {
+          y: 0,
+          opacity: 1,
+          duration: 0.26,
+          ease: "power2.out",
+        }, 0.70)
         .to(".hero-grid-light", { opacity: 0.24, duration: 0.34, ease: "power1.inOut" }, 0.42);
+
+      // The cue's travelling light runs on its own loop rather than on the
+      // scrubbed timeline: it has to keep inviting the scroll while the reader
+      // is sitting still, which a scrub-driven tween cannot do.
+      // The rail clips the beam at both ends, so it travels in and out on its
+      // own — animating opacity as well would only make the repeat visibly jump.
+      gsap.fromTo(
+        "[data-cue-beam]",
+        { yPercent: -120 },
+        {
+          yPercent: 260,
+          duration: 1.8,
+          ease: "power1.inOut",
+          repeat: -1,
+          repeatDelay: 0.5,
+        },
+      );
     }, root);
 
     return () => ctx.revert();
@@ -849,41 +801,32 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
 
         <div
           data-morph-work-heading
-          className={`pointer-events-none absolute left-[clamp(22px,5.5vw,86px)] top-[31%] z-[34] max-w-[38vw] max-[760px]:left-4 max-[760px]:top-[19%] max-[760px]:max-w-[calc(100%_-_32px)] ${language === "fa" ? "text-right [direction:rtl]" : "text-left"}`}
+          className={`pointer-events-none absolute inset-x-0 top-1/2 z-[34] flex -translate-y-1/2 flex-col items-center px-6 text-center ${language === "fa" ? "[direction:rtl]" : ""}`}
         >
-          <div className={`font-mono text-[9px] uppercase tracking-[.2em] ${theme === "light" ? "text-[#253a5a]/40" : "text-white/30"}`} data-morph-meta>
+          <div className={`font-mono text-[10px] uppercase tracking-[.32em] ${theme === "light" ? "text-[#253a5a]/40" : "text-white/30"}`} data-morph-meta>
             01 / SELECTED WORK
           </div>
-          <div className={`mt-5 text-[clamp(54px,7.8vw,126px)] font-[560] leading-[.78] tracking-[-.085em] ${theme === "light" ? "text-[#172238]" : "text-[#f4f6fb]"}`}>
+          <div className={`mt-6 text-[clamp(58px,11vw,188px)] font-[560] leading-[.8] tracking-[-.075em] ${theme === "light" ? "text-[#172238]" : "text-[#f4f6fb]"}`}>
             SELECTED
-            <span className={`mt-[.12em] block ${theme === "light" ? "text-[#172238]/14" : "text-white/10"}`}>WORK</span>
+            <span className={`mt-[.1em] block ${theme === "light" ? "text-[#172238]/14" : "text-white/10"}`}>WORK</span>
           </div>
-          <div className={`mt-8 max-w-[340px] text-[11px] leading-[1.75] ${theme === "light" ? "text-[#2b3953]/48" : "text-white/40"}`} data-morph-meta>
+          <div className={`mt-8 max-w-[420px] text-[11px] leading-[1.75] ${theme === "light" ? "text-[#2b3953]/48" : "text-white/40"}`} data-morph-meta>
             Design, technology and interaction — resolved into shipped work.
           </div>
-        </div>
 
-        <div
-          ref={morphCoverRef}
-          data-hero-morph-cover
-          className={`pointer-events-none absolute left-0 top-0 z-[36] overflow-hidden border [will-change:transform,width,height,opacity] ${
-            theme === "light"
-              ? "border-[#294368]/10 bg-[#e9eef6] shadow-[0_36px_90px_rgba(45,65,98,.16)]"
-              : "border-white/[.09] bg-[#07090d] shadow-[0_42px_110px_rgba(0,0,0,.55),0_0_70px_rgba(113,135,255,.06)]"
-          }`}
-        >
-          <img
-            ref={morphImageRef}
-            src="/projects/allixro-cover-1920x1080.jpg"
-            alt="Allixro red profile project cover"
-            className="absolute inset-0 h-full w-full object-cover object-center [will-change:transform,filter,clip-path,opacity]"
-            draggable={false}
-          />
-          <div className={`absolute inset-0 ${theme === "light" ? "bg-[linear-gradient(180deg,transparent_58%,rgba(18,37,66,.10))]" : "bg-[linear-gradient(180deg,transparent_54%,rgba(2,4,8,.32))]"}`} />
-          <div data-morph-scan className={`absolute left-0 top-0 z-10 h-[16%] w-full ${theme === "light" ? "bg-[linear-gradient(180deg,transparent,rgba(255,255,255,.62),rgba(69,117,183,.15),transparent)]" : "bg-[linear-gradient(180deg,transparent,rgba(186,226,255,.38),rgba(114,229,238,.08),transparent)]"}`} />
-          <div className={`absolute bottom-4 left-4 right-4 z-20 flex items-center justify-between border-t pt-3 font-mono text-[7.5px] uppercase tracking-[.15em] ${theme === "light" ? "border-[#294368]/10 text-[#213550]/42" : "border-white/[.08] text-white/34"}`} data-morph-meta>
-            <span>ASSET / COVER_01</span>
-            <span>16:9 / LOADED</span>
+          {/* Invitation to keep scrolling: the projects themselves live below
+              this sticky hero, so the section needs to say that out loud now
+              that no cover sits here to imply more content. */}
+          <div data-morph-scroll-cue className="mt-11 flex flex-col items-center">
+            <div className={`font-mono text-[9px] uppercase tracking-[.34em] ${theme === "light" ? "text-[#253a5a]/45" : "text-white/35"}`}>
+              {copy.stage.scroll}
+            </div>
+            <div className={`relative mt-4 h-[92px] w-px overflow-hidden ${theme === "light" ? "bg-[#294368]/12" : "bg-white/10"}`}>
+              <div
+                data-cue-beam
+                className={`absolute left-0 top-0 h-[38px] w-full ${theme === "light" ? "bg-[linear-gradient(180deg,transparent,#2397bb,transparent)]" : "bg-[linear-gradient(180deg,transparent,#59e1ee,transparent)]"}`}
+              />
+            </div>
           </div>
         </div>
 
@@ -894,6 +837,8 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
       <SelectedWork theme={theme} language={language} projects={work} />
 
       <MembersSection theme={theme} language={language} members={members} />
+
+      <SiteFooter theme={theme} language={language} settings={settings} />
     </>
   );
 }

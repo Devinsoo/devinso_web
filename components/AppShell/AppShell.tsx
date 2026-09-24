@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Hero } from "@/components/Hero/Hero";
 import type { TeamMember } from "@/lib/team";
 import type { WorkProject } from "@/components/Work/SelectedWork";
+import type { ApiSiteSettings } from "@/lib/api/types";
 import type { DevinsoLanguage, DevinsoTheme } from "@/lib/preferences";
 
 type AppShellProps = {
@@ -11,6 +12,8 @@ type AppShellProps = {
   members?: TeamMember[];
   /** Team projects fetched on the server and handed to the work rail. */
   work?: WorkProject[];
+  /** Site-wide settings (contact, social, identity) used by the footer. */
+  settings?: ApiSiteSettings | null;
   initialTheme?: DevinsoTheme;
   initialLanguage?: DevinsoLanguage;
 };
@@ -23,7 +26,7 @@ function getBrowserLanguage(): DevinsoLanguage {
   return window.navigator.language?.toLowerCase().startsWith("fa") ? "fa" : "en";
 }
 
-export function AppShell({ initialTheme, initialLanguage, members, work }: AppShellProps) {
+export function AppShell({ initialTheme, initialLanguage, members, work, settings }: AppShellProps) {
   const [theme, setTheme] = useState<DevinsoTheme>(initialTheme ?? "dark");
   const [language, setLanguage] = useState<DevinsoLanguage>(initialLanguage ?? "en");
 
@@ -46,5 +49,13 @@ export function AppShell({ initialTheme, initialLanguage, members, work }: AppSh
     document.documentElement.dir = "ltr";
   }, [language]);
 
-  return <Hero initialTheme={theme} initialLanguage={language} members={members} work={work} />;
+  return (
+    <Hero
+      initialTheme={theme}
+      initialLanguage={language}
+      members={members}
+      work={work}
+      settings={settings}
+    />
+  );
 }

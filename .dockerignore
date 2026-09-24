@@ -1,0 +1,27 @@
+# Dependencies and build output are recreated inside the image.
+node_modules
+.next
+out
+build
+dist
+
+# Env / secrets arrive via docker-compose, never baked into a layer.
+.env
+.env.local
+.env.*.local
+
+# Local noise
+.git
+.github
+.vscode
+.idea
+.vs
+.claude
+coverage
+test-results
+playwright-report
+*.log
+
+# Docker's own files
+Dockerfile*
+.dockerignore
