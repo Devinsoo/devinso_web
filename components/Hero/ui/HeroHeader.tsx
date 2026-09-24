@@ -45,10 +45,13 @@ export function HeroHeader({ copy, theme, language, settingsOpen, settingsRef, o
         data-reveal
         aria-label={copy.nav.aria}
       >
-        {[copy.nav.work, copy.nav.studio, copy.nav.contact].map((label, index) => (
+        {/* `#contact` has no section yet — it stays here deliberately, waiting
+            for the contact block to be built. The other two point at sections
+            that exist. */}
+        {[copy.nav.work, copy.nav.team, copy.nav.contact].map((label, index) => (
           <a
             key={label}
-            href={index === 0 ? "#work" : index === 1 ? "#studio" : "#contact"}
+            href={index === 0 ? "#work" : index === 1 ? "#members" : "#contact"}
             className={`relative transition-colors duration-300 after:absolute after:-bottom-1.5 after:left-0 after:right-0 after:h-px after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 max-[540px]:hidden ${
               light ? "hover:text-[#172238] after:bg-[#2397bb]/55" : "hover:text-white/85 after:bg-[#96c3ff]/65"
             }`}

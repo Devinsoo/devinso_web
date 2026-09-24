@@ -65,6 +65,14 @@ const nextConfig: NextConfig = {
     // default (false) is what keeps the optimiser from being pointed at
     // anything on the deploy target's own network.
     dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
+
+    // Under Docker Compose the media origin the browser sees (localhost:5100 →
+    // the admin container) is not resolvable from inside *this* container, so
+    // the server-side image optimiser cannot fetch the upload. Opting out of
+    // optimisation makes next/image emit a plain <img> the browser loads
+    // straight from the admin app. Off by default — unset locally, so normal
+    // dev and Vercel builds keep the optimiser. See docker-compose.yml.
+    unoptimized: process.env.DEVINSO_UNOPTIMIZED_IMAGES === "1",
   },
 };
 

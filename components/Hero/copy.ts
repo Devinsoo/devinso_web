@@ -1,7 +1,7 @@
 export const UI_COPY = {
   en: {
     studioTagline: "Digital product team",
-    nav: { work: "Work", studio: "Studio", contact: "Contact", settings: "Settings", aria: "Primary navigation" },
+    nav: { work: "Work", team: "Team", contact: "Contact", settings: "Settings", aria: "Primary navigation" },
     settings: {
       eyebrow: "Interface",
       title: "Preferences",
@@ -71,7 +71,7 @@ export const UI_COPY = {
   },
   fa: {
     studioTagline: "تیم طراحی محصول دیجیتال",
-    nav: { work: "نمونه‌کار", studio: "استودیو", contact: "تماس", settings: "تنظیمات", aria: "ناوبری اصلی" },
+    nav: { work: "نمونه‌کار", team: "تیم", contact: "تماس", settings: "تنظیمات", aria: "ناوبری اصلی" },
     settings: {
       eyebrow: "رابط",
       title: "تنظیمات",
