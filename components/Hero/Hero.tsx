@@ -9,6 +9,8 @@ import { HeroFooter } from "@/components/Hero/ui/HeroFooter";
 import { ConstructionStage } from "@/components/Hero/ui/ConstructionStage";
 import { SelectedWork, type WorkProject } from "@/components/Work/SelectedWork";
 import { MembersSection } from "@/components/Members/MembersSection";
+import { SiteFooter } from "@/components/Footer/SiteFooter";
+import type { ApiSiteSettings } from "@/lib/api/types";
 import type { TeamMember } from "@/lib/team";
 import { CONSTRUCTION_SETTINGS, GRID_LINES } from "@/components/Hero/construction";
 import gsap from "gsap";
@@ -50,9 +52,11 @@ type HeroProps = {
   members?: TeamMember[];
   /** Team projects fetched on the server; the rail falls back without them. */
   work?: WorkProject[];
+  /** Site-wide settings (contact, social, identity) rendered by the footer. */
+  settings?: ApiSiteSettings | null;
 };
 
-export function Hero({ initialTheme = "dark", initialLanguage = "en", members, work }: HeroProps) {
+export function Hero({ initialTheme = "dark", initialLanguage = "en", members, work, settings }: HeroProps) {
   const rootRef = useRef<HTMLElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -833,6 +837,8 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
       <SelectedWork theme={theme} language={language} projects={work} />
 
       <MembersSection theme={theme} language={language} members={members} />
+
+      <SiteFooter theme={theme} language={language} settings={settings} />
     </>
   );
 }
