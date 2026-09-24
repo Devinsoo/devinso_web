@@ -32,10 +32,19 @@ export function AppShell({ initialTheme, initialLanguage, members, work, setting
 
   useEffect(() => {
     // No saved preference: fall back to what the browser already tells us.
+    //
+    // This deliberately runs after mount instead of during render. The server
+    // cannot read matchMedia or navigator.language, so resolving it inline
+    // would make the client's first render disagree with the server's markup
+    // and blow up hydration. Seeding from the cookie and correcting once on
+    // the client is the hydration-safe shape — which is precisely what
+    // set-state-in-effect cannot distinguish from a cascading render.
+    /* eslint-disable react-hooks/set-state-in-effect */
     const nextTheme = initialTheme ?? getSystemTheme();
     const nextLanguage = initialLanguage ?? getBrowserLanguage();
     setTheme(nextTheme);
     setLanguage(nextLanguage);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [initialLanguage, initialTheme]);
 
   useEffect(() => {
