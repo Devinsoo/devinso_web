@@ -54,8 +54,17 @@ Copy `.env.example` to `.env.local` and adjust if your ports differ:
 
 Server components call the API origin directly, so the URL never reaches the
 client bundle. Browser calls go to `/api/devinso/*` on this origin, which
-`next.config.ts` rewrites onto the API — no CORS preflight in dev. Reads happen
-on the server today; the proxy matters for the form posts.
+`app/api/devinso/[...path]` proxies onto the API — no CORS preflight in dev.
+Reads happen on the server today; the proxy matters for the form posts.
+Uploaded images take the same shape: `/uploads/*` is proxied onto
+`DEVINSO_MEDIA_URL` by `app/uploads/[...path]`.
+
+Both are route handlers rather than `next.config.ts` rewrites on purpose. A
+rewrite's `destination` is resolved by `next build` and frozen into
+`.next/routes-manifest.json`, which `next start` serves from without re-running
+the config — so an image built by CI (where neither origin env var is set)
+bakes in the localhost defaults and ignores whatever the deployment sets at
+runtime. A handler reads its origin per request, so one image runs anywhere.
 
 **The site renders without the API.** Every read falls back to the bundled
 content in `lib/` and `components/Profile/data.ts`, so frontend-only work needs
