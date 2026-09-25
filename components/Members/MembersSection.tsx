@@ -26,10 +26,10 @@ const AUTO_ADVANCE_MS = 5200;
 const COPY = {
   en: {
     eyebrow: "MEMBERS / REGISTRY",
-    titleA: "TEAM",
-    titleB: "MEMBERS",
+    titleA: "The",
+    titleB: "Team",
     intro:
-      "One frame, every seat. Step through the registry to read each member — or the vacancy waiting to be filled.",
+      "The people behind our digital products.",
     registry: "REGISTRY",
     of: "OF",
     status: "STATUS",
@@ -53,10 +53,10 @@ const COPY = {
   },
   fa: {
     eyebrow: "اعضا / فهرست",
-    titleA: "TEAM",
-    titleB: "MEMBERS",
+    titleA: "اعضای",
+    titleB: "تیم",
     intro:
-      "یک قاب، همه جایگاه‌ها. در فهرست حرکت کنید تا هر عضو را بخوانید — یا جایگاهی که هنوز خالی است.",
+      "اعضای تیم، تخصص‌ها و سوابق کاری",
     registry: "فهرست",
     of: "از",
     status: "وضعیت",
@@ -307,8 +307,8 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
               light ? "text-[#16253d]" : "text-white/[.94]"
             }`}
           >
-            <span>{copy.titleA}</span>
-            <span className={light ? "text-[#345783]/28" : "text-white/16"}>{copy.titleB}</span>
+            <span className={light ? "text-[#345783]/28" : "text-white/16"}>{copy.titleA}</span>
+            <span >{copy.titleB}</span>
           </div>
           <p
             data-registry-reveal
