@@ -43,7 +43,7 @@ Copy `.env.example` to `.env.local` and adjust if your ports differ:
 | Variable | Purpose |
 | --- | --- |
 | `DEVINSO_API_URL` | API origin. Server-side only. Use the HTTP profile — Node rejects the ASP.NET dev certificate. |
-| `DEVINSO_MEDIA_URL` | Origin serving uploaded images (the admin app's wwwroot). Must match the API's `Media:BaseUrl`. |
+| `DEVINSO_MEDIA_URL` | Origin the **server** fetches uploaded images from (the admin app's wwwroot). Never sent to the browser, so in production prefer the internal address of the admin container over its public hostname. Need not match the API's `Media:BaseUrl`. |
 | `DEVINSO_API_TIMEOUT_MS` | How long one call may take before the page gives up on it. |
 | `DEVINSO_API_CACHE` | Set to `off` to bypass every cache layer. |
 | `DEVINSO_API_DEV_TTL_SECONDS` | Ceiling on any cached read in development. Default 15. |

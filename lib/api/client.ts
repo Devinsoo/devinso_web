@@ -1,5 +1,6 @@
 import { API_TIMEOUT_MS, apiBase, isDev } from "@/lib/api/config";
 import { CACHE_TAG, type CacheOptions, cached } from "@/lib/api/cache";
+import { withSameOriginUploads } from "@/lib/api/media";
 
 /** A non-2xx answer, or a request that never got one. */
 export class ApiError extends Error {
@@ -110,7 +111,10 @@ async function request<T>(path: string, init: RequestInit, options: RequestOptio
 
   if (response.status === 204) return undefined as T;
 
-  return (await response.json()) as T;
+  // Every response passes through here, which is why the upload URLs are
+  // rewritten at this one point rather than in each content mapper: a page can
+  // then never render the panel's origin, whatever new field the API grows.
+  return withSameOriginUploads((await response.json()) as T);
 }
 
 /**

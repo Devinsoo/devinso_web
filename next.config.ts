@@ -7,25 +7,15 @@ import type { NextConfig } from "next";
 const API_ORIGIN = (process.env.DEVINSO_API_URL ?? "http://localhost:5200").replace(/\/$/, "");
 
 /**
- * Origin serving uploaded images (the admin app's wwwroot).
+ * Origin serving uploaded images (the admin app's wwwroot). Read only by the
+ * rewrite below: nothing in the browser ever learns this value, which is the
+ * point — see `lib/api/media.ts`. In production it may safely be an
+ * internal-network address, since only the Next server resolves it.
  *
- * HTTP in development: next/image optimises a remote image by fetching it from
- * the Next server, and Node rejects the ASP.NET self-signed certificate, so an
- * https origin fails there even once it is allow-listed.
+ * HTTP in development, because Node rejects the ASP.NET self-signed
+ * certificate when the server fetches an upload through the rewrite.
  */
 const MEDIA_ORIGIN = (process.env.DEVINSO_MEDIA_URL ?? "http://localhost:5100").replace(/\/$/, "");
-
-/** Uploads live under /uploads; nothing else on those origins is an image. */
-function uploadsPattern(origin: string) {
-  const url = new URL(origin);
-
-  return {
-    protocol: url.protocol.replace(":", "") as "http" | "https",
-    hostname: url.hostname,
-    port: url.port,
-    pathname: "/uploads/**",
-  };
-}
 
 const nextConfig: NextConfig = {
   async rewrites() {
@@ -37,14 +27,25 @@ const nextConfig: NextConfig = {
         source: "/api/devinso/:path*",
         destination: `${API_ORIGIN}/api/v1/:path*`,
       },
+      {
+        // Uploads are stored by the admin panel and served from its origin. The
+        // browser is never told that: `lib/api/media.ts` turns every upload URL
+        // in an API response into this same-origin path, and the panel's
+        // hostname lives only in DEVINSO_MEDIA_URL and in the hop below. A
+        // visitor who reads the page source learns nothing about where the
+        // panel is, so its login form is not there to be found.
+        source: "/uploads/:path*",
+        destination: `${MEDIA_ORIGIN}/uploads/:path*`,
+      },
     ];
   },
 
   images: {
-    // Uploads are served by the admin app rather than from /public, so
-    // next/image refuses them ("url" parameter is not allowed) until the origin
-    // is named here.
-    remotePatterns: [uploadsPattern(MEDIA_ORIGIN), uploadsPattern(API_ORIGIN)],
+    // No remotePatterns on purpose. Every upload reaches next/image as the
+    // same-origin path /uploads/..., which the optimiser fetches back through
+    // the rewrite above, so no remote origin needs allow-listing. Leaving the
+    // list empty also fails closed: an absolute panel URL that somehow escaped
+    // `lib/api/media.ts` is refused at render rather than published to the page.
 
     // Uploads are content-addressed by the admin app — a new upload is a new
     // GUID filename — so an optimised copy never goes stale and there is no
@@ -56,23 +57,17 @@ const nextConfig: NextConfig = {
     // in place, which this one does not.
     minimumCacheTTL: 31536000,
 
-    // Next 16 refuses to optimise a remote image served from a local IP, which
-    // in development is every upload, since the admin app runs on localhost.
-    // The refusal looks identical to a missing pattern - 400, "url" parameter
-    // is not allowed - so allow-listing the origin alone is not enough.
+    // dangerouslyAllowLocalIP and DEVINSO_UNOPTIMIZED_IMAGES both used to live
+    // here, and both existed for the same reason: the optimiser had to reach the
+    // media origin itself, which is a localhost address in development and not
+    // resolvable from inside this container under Docker Compose. Serving
+    // uploads through our own rewrite removes that need — the optimiser now
+    // fetches its own origin — so the flags are gone.
     //
-    // Development only. In production the media origin is a real host, and the
-    // default (false) is what keeps the optimiser from being pointed at
-    // anything on the deploy target's own network.
-    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
-
-    // Under Docker Compose the media origin the browser sees (localhost:5100 →
-    // the admin container) is not resolvable from inside *this* container, so
-    // the server-side image optimiser cannot fetch the upload. Opting out of
-    // optimisation makes next/image emit a plain <img> the browser loads
-    // straight from the admin app. Off by default — unset locally, so normal
-    // dev and Vercel builds keep the optimiser. See docker-compose.yml.
-    unoptimized: process.env.DEVINSO_UNOPTIMIZED_IMAGES === "1",
+    // Losing DEVINSO_UNOPTIMIZED_IMAGES also closes the trap it set: it changed
+    // both what `next build` wrote into the HTML (a /_next/image URL or a plain
+    // src) and whether `next start` served that route at all, so setting it only
+    // at runtime made every image on the deployed site 404.
   },
 };
 
