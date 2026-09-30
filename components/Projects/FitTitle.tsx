@@ -12,6 +12,8 @@ type FitTitleProps = {
   maxLines?: number;
   /** Unitless line-height, applied inline so the fit maths matches what renders. */
   leading?: number;
+  /** Font size never exceeds this fraction of the column width. */
+  maxWidthRatio?: number;
   className?: string;
   style?: CSSProperties;
 } & Record<`data-${string}`, string | undefined>;
@@ -27,6 +29,7 @@ export function FitTitle({
   max = 122,
   maxLines = 3,
   leading = 0.86,
+  maxWidthRatio = 0.17,
   className = "",
   style,
   ...rest
@@ -45,8 +48,11 @@ export function FitTitle({
     };
 
     const fit = () => {
+      // Keep short titles proportionate on narrow columns instead of letting
+      // them balloon to fill the full width (e.g. ~56px on a phone).
+      const cap = Math.max(min, Math.min(max, Math.floor(parent.clientWidth * maxWidthRatio)));
       let lo = min;
-      let hi = max;
+      let hi = cap;
       let best = min;
       while (lo <= hi) {
         const mid = Math.floor((lo + hi) / 2);
@@ -68,7 +74,7 @@ export function FitTitle({
     document.fonts?.ready.then(fit).catch(() => {});
 
     return () => observer.disconnect();
-  }, [text, min, max, maxLines, leading]);
+  }, [text, min, max, maxLines, leading, maxWidthRatio]);
 
   return (
     <h1
