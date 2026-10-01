@@ -184,7 +184,8 @@ function ProjectCover({ project, language }: { project: ProjectDetail; language:
     const alt = language === "fa"
       ? project.coverAltFa ?? project.coverAlt ?? project.titleFa
       : project.coverAlt ?? project.title;
-    return <><Image src={project.coverImage} alt={alt} fill priority sizes="100vw" className="object-cover" /><div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(2,3,7,.38))]" /></>;
+    // Mobile: render at the image's natural ratio so nothing is cropped. md+: fill the framed cover box.
+    return <><Image src={project.coverImage} alt={alt} width={0} height={0} priority sizes="100vw" className="block h-auto w-full md:absolute md:inset-0 md:h-full md:object-cover" /><div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(2,3,7,.38))]" /></>;
   }
   if (project.preview === "automation") return <AutomationVisual accent={project.accent} />;
   return <IdentityVisual accent={project.accent} />;
@@ -424,7 +425,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
 
       <article className="relative z-10">
         <section className="mx-auto grid w-[min(1440px,calc(100%_-_clamp(28px,6vw,96px)))] gap-12 pb-[clamp(48px,7vw,96px)] pt-[clamp(68px,9vw,130px)] lg:grid-cols-[1.25fr_.75fr] lg:items-end">
-          <div className="text-start">
+          <div className="min-w-0 text-start">
             <div data-project-intro className="flex items-center gap-3"><span className="rounded-full border px-3 py-2 font-mono text-[7px] tracking-[.16em]" style={{ borderColor: `${project.accent}55`, color: project.accent }}>{statusLabel(project.status, language)}</span><span className={`font-mono text-[8px] uppercase tracking-[.18em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>{typeLabel(project.type, language)}{projectNumber ? ` / ${copy.id} ${projectNumber}` : ""}</span></div>
             <FitTitle data-project-intro text={title} min={34} max={122} maxLines={3} leading={rtl ? 1.2 : 0.86} className={`mt-7 font-[570] ${rtl ? "" : "tracking-[-.03em]"}`} />
           </div>
@@ -435,7 +436,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-intro className="mx-auto w-[min(1560px,calc(100%_-_clamp(20px,4vw,64px)))]">
-          <div className={`relative aspect-[16/8.1] min-h-[360px] overflow-hidden rounded-[clamp(20px,3vw,40px)] border max-md:aspect-[4/3] ${light ? "border-[#294368]/10 bg-[#dfe7f0] shadow-[0_40px_110px_rgba(34,50,76,.13)]" : "border-white/[.08] bg-[#080a0f] shadow-[0_44px_130px_rgba(0,0,0,.48)]"}`}>
+          <div className={`relative aspect-[16/8.1] overflow-hidden rounded-[clamp(20px,3vw,40px)] border md:min-h-[360px] ${project.coverImage ? "max-md:aspect-auto" : "min-h-[360px] max-md:aspect-[4/3]"} ${light ? "border-[#294368]/10 bg-[#dfe7f0] shadow-[0_40px_110px_rgba(34,50,76,.13)]" : "border-white/[.08] bg-[#080a0f] shadow-[0_44px_130px_rgba(0,0,0,.48)]"}`}>
             <ProjectCover project={project} language={language} />
             <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between border-t border-white/10 pt-4 font-mono text-[7px] tracking-[.16em] text-white/38"><span>{projectNumber ? `${copy.project} / ${projectNumber}` : copy.project}</span><span>{project.coverImage ? copy.coverLoaded : copy.coverGenerated}</span></div>
           </div>
