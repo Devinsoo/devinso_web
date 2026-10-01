@@ -9,6 +9,19 @@
         "dev"
       ],
       "port": 4000
+    },
+    {
+      "name": "devinso-api",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "E:/projMain/Devinso/Devinso.Api/Devinso.Api.csproj",
+        "--launch-profile",
+        "http"
+      ],
+      "port": 5200,
+      "autoPort": false
     }
   ]
 }
