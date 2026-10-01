@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ProfileBackground } from "@/components/Profile/ProfileBackground";
@@ -11,6 +11,8 @@ import { SkillsPanel } from "@/components/Profile/SkillsPanel";
 import { ProfileSignals } from "@/components/Profile/ProfileSignals";
 import { ProjectsRail } from "@/components/Profile/ProjectsRail";
 import { PROFILE_COPY } from "@/components/Profile/copy";
+import { SubpageHeader } from "@/components/Brand/SubpageHeader";
+import { DEVINSO_COOKIE, setCookie, type DevinsoLanguage } from "@/lib/preferences";
 import { getThemeAccent, accentCssVars } from "@/components/Profile/theme";
 import type { MemberProfileData } from "@/components/Profile/types";
 
@@ -18,19 +20,46 @@ gsap.registerPlugin(ScrollTrigger);
 
 type MemberProfileProps = {
   data: MemberProfileData;
-  language?: "en" | "fa";
+  /** From the language cookie, read on the server so the first paint is right. */
+  initialLanguage?: DevinsoLanguage;
 };
 
-export function MemberProfile({ data, language = "en" }: MemberProfileProps) {
+export function MemberProfile({ data, initialLanguage = "en" }: MemberProfileProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [booted, setBooted] = useState(false);
+  const [language, setLanguage] = useState<DevinsoLanguage>(initialLanguage);
   const copy = PROFILE_COPY[language];
+  const rtl = language === "fa";
   const accent = getThemeAccent(data.profile.theme?.slug);
 
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = "dark";
     document.documentElement.style.colorScheme = "dark";
   }, []);
+
+  useLayoutEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = rtl ? "rtl" : "ltr";
+    document.documentElement.dataset.language = language;
+  }, [language, rtl]);
+
+  // Persian text wraps to different heights, so every scroll trigger below the
+  // header has moved; re-measure rather than rebuild.
+  useEffect(() => {
+    ScrollTrigger.refresh();
+  }, [language]);
+
+  // The server sets the tab title from the cookie; keep it in step with the
+  // in-page language switch, which does not reload.
+  const pageTitle = (rtl && data.profile.fullNameFa) || data.profile.fullName;
+  useEffect(() => {
+    document.title = `${pageTitle} · Devinso`;
+  }, [pageTitle]);
+
+  const changeLanguage = (next: DevinsoLanguage) => {
+    setLanguage(next);
+    setCookie(DEVINSO_COOKIE.language, next);
+  };
 
   useLayoutEffect(() => {
     if (!booted || !rootRef.current) return;
@@ -172,26 +201,42 @@ export function MemberProfile({ data, language = "en" }: MemberProfileProps) {
   return (
     <main
       ref={rootRef}
+      lang={language}
+      dir={rtl ? "rtl" : "ltr"}
+      data-locale={language}
       style={accentCssVars(accent)}
-      className="profile-page relative min-h-screen overflow-hidden bg-[#050508] text-[#f2f0ec] [background:radial-gradient(circle_at_50%_18%,rgba(150,195,255,.07),transparent_28%),linear-gradient(180deg,rgba(255,255,255,.012),rgba(255,255,255,0)),#050508]"
+      // overflow-clip, not overflow-hidden: hidden makes <main> a scroll
+      // container, and the sticky header would then stick to it instead of
+      // the viewport.
+      className="profile-page relative min-h-screen overflow-clip bg-[#050508] text-[#f2f0ec] [background:radial-gradient(circle_at_50%_18%,rgba(150,195,255,.07),transparent_28%),linear-gradient(180deg,rgba(255,255,255,.012),rgba(255,255,255,0)),#050508]"
     >
       <ProfileBackground />
 
-      <div aria-hidden="true" className="fixed bottom-10 left-5 top-10 z-30 hidden w-px bg-white/[.06] xl:block">
+      <div aria-hidden="true" className="fixed bottom-10 start-5 top-24 z-30 hidden w-px bg-white/[.06] xl:block">
         <span className="profile-scroll-line absolute inset-0 block bg-[linear-gradient(180deg,rgba(var(--accent-a),.95),rgba(var(--accent-b),.5),rgba(var(--accent-a),.2))] shadow-[0_0_14px_rgba(var(--accent-a),.32)]" />
-        <span className="absolute -left-[3px] top-0 h-[7px] w-[7px] rounded-full bg-[rgba(var(--accent-a),.9)] shadow-[0_0_12px_rgba(var(--accent-a),.65)]" />
+        <span className="absolute -start-[3px] top-0 h-[7px] w-[7px] rounded-full bg-[rgba(var(--accent-a),.9)] shadow-[0_0_12px_rgba(var(--accent-a),.65)]" />
       </div>
 
       {!booted ? (
         <ProfileTerminal
-          lines={copy.boot.lines}
-          status={copy.boot.status}
-          ready={copy.boot.ready}
-          skip={copy.boot.skip}
+          // The boot sequence is a terminal readout, English in both languages.
+          lines={PROFILE_COPY.en.boot.lines}
+          status={PROFILE_COPY.en.boot.status}
+          ready={PROFILE_COPY.en.boot.ready}
+          skip={PROFILE_COPY.en.boot.skip}
           username={data.profile.username}
           onComplete={() => setBooted(true)}
         />
       ) : null}
+
+      <SubpageHeader
+        theme="dark"
+        language={language}
+        onLanguageChange={changeLanguage}
+        context={`${copy.eyebrow} / ${data.profile.username}`}
+        backHref="/#members"
+        backLabel={copy.back}
+      />
 
       <ProfileHeader data={data} copy={copy} language={language} />
       <ExperienceLog experiences={data.experiences} copy={copy} language={language} />

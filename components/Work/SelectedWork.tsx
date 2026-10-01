@@ -35,6 +35,8 @@ export type WorkProject = {
   roleFa: string;
   stack: string[];
   year: string;
+  /** Solar Hijri year for the Persian view; falls back to `year`. */
+  yearFa?: string;
   accent: "crimson" | "violet" | "ice";
   morph: MorphMode;
   preview?: "automation" | "identity";
@@ -115,7 +117,7 @@ const COPY = {
     eyebrowLabel: "SELECTED WORK",
     titleA: "SELECTED",
     titleB: "WORK",
-    intro: "A continuous project rail where each cover morphs with a different behavior to keep the section alive and non-repetitive.",
+    intro: "A look at the products we've built at DEVINSO. This section features websites and systems where our team handled both the user interface design and software development.",
     project: "PROJECT",
     role: "ROLE",
     stack: "STACK",
@@ -124,6 +126,8 @@ const COPY = {
     viewCase: "VIEW CASE",
     signal: "CURATED / RECENT / TEAM",
     coverSpec: "COVER SPEC / 1920 × 1080 / 16:9",
+    asset: "ASSET / COVER",
+    handoff: "HANDOFF / PROJECT_01",
     mode: {
       expand: "EXPAND",
       split: "SPLIT",
@@ -131,22 +135,24 @@ const COPY = {
     },
   },
   fa: {
-    eyebrowLabel: "نمونه‌کارهای منتخب",
-    titleA: "SELECTED",
-    titleB: "WORK",
-    intro: "یک ریل پروژه‌ای پیوسته که هر کاور با رفتاری متفاوت مورف می‌شود تا سکشن زنده بماند و تکراری نشود.",
+    eyebrowLabel: "پروژه‌ها",
+    titleA: "نمونه‌کارهای",
+    titleB: "منتخب",
+    intro: "نگاهی به محصولاتی که در DEVINSO ساخته‌ایم. در این بخش وب‌سایت‌ها و سیستم‌هایی را می‌بینید که طراحی رابط کاربری و توسعه نرم‌افزار آن‌ها را تیم ما انجام داده است.",
     project: "پروژه",
     role: "نقش",
     stack: "تکنولوژی",
     year: "سال",
-    morph: "مورف",
+    morph: "جلوه",
     viewCase: "مشاهده پروژه",
     signal: "منتخب / جدید / تیمی",
-    coverSpec: "استاندارد کاور / 1920 × 1080 / 16:9",
+    coverSpec: "مشخصات کاور / 1920 × 1080 / 16:9",
+    asset: "فایل / کاور",
+    handoff: "تحویل / پروژه 01",
     mode: {
-      expand: "EXPAND",
-      split: "SPLIT",
-      depth: "DEPTH",
+      expand: "گسترش",
+      split: "دوبخشی",
+      depth: "عمق",
     },
   },
 } as const;
@@ -177,7 +183,9 @@ const ACCENTS = {
 
 function AutomationPreview({ light }: { light: boolean }) {
   return (
-    <div className="absolute inset-[7%] overflow-hidden rounded-[24px]">
+    // Decorative English mock-up: `lang="en"` keeps it out of the Persian
+    // type adjustments in globals.css.
+    <div lang="en" className="absolute inset-[7%] overflow-hidden rounded-[24px]">
       <div className={`absolute inset-0 rounded-[24px] border ${light ? "border-[#4f4180]/10 bg-[#f0f2f7]" : "border-white/[.08] bg-[#090810]"}`} />
       <div className={`absolute inset-0 opacity-70 ${light ? "[background-image:linear-gradient(rgba(80,63,126,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(80,63,126,.06)_1px,transparent_1px)]" : "[background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)]"} [background-size:32px_32px]`} />
       <div className="absolute inset-[8%] grid grid-cols-2 gap-4">
@@ -203,7 +211,7 @@ function AutomationPreview({ light }: { light: boolean }) {
 
 function IdentityPreview({ light }: { light: boolean }) {
   return (
-    <div className="absolute inset-[7%] overflow-hidden rounded-[24px]">
+    <div lang="en" className="absolute inset-[7%] overflow-hidden rounded-[24px]">
       <div className={`absolute inset-0 rounded-[24px] border ${light ? "border-[#34527c]/10 bg-[#eef3f8]" : "border-white/[.075] bg-[#080b10]"}`} />
       <div className={`absolute inset-0 ${light ? "[background-image:linear-gradient(rgba(54,82,124,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(54,82,124,.055)_1px,transparent_1px)]" : "[background-image:linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)]"} [background-size:46px_46px]`} />
       <div className="absolute inset-[9%] flex flex-col justify-between">
@@ -214,7 +222,7 @@ function IdentityPreview({ light }: { light: boolean }) {
         <div className="relative py-10">
           <div className={`absolute left-1/2 top-0 h-full w-px ${light ? "bg-[#49668f]/10" : "bg-white/[.055]"}`} />
           <div className={`absolute left-0 top-1/2 h-px w-full ${light ? "bg-[#49668f]/10" : "bg-white/[.055]"}`} />
-          <div className={`relative text-center text-[clamp(44px,8vw,118px)] font-[560] leading-none tracking-[-.085em] ${light ? "bg-[linear-gradient(110deg,#182641,#486a9a_70%,#6c60a2)] bg-clip-text text-transparent" : "bg-[linear-gradient(110deg,#fff,#a7ceff_68%,#c9b8ff)] bg-clip-text text-transparent"}`}>
+          <div className={`relative text-center text-[clamp(44px,8vw,118px)] font-[560] leading-none tracking-[-.05em] ${light ? "bg-[linear-gradient(110deg,#182641,#486a9a_70%,#6c60a2)] bg-clip-text text-transparent" : "bg-[linear-gradient(110deg,#fff,#a7ceff_68%,#c9b8ff)] bg-clip-text text-transparent"}`}>
             DEVINSO
           </div>
           <div className={`mx-auto mt-5 h-px w-[44%] ${light ? "bg-[linear-gradient(90deg,transparent,#45668f40,transparent)]" : "bg-[linear-gradient(90deg,transparent,#a7ceff44,transparent)]"}`} />
@@ -271,7 +279,6 @@ function SceneChrome({ project, light }: { project: WorkProject; light: boolean 
 
 function ProjectScene({ project, theme, language, index }: { project: WorkProject; theme: DevinsoTheme; language: DevinsoLanguage; index: number }) {
   const light = theme === "light";
-  const rtl = language === "fa";
   const copy = COPY[language];
   const accent = ACCENTS[project.accent];
   const isStacked = project.layout === "stacked";
@@ -293,12 +300,12 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
         <span className="sr-only">{copy.viewCase}</span>
       </Link>
       <div className="relative z-[1]">
-        <div className={`mb-5 flex items-center justify-between gap-4 ${rtl ? "text-right" : "text-left"}`}>
+        <div className="mb-5 flex items-center justify-between gap-4 text-start">
           <div>
             <div data-project-detail className={`font-mono text-[10px] uppercase tracking-[.22em] ${light ? "text-[#294368]/35" : "text-white/26"}`}>
               {copy.project} / {project.number}
             </div>
-            <div data-project-detail className={`mt-2 text-[clamp(28px,4vw,58px)] font-[560] leading-[.96] tracking-[-.06em] ${light ? "text-[#16253d]" : "text-white/[.94]"}`}>
+            <div data-project-detail className={`mt-2 text-[clamp(28px,4vw,58px)] font-[560] leading-[.96] tracking-[-.03em] ${light ? "text-[#16253d]" : "text-white/[.94]"}`}>
               {language === "fa" ? project.titleFa : project.title}
             </div>
           </div>
@@ -309,7 +316,7 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
 
         <div className={`grid gap-8 ${isStacked ? "grid-cols-1" : mediaFirst ? "lg:grid-cols-[1.22fr_.86fr]" : "lg:grid-cols-[.86fr_1.22fr]"} items-center`}>
           {!mediaFirst && !isStacked && (
-            <div className={`${rtl ? "lg:order-2" : ""}`}>
+            <div>
               <SceneText project={project} theme={theme} language={language} />
             </div>
           )}
@@ -326,10 +333,10 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
                 <ProjectPreview project={project} light={light} />
               </div>
               <div data-project-scan className="pointer-events-none absolute inset-x-[3.2%] top-[3.2%] h-[22%] rounded-[18px] bg-[linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0))] opacity-0 mix-blend-screen blur-[14px]" />
-              <div data-project-asset className={`absolute bottom-5 ${rtl ? "right-5" : "left-5"} rounded-full border px-3 py-2 text-[8px] uppercase tracking-[.18em] ${light ? "border-[#294368]/10 bg-white/78 text-[#294368]/45" : "border-white/[.08] bg-black/28 text-white/40"}`}>
-                {index === 0 ? copy.coverSpec : `ASSET / COVER_0${index + 1}`}
+              <div data-project-asset className={`absolute bottom-5 start-5 rounded-full border px-3 py-2 text-[8px] uppercase tracking-[.18em] ${light ? "border-[#294368]/10 bg-white/78 text-[#294368]/45" : "border-white/[.08] bg-black/28 text-white/40"}`}>
+                {index === 0 ? copy.coverSpec : `${copy.asset} 0${index + 1}`}
               </div>
-              <div className={`absolute ${rtl ? "left-5" : "right-5"} top-5 rounded-full border px-3 py-2 text-[8px] uppercase tracking-[.18em] ${light ? "border-[#294368]/10 bg-white/74 text-[#294368]/45" : "border-white/[.08] bg-black/24 text-white/36"}`}>
+              <div className={`absolute end-5 top-5 rounded-full border px-3 py-2 text-[8px] uppercase tracking-[.18em] ${light ? "border-[#294368]/10 bg-white/74 text-[#294368]/45" : "border-white/[.08] bg-black/24 text-white/36"}`}>
                 {copy.mode[project.morph]}
               </div>
             </div>
@@ -348,11 +355,10 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
 
 function SceneText({ project, theme, language }: { project: WorkProject; theme: DevinsoTheme; language: DevinsoLanguage }) {
   const light = theme === "light";
-  const rtl = language === "fa";
   const copy = COPY[language];
   const accent = ACCENTS[project.accent];
   return (
-    <div className={`space-y-5 ${rtl ? "text-right" : "text-left"}`}>
+    <div className="space-y-5 text-start">
       <div data-project-detail className={`text-[13px] ${light ? "text-[#294368]/55" : "text-white/54"}`}>
         {language === "fa" ? project.categoryFa : project.category}
       </div>
@@ -362,12 +368,12 @@ function SceneText({ project, theme, language }: { project: WorkProject; theme: 
       <div className="grid gap-3 sm:grid-cols-3">
         <InfoBox label={copy.role} value={language === "fa" ? project.roleFa : project.role} theme={theme} accent={accent.strong} />
         <InfoBox label={copy.stack} value={project.stack.join(" / ")} theme={theme} accent={accent.strong} />
-        <InfoBox label={copy.year} value={project.year} theme={theme} accent={accent.strong} />
+        <InfoBox label={copy.year} value={language === "fa" ? project.yearFa ?? project.year : project.year} theme={theme} accent={accent.strong} />
       </div>
       <div data-project-detail className="flex flex-wrap items-center gap-3 pt-1">
         <span className={`inline-flex min-h-[46px] items-center gap-2 rounded-full border px-5 text-[11px] font-[650] uppercase tracking-[.16em] transition-transform duration-300 group-hover:-translate-y-0.5 ${light ? "border-[#294368]/12 bg-white text-[#17263d]" : "border-white/[.085] bg-white/[.03] text-white/88"}`}>
           {copy.viewCase}
-          <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden="true"><path d="M2.2 9.8 9.6 2.4M4 2.4h5.6V8" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <svg viewBox="0 0 12 12" className="h-3 w-3 rtl:-scale-x-100" aria-hidden="true"><path d="M2.2 9.8 9.6 2.4M4 2.4h5.6V8" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </span>
         <div className={`inline-flex items-center gap-2 text-[9px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/30"}`}>
           <i className="h-2 w-2 rounded-full" style={{ backgroundColor: accent.strong, boxShadow: `0 0 16px ${accent.strong}` }} />
@@ -384,7 +390,7 @@ function InfoBox({ label, value, theme, accent }: { label: string; value: string
     <div data-project-detail className={`rounded-2xl border p-4 ${light ? "border-[#294368]/10 bg-[#eef3f8]/[.86]" : "border-white/[.065] bg-white/[.02]"}`}>
       <div className={`text-[8px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/28"}`}>{label}</div>
       <div className={`mt-3 text-[13px] leading-6 ${light ? "text-[#17263d]" : "text-white/84"}`}>{value}</div>
-      <div className="mt-4 h-px w-full" style={{ background: `linear-gradient(90deg, ${accent}33, transparent)` }} />
+      <div className="mt-4 h-px w-full rtl:-scale-x-100" style={{ background: `linear-gradient(90deg, ${accent}33, transparent)` }} />
     </div>
   );
 }
@@ -424,15 +430,16 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
         gsap.set(dockTitle, {
           y: -34,
           scale: 1.34,
-          transformOrigin: "left top",
+          transformOrigin: rtl ? "right top" : "left top",
           opacity: 0.88,
           filter: "blur(2px)",
         });
         gsap.set(dockCopy, { y: 14, opacity: 0, filter: "blur(5px)" });
-        gsap.set(lineH, { scaleX: 0, transformOrigin: "left center", opacity: 0.4 });
+        // The bridge grows from the reading-start edge: right in Persian.
+        gsap.set(lineH, { scaleX: 0, transformOrigin: rtl ? "right center" : "left center", opacity: 0.4 });
         gsap.set(lineV, { scaleY: 0, transformOrigin: "top center", opacity: 0.4 });
         gsap.set(bridgeNode, { scale: 0, opacity: 0 });
-        gsap.set(bridgeMeta, { x: -8, opacity: 0 });
+        gsap.set(bridgeMeta, { x: rtl ? 8 : -8, opacity: 0 });
         gsap.set(firstScene, { y: 58, scale: 0.988, opacity: 0.78 });
 
         const bridgeTimeline = gsap.timeline({ paused: true, defaults: { overwrite: "auto" } });
@@ -581,7 +588,7 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
     // Not keyed on `theme`: this timeline animates positions and opacities
     // only, so a theme swap used to rebuild every tween and ScrollTrigger here
     // for no visual change. Hero refreshes the trigger positions instead.
-  }, [language]);
+  }, [language, rtl]);
 
   // `cursor: none` is keyed off this attribute rather than being baked into the
   // markup: before hydration the pill is not being driven yet, and hiding the
@@ -655,23 +662,23 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
       <div className="mx-auto max-w-[1440px]">
         <div data-work-bridge className="relative pb-8 pt-[clamp(10px,2vw,24px)] sm:pb-10">
           <div className="grid items-end gap-5 lg:grid-cols-[minmax(300px,.78fr)_minmax(340px,1.22fr)] lg:gap-8">
-            <div data-work-dock className={`${rtl ? "text-right" : "text-left"}`}>
+            <div data-work-dock className="text-start">
               <div
                 data-work-dock-label
-                className={`font-mono text-[10px] uppercase tracking-[.22em] ${light ? "text-[#294368]/38" : "text-white/30"}`}
+                className={`font-mono uppercase ${rtl ? "text-[11px] tracking-normal" : "text-[10px] tracking-[.22em]"} ${light ? "text-[#294368]/38" : "text-white/30"}`}
               >
                 {eyebrow}
               </div>
               <div
                 data-work-dock-title
-                className={`mt-3 inline-flex flex-wrap items-baseline gap-x-3 text-[clamp(34px,5.6vw,78px)] font-[560] leading-[.9] tracking-[-.075em] ${light ? "text-[#16253d]" : "text-white/[.94]"}`}
+                className={`mt-3 inline-flex flex-wrap items-baseline gap-x-3 text-[clamp(34px,5.6vw,78px)] font-[560] ${rtl ? "leading-[1.25] tracking-normal" : "leading-[.9] tracking-[-.03em]"} ${light ? "text-[#16253d]" : "text-white/[.94]"}`}
               >
                 <span>{copy.titleA}</span>
                 <span className={light ? "text-[#345783]/28" : "text-white/16"}>{copy.titleB}</span>
               </div>
               <p
                 data-work-dock-copy
-                className={`mt-4 max-w-[48ch] text-[12px] leading-6 ${light ? "text-[#223857]/52" : "text-white/42"}`}
+                className={`mt-4 max-w-[48ch] ${rtl ? "text-[13.5px] leading-[2.05]" : "text-[12px] leading-6"} ${light ? "text-[#223857]/52" : "text-white/42"}`}
               >
                 {copy.intro}
               </p>
@@ -681,7 +688,7 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
               <div className="absolute left-0 right-0 top-[32px] flex items-start">
                 <div
                   data-work-bridge-line-h
-                  className={`h-px flex-1 ${light ? "bg-[linear-gradient(90deg,rgba(63,95,140,.34),rgba(63,95,140,.11))]" : "bg-[linear-gradient(90deg,rgba(160,202,255,.34),rgba(255,255,255,.07))]"}`}
+                  className={`h-px flex-1 ${light ? "bg-[linear-gradient(to_right,rgba(63,95,140,.34),rgba(63,95,140,.11))] rtl:bg-[linear-gradient(to_left,rgba(63,95,140,.34),rgba(63,95,140,.11))]" : "bg-[linear-gradient(to_right,rgba(160,202,255,.34),rgba(255,255,255,.07))] rtl:bg-[linear-gradient(to_left,rgba(160,202,255,.34),rgba(255,255,255,.07))]"}`}
                 />
                 <div className="relative h-[58px] w-[18px] shrink-0">
                   <i
@@ -696,9 +703,9 @@ export function SelectedWork({ theme, language, projects }: SelectedWorkProps) {
               </div>
               <div
                 data-work-bridge-meta
-                className={`absolute right-0 top-0 font-mono text-[9px] uppercase tracking-[.19em] ${light ? "text-[#294368]/34" : "text-white/28"}`}
+                className={`absolute end-0 top-0 font-mono uppercase ${rtl ? "text-[10.5px] tracking-normal" : "text-[9px] tracking-[.19em]"} ${light ? "text-[#294368]/34" : "text-white/28"}`}
               >
-                HANDOFF / PROJECT_01
+                {copy.handoff}
               </div>
             </div>
           </div>

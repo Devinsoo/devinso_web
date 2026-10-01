@@ -83,14 +83,18 @@ export function ProfileTerminal({ lines, status, ready, skip, username, onComple
   }, []);
 
   return (
+    // English-only readout: pinned LTR and lang="en" so the Persian page's
+    // direction and type adjustments leave it alone.
     <div
       ref={rootRef}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-[#050508] px-6"
+      dir="ltr"
+      lang="en"
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#050508] px-6"
     >
       <button
         type="button"
         onClick={finish}
-        className="absolute right-5 top-5 rounded-full border border-white/[.1] bg-white/[.025] px-3.5 py-2 font-mono text-[9px] uppercase tracking-[.16em] text-white/40 outline-none transition-colors hover:border-white/25 hover:text-white/75 focus-visible:ring-2 focus-visible:ring-white/25"
+        className="absolute end-5 top-5 rounded-full border border-white/[.1] bg-white/[.025] px-3.5 py-2 font-mono text-[9px] uppercase tracking-[.16em] text-white/40 outline-none transition-colors hover:border-white/25 hover:text-white/75 focus-visible:ring-2 focus-visible:ring-white/25"
       >
         {skip}
       </button>

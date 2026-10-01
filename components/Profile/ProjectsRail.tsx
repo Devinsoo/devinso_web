@@ -36,11 +36,13 @@ const TYPE_ACCENT: Record<MemberProject["type"], { glow: string; text: string; b
 
 function ProjectCover({
   project,
+  title,
   index,
   glow,
   wash,
 }: {
   project: MemberProject;
+  title: string;
   index: number;
   glow: string;
   wash: string;
@@ -50,7 +52,7 @@ function ProjectCover({
       <div className="project-cover relative aspect-[16/10] w-full overflow-hidden rounded-[16px] border border-white/[.07]">
         <Image
           src={project.coverImage}
-          alt={project.title}
+          alt={title}
           fill
           sizes="(max-width: 900px) 100vw, 420px"
           className="project-cover-image object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.06]"
@@ -95,7 +97,11 @@ function ProjectCard({
   const description = isRTL && project.descriptionFa ? project.descriptionFa : project.description;
   const outcome = isRTL && project.outcomeFa ? project.outcomeFa : project.outcome;
   const role = isRTL && project.membership.roleFa ? project.membership.roleFa : project.membership.role;
-  const year = new Date(project.createdAt).getFullYear();
+  const title = isRTL && project.titleFa ? project.titleFa : project.title;
+  // Persian shows the Solar Hijri year, like the rest of the Persian record.
+  const year = isRTL
+    ? new Intl.DateTimeFormat("fa-IR", { year: "numeric" }).format(new Date(project.createdAt))
+    : new Date(project.createdAt).getFullYear();
 
   const handleMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!cardRef.current || event.pointerType === "touch") return;
@@ -124,7 +130,7 @@ function ProjectCard({
       style={{ "--project-accent": accent.glow } as CSSProperties}
       className="project-card group relative flex flex-col overflow-hidden rounded-[22px] border border-white/[.08] bg-white/[.02] p-4 [transform-style:preserve-3d] transition-colors duration-300 hover:border-[var(--project-accent)]"
     >
-      <ProjectCover project={project} index={index} glow={accent.glow} wash={accent.wash} />
+      <ProjectCover project={project} title={title} index={index} glow={accent.glow} wash={accent.wash} />
 
       <div className="relative flex flex-1 flex-col px-2 pt-5">
         <div className="flex items-center justify-between gap-3">
@@ -143,8 +149,8 @@ function ProjectCard({
           </span>
         </div>
 
-        <h3 className="mt-4 text-[19px] font-[560] leading-tight tracking-[-.01em] text-[#f4f6fb]">{project.title}</h3>
-        <p className="mt-3 text-[12px] leading-[1.75] text-white/45">{description}</p>
+        <h3 className="mt-4 text-[19px] font-[560] leading-tight tracking-[-.01em] text-[#f4f6fb]">{title}</h3>
+        <p className={`mt-3 text-white/45 ${isRTL ? "text-[13px] leading-[1.95]" : "text-[12px] leading-[1.75]"}`}>{description}</p>
 
         <div className="mt-4 font-mono text-[9px] uppercase tracking-[.15em] text-white/30">
           {copy.projectsSection.role} / <span className="text-white/55">{role}</span>
@@ -181,7 +187,7 @@ function ProjectCard({
               className="inline-flex items-center gap-1.5 rounded-sm font-mono text-[9.5px] uppercase tracking-[.14em] text-white/60 outline-none transition-colors duration-300 hover:text-white focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-a),.3)]"
             >
               {copy.projectsSection.viewProject}
-              <ArrowUpRight size={12} strokeWidth={1.75} />
+              <ArrowUpRight size={12} strokeWidth={1.75} className="rtl:-scale-x-100" />
             </Link>
           ) : project.projectUrl ? (
             <a
@@ -191,7 +197,7 @@ function ProjectCard({
               className="inline-flex items-center gap-1.5 rounded-sm font-mono text-[9.5px] uppercase tracking-[.14em] text-white/60 outline-none transition-colors duration-300 hover:text-white focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-a),.3)]"
             >
               {copy.projectsSection.viewProject}
-              <ArrowUpRight size={12} strokeWidth={1.75} />
+              <ArrowUpRight size={12} strokeWidth={1.75} className="rtl:-scale-x-100" />
             </a>
           ) : null}
           {project.githubUrl ? (

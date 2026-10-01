@@ -106,8 +106,11 @@ function memberFor(member: ApiProjectMember, index: number) {
   return {
     id: index + 1,
     fullName: member.fullName,
+    fullNameFa: member.fullNameFa,
+    username: member.username,
     roleType: member.role ? (ROLES[member.role] ?? "CONTRIBUTOR") : "CONTRIBUTOR",
     role: member.jobTitle ?? "",
+    roleFa: member.jobTitleFa,
     // No per-project blurb or join date in the schema yet.
     description: null,
     avatar: member.avatarUrl ?? null,
@@ -137,6 +140,7 @@ function toProjectDetail(project: ApiProjectDetail, accentKey: keyof typeof ACCE
       .filter((block): block is ProjectContentBlock => block !== null),
     coverImage: project.coverImageUrl ?? null,
     coverAlt: project.media[0]?.altText ?? project.media[0]?.title ?? null,
+    coverAltFa: project.media[0]?.altTextFa ?? project.media[0]?.title ?? null,
     projectUrl: project.projectUrl ?? null,
     githubUrl: project.repositoryUrl ?? null,
     techStack: project.techStack.map((tool) => tool.name),
@@ -145,7 +149,7 @@ function toProjectDetail(project: ApiProjectDetail, accentKey: keyof typeof ACCE
     // Only published projects are reachable through the public API at all.
     status: "PUBLISHED",
 
-    createdBy: { id: 0, fullName: lead?.fullName ?? "" },
+    createdBy: { id: 0, fullName: lead?.fullName ?? "", fullNameFa: lead?.fullNameFa },
     members: project.members.map(memberFor),
     createdAt: toDateOnly(project.createdAt),
     updatedAt: toDateOnly(project.updatedAt ?? project.createdAt),
@@ -160,6 +164,7 @@ export function toMemberProjects(projects: ApiMemberProject[]): MemberProject[] 
   return projects.map((project, index) => ({
     id: index + 1,
     title: project.title,
+    titleFa: project.titleFa,
     slug: project.slug,
     description: project.description ?? "",
     descriptionFa: project.descriptionFa,

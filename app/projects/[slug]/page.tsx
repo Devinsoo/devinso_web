@@ -52,25 +52,30 @@ function pickNextProject(
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = await resolveProject(slug);
+  const [project, cookieStore] = await Promise.all([resolveProject(slug), cookies()]);
+  const fa = cookieStore.get(DEVINSO_COOKIE.language)?.value === "fa";
 
+  // Bare titles: the root layout's template already appends "· Devinso".
   if (!project) {
-    return { title: "Project not found | Devinso" };
+    return { title: fa ? "پروژه پیدا نشد" : "Project not found" };
   }
 
+  const title = (fa && project.titleFa) || project.title;
+  const description = (fa && project.descriptionFa) || project.description;
+
   return {
-    title: `${project.title} | Devinso`,
-    description: project.description,
+    title,
+    description,
     openGraph: {
-      title: `${project.title} | Devinso`,
-      description: project.description,
+      title: `${title} · Devinso`,
+      description,
       type: "article",
       images: [],
     },
     twitter: {
       card: "summary",
-      title: `${project.title} | Devinso`,
-      description: project.description,
+      title: `${title} · Devinso`,
+      description,
       images: [],
     },
   };

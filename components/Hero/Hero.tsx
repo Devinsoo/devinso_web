@@ -60,6 +60,7 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
   const rootRef = useRef<HTMLElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
   const [theme, setTheme] = useState<"dark" | "light">(initialTheme);
   const [language, setLanguage] = useState<Language>(initialLanguage);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -94,9 +95,11 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
   useEffect(() => {
     document.documentElement.dataset.language = language;
     document.documentElement.lang = language === "fa" ? "fa" : "en";
-    // Keep the document layout physically LTR. Persian RTL is applied only
-    // to text containers so grid/flex positioning does not reverse twice.
-    document.documentElement.dir = "ltr";
+    // Persian runs the whole document right-to-left. Layouts rely on the
+    // inherited direction (logical start/end), so nothing below mirrors by
+    // hand — doing both would flip things back. The logo stage is the one
+    // exception and pins itself to LTR.
+    document.documentElement.dir = isRTL ? "rtl" : "ltr";
   }, [language, isRTL]);
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
@@ -143,7 +146,14 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
     let idleTweens: gsap.core.Tween[] = [];
 
     const ctx = gsap.context(() => {
-      gsap.set("[data-reveal]", { y: 14, opacity: 0 });
+      // The header lives outside the hero (it is fixed to the viewport), so
+      // the scoped "[data-reveal]" selector would miss it — collect both,
+      // header first so the stagger still opens with it.
+      const revealTargets = [
+        ...(headerRef.current?.querySelectorAll<HTMLElement>("[data-reveal]") ?? []),
+        ...rootRef.current!.querySelectorAll<HTMLElement>("[data-reveal]"),
+      ];
+      gsap.set(revealTargets, { y: 14, opacity: 0 });
       gsap.set(coreRef.current, { opacity: 1, scale: 1, x: 0, y: 0 });
       gsap.set(".logo-fill, .logo-glass-sheen, .logo-glass-rim", { opacity: 0 });
       gsap.set(".logo-directional-light, .logo-reflection-layer, .logo-fresnel-edge", { opacity: 0 });
@@ -284,7 +294,7 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
       });
 
       intro
-        .to("[data-reveal]", {
+        .to(revealTargets, {
           y: 0,
           opacity: 1,
           duration: 0.72,
@@ -660,12 +670,6 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
           duration: 0.22,
           ease: "power2.in",
         }, 0.08)
-        .to(".hero-topline", {
-          y: -14,
-          opacity: 0.18,
-          duration: 0.25,
-          ease: "power2.inOut",
-        }, 0.10)
         .to(".hero-footer", {
           y: 14,
           opacity: 0,
@@ -758,22 +762,17 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
     ? "[background:radial-gradient(ellipse_58%_52%_at_72%_44%,rgba(79,132,228,.15),transparent_66%),radial-gradient(ellipse_48%_42%_at_42%_78%,rgba(123,102,214,.10),transparent_64%),radial-gradient(circle_at_15%_22%,rgba(37,171,203,.10),transparent_26%),radial-gradient(circle_at_83%_12%,rgba(255,255,255,.98),transparent_22%),linear-gradient(135deg,#fbfdff_0%,#eff4fa_42%,#e8eef7_100%)] text-[#182235]"
     : "[background:radial-gradient(circle_at_50%_50%,rgba(150,195,255,.09),transparent_22%),radial-gradient(circle_at_22%_44%,rgba(113,135,255,.10),transparent_26%),radial-gradient(circle_at_76%_46%,rgba(113,135,255,.09),transparent_29%),radial-gradient(circle_at_16%_74%,rgba(110,188,255,.028),transparent_18%),linear-gradient(180deg,rgba(255,255,255,.014),rgba(255,255,255,0)),#050508] text-[#f2f0ec]";
 
-  const desktopGrid = language === "fa"
-    ? "min-[961px]:grid-cols-[minmax(500px,1.30fr)_minmax(270px,.70fr)]"
-    : "min-[961px]:grid-cols-[minmax(270px,.70fr)_minmax(500px,1.30fr)]";
+  // One template for both languages: under dir="rtl" the first track already
+  // sits on the right, which puts the Persian copy on the reading side.
+  const desktopGrid = "min-[961px]:grid-cols-[minmax(270px,.70fr)_minmax(500px,1.30fr)]";
 
   return (
-    <>
-      <section
-        ref={rootRef}
-        className={`hero-stage logo-hero relative isolate h-[188svh] min-h-[1180px] transition-colors duration-300 max-[760px]:h-[176svh] max-[540px]:min-h-[1080px] ${heroThemeClass}`}
-        data-theme={theme}
-        data-language={language}
-      >
-        <div ref={stickyRef} className="hero-morph-sticky sticky top-0 h-[100svh] min-h-[720px] overflow-hidden max-[540px]:min-h-[100dvh]">
-      <HeroBackground copy={copy} theme={theme} />
-
+    // `contents` keeps this wrapper out of layout; it only carries the
+    // language and direction into the server-rendered markup, so a Persian
+    // page paints right-to-left before hydration sets them on <html>.
+    <div className="contents" lang={language} dir={isRTL ? "rtl" : "ltr"} data-locale={language}>
       <HeroHeader
+        headerRef={headerRef}
         copy={copy}
         theme={theme}
         language={language}
@@ -784,13 +783,21 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
         onLanguageChange={changeLanguage}
       />
 
+      <section
+        ref={rootRef}
+        className={`hero-stage logo-hero relative isolate h-[188svh] min-h-[1180px] transition-colors duration-300 max-[760px]:h-[176svh] max-[540px]:min-h-[1080px] ${heroThemeClass}`}
+        data-theme={theme}
+        data-language={language}
+      >
+        <div ref={stickyRef} className="hero-morph-sticky sticky top-0 h-[100svh] min-h-[720px] overflow-hidden max-[540px]:min-h-[100dvh]">
+      <HeroBackground copy={copy} theme={theme} />
+
       <div className={`hero-frame hero-frame-logo relative z-10 mx-auto grid min-h-[max(760px,100svh)] min-w-0 w-[min(1440px,calc(100%_-_clamp(40px,7vw,112px)))] items-center gap-[clamp(34px,5vw,78px)] [isolation:isolate] ${desktopGrid} min-[961px]:max-[1240px]:w-[min(1160px,calc(100%_-_44px))] min-[961px]:max-[1240px]:gap-[clamp(24px,3.4vw,44px)] max-[960px]:w-[min(820px,calc(100%_-_40px))] max-[960px]:min-h-0 max-[960px]:grid-cols-1 max-[960px]:gap-[22px] max-[960px]:py-[118px] max-[760px]:w-[calc(100%_-_28px)] max-[760px]:pt-[104px] max-[760px]:pb-[78px] max-[540px]:w-full max-[540px]:items-start max-[540px]:gap-0 max-[540px]:px-4 max-[540px]:pb-0 max-[540px]:pt-[114px] max-[390px]:px-3 max-[390px]:pt-[108px] max-[540px]:[overflow-anchor:none]`}>
         <HeroIntro copy={copy} theme={theme} language={language} />
 
         <ConstructionStage
           copy={copy}
           theme={theme}
-          language={language}
           stageRef={stageRef}
           coreRef={coreRef}
           logoDirectionalLightRef={logoDirectionalLightRef}
@@ -801,24 +808,26 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
 
         <div
           data-morph-work-heading
-          className={`pointer-events-none absolute inset-x-0 top-1/2 z-[34] flex -translate-y-1/2 flex-col items-center px-6 text-center ${language === "fa" ? "[direction:rtl]" : ""}`}
+          className="pointer-events-none absolute inset-x-0 top-1/2 z-[34] flex -translate-y-1/2 flex-col items-center px-6 text-center"
         >
-          <div className={`font-mono text-[10px] uppercase tracking-[.32em] ${theme === "light" ? "text-[#253a5a]/40" : "text-white/30"}`} data-morph-meta>
-            01 / SELECTED WORK
+          <div className={`text-[10px] uppercase ${isRTL ? "tracking-normal" : "font-mono tracking-[.32em]"} ${theme === "light" ? "text-[#253a5a]/40" : "text-white/30"}`} data-morph-meta>
+            {copy.workIntro.meta}
           </div>
-          <div className={`mt-6 text-[clamp(58px,11vw,188px)] font-[560] leading-[.8] tracking-[-.075em] ${theme === "light" ? "text-[#172238]" : "text-[#f4f6fb]"}`}>
-            SELECTED
-            <span className={`mt-[.1em] block ${theme === "light" ? "text-[#172238]/14" : "text-white/10"}`}>WORK</span>
+          {/* Persian is cursive: negative tracking would crush the joins and
+              the Latin .8 leading would clip its taller ascenders. */}
+          <div className={`mt-6 font-[560] ${isRTL ? "text-[clamp(52px,9vw,150px)] leading-[1.12] tracking-normal" : "text-[clamp(58px,11vw,188px)] leading-[.8] tracking-[-.03em]"} ${theme === "light" ? "text-[#172238]" : "text-[#f4f6fb]"}`}>
+            {copy.workIntro.titleA}
+            <span className={`mt-[.1em] block ${theme === "light" ? "text-[#172238]/14" : "text-white/10"}`}>{copy.workIntro.titleB}</span>
           </div>
-          <div className={`mt-8 max-w-[420px] text-[11px] leading-[1.75] ${theme === "light" ? "text-[#2b3953]/48" : "text-white/40"}`} data-morph-meta>
-            Design, technology and interaction — resolved into shipped work.
+          <div className={`mt-8 max-w-[420px] ${isRTL ? "text-[12.5px] leading-[1.9]" : "text-[11px] leading-[1.75]"} ${theme === "light" ? "text-[#2b3953]/48" : "text-white/40"}`} data-morph-meta>
+            {copy.workIntro.tagline}
           </div>
 
           {/* Invitation to keep scrolling: the projects themselves live below
               this sticky hero, so the section needs to say that out loud now
               that no cover sits here to imply more content. */}
           <div data-morph-scroll-cue className="mt-11 flex flex-col items-center">
-            <div className={`font-mono text-[9px] uppercase tracking-[.34em] ${theme === "light" ? "text-[#253a5a]/45" : "text-white/35"}`}>
+            <div className={`uppercase ${isRTL ? "text-[11px] tracking-normal" : "font-mono text-[9px] tracking-[.34em]"} ${theme === "light" ? "text-[#253a5a]/45" : "text-white/35"}`}>
               {copy.stage.scroll}
             </div>
             <div className={`relative mt-4 h-[92px] w-px overflow-hidden ${theme === "light" ? "bg-[#294368]/12" : "bg-white/10"}`}>
@@ -839,6 +848,6 @@ export function Hero({ initialTheme = "dark", initialLanguage = "en", members, w
       <MembersSection theme={theme} language={language} members={members} />
 
       <SiteFooter theme={theme} language={language} settings={settings} />
-    </>
+    </div>
   );
 }

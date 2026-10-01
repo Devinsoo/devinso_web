@@ -4,19 +4,17 @@ import Image from "next/image";
 import { FitTitle } from "@/components/Projects/FitTitle";
 import { RichText } from "@/components/Projects/RichText";
 import Link from "next/link";
-import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
-  ArrowLeft,
   ArrowUpRight,
   CalendarDays,
   Code,
   Globe,
-  Languages,
-  Moon,
-  Sun,
   UserRound,
   UsersRound,
 } from "lucide-react";
+import { SubpageHeader } from "@/components/Brand/SubpageHeader";
+import { MemberPhoto } from "@/components/Brand/MemberPhoto";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type {
@@ -71,6 +69,19 @@ const COPY = {
     draft: "DRAFT",
     published: "PUBLISHED",
     archived: "ARCHIVED",
+    sections: { about: "01 / ABOUT", content: "02 / CONTENT", stack: "03 / STACK", links: "04 / URLS", members: "05 / MEMBERS" },
+    block: "BLOCK",
+    blockKinds: { heading: "HEADING", text: "TEXT", image: "IMAGE", gallery: "GALLERY", quote: "QUOTE", embed: "EMBED" },
+    items: "ITEMS",
+    blocks: "BLOCKS",
+    blockTypes: "TEXT / IMAGE / MEDIA",
+    urlAvailable: "URL / AVAILABLE",
+    urlNull: "URL / NULL",
+    coverLoaded: "COVER / LOADED",
+    coverGenerated: "COVER / GENERATED PREVIEW",
+    project: "PROJECT",
+    id: "ID",
+    viewProfile: "VIEW PROFILE",
   },
   fa: {
     page: "جزئیات پروژه",
@@ -107,6 +118,19 @@ const COPY = {
     draft: "پیش‌نویس",
     published: "منتشرشده",
     archived: "آرشیوشده",
+    sections: { about: "01 / درباره", content: "02 / محتوا", stack: "03 / تکنولوژی", links: "04 / لینک‌ها", members: "05 / اعضا" },
+    block: "بلوک",
+    blockKinds: { heading: "تیتر", text: "متن", image: "تصویر", gallery: "گالری", quote: "نقل‌قول", embed: "امبد" },
+    items: "مورد",
+    blocks: "بلوک",
+    blockTypes: "متن / تصویر / رسانه",
+    urlAvailable: "لینک / فعال",
+    urlNull: "لینک / ثبت نشده",
+    coverLoaded: "کاور / بارگذاری‌شده",
+    coverGenerated: "کاور / پیش‌نمایش تولیدی",
+    project: "پروژه",
+    id: "شناسه",
+    viewProfile: "مشاهده پروفایل",
   },
 } as const;
 
@@ -120,7 +144,7 @@ function formatDate(date: string, language: DevinsoLanguage) {
 
 function AutomationVisual({ accent }: { accent: string }) {
   return (
-    <div className="absolute inset-[6%] overflow-hidden rounded-[20px] border border-white/10 bg-[#090b12] shadow-[0_34px_100px_rgba(0,0,0,.52)]">
+    <div lang="en" dir="ltr" className="absolute inset-[6%] overflow-hidden rounded-[20px] border border-white/10 bg-[#090b12] shadow-[0_34px_100px_rgba(0,0,0,.52)]">
       <div className="flex h-12 items-center justify-between border-b border-white/[.07] px-5">
         <div className="flex items-center gap-2"><i className="h-2 w-2 rounded-full" style={{ backgroundColor: accent, boxShadow: `0 0 16px ${accent}` }} /><span className="font-mono text-[8px] tracking-[.16em] text-white/38">AUTOMATION / LIVE</span></div>
         <div className="flex gap-1.5">{[0, 1, 2].map((dot) => <i key={dot} className="h-1.5 w-1.5 rounded-full bg-white/20" />)}</div>
@@ -145,7 +169,7 @@ function AutomationVisual({ accent }: { accent: string }) {
 
 function IdentityVisual({ accent }: { accent: string }) {
   return (
-    <div className="absolute inset-0 grid place-items-center overflow-hidden">
+    <div lang="en" dir="ltr" className="absolute inset-0 grid place-items-center overflow-hidden">
       <div className="case-orbit absolute aspect-square h-[72%] rounded-full border border-white/10"><i className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ backgroundColor: accent, boxShadow: `0 0 24px ${accent}` }} /></div>
       <div className="absolute aspect-square h-[48%] rotate-45 border border-white/[.08]" />
       <span className="absolute left-[6%] top-[8%] font-mono text-[8px] tracking-[.18em] text-white/30">IDENTITY / RESPONSIVE GRID</span>
@@ -155,9 +179,12 @@ function IdentityVisual({ accent }: { accent: string }) {
   );
 }
 
-function ProjectCover({ project }: { project: ProjectDetail }) {
+function ProjectCover({ project, language }: { project: ProjectDetail; language: DevinsoLanguage }) {
   if (project.coverImage) {
-    return <><Image src={project.coverImage} alt={project.coverAlt ?? project.title} fill priority sizes="100vw" className="object-cover" /><div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(2,3,7,.38))]" /></>;
+    const alt = language === "fa"
+      ? project.coverAltFa ?? project.coverAlt ?? project.titleFa
+      : project.coverAlt ?? project.title;
+    return <><Image src={project.coverImage} alt={alt} fill priority sizes="100vw" className="object-cover" /><div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(2,3,7,.38))]" /></>;
   }
   if (project.preview === "automation") return <AutomationVisual accent={project.accent} />;
   return <IdentityVisual accent={project.accent} />;
@@ -198,9 +225,9 @@ function MemberRoleBadge({ roleType, label, accent, light }: { roleType: Project
   );
 }
 
-function ProjectLinkCard({ href, label, unavailable, icon, accent, light }: { href: string | null; label: string; unavailable: string; icon: ReactNode; accent: string; light: boolean }) {
+function ProjectLinkCard({ href, label, unavailable, icon, accent, light, availableTag, nullTag }: { href: string | null; label: string; unavailable: string; icon: ReactNode; accent: string; light: boolean; availableTag: string; nullTag: string }) {
   const className = `project-interactive-card group relative flex min-h-[148px] items-end justify-between overflow-hidden rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`;
-  const content = <><div className="absolute right-5 top-5 opacity-55">{icon}</div><div><span className={`font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/36" : "text-white/28"}`}>{href ? "URL / AVAILABLE" : "URL / NULL"}</span><strong className={`mt-3 block text-[14px] font-medium ${href ? "" : light ? "text-[#17263d]/38" : "text-white/34"}`}>{href ? label : unavailable}</strong></div>{href && <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={1.4} />}<i className="absolute bottom-0 left-0 h-[2px] w-1/3 transition-[width] duration-500 group-hover:w-full" style={{ backgroundColor: accent }} /></>;
+  const content = <><div className="absolute end-5 top-5 opacity-55">{icon}</div><div><span className={`font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/36" : "text-white/28"}`}>{href ? availableTag : nullTag}</span><strong className={`mt-3 block text-[14px] font-medium ${href ? "" : light ? "text-[#17263d]/38" : "text-white/34"}`}>{href ? label : unavailable}</strong></div>{href && <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" strokeWidth={1.4} />}<i className="absolute bottom-0 start-0 h-[2px] w-1/3 transition-[width] duration-500 group-hover:w-full" style={{ backgroundColor: accent }} /></>;
   return href ? <a href={href} target="_blank" rel="noreferrer" className={className}>{content}</a> : <div className={className}>{content}</div>;
 }
 
@@ -246,6 +273,7 @@ function ProjectContent({ blocks, language, light, accent }: { blocks: ProjectCo
   const copy = COPY[language];
   const rtl = language === "fa";
   const text = (en: string, fa: string) => language === "fa" ? fa : en;
+  const tag = (number: string, kind: keyof typeof copy.blockKinds) => `${copy.block} / ${number} / ${copy.blockKinds[kind]}`;
 
   if (!blocks.length) {
     return <div className={`rounded-[22px] border border-dashed p-8 text-center font-mono text-[9px] uppercase tracking-[.16em] ${light ? "border-[#294368]/20 text-[#294368]/40" : "border-white/[.12] text-white/30"}`}>{copy.contentEmpty}</div>;
@@ -255,24 +283,24 @@ function ProjectContent({ blocks, language, light, accent }: { blocks: ProjectCo
     {blocks.map((block, index) => {
       const blockNumber = String(index + 1).padStart(2, "0");
       if (block.type === "heading") {
-        return <div key={`${block.type}-${index}`} data-project-item className={`border-t pt-5 ${light ? "border-[#294368]/12" : "border-white/[.09]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><span className={`font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/27"}`}>BLOCK / {blockNumber} / HEADING</span><h3 className="mt-5 max-w-[18ch] text-[clamp(25px,3.8vw,48px)] font-[560] leading-[.95] tracking-[-.05em]">{text(block.text, block.textFa)}</h3></div>;
+        return <div key={`${block.type}-${index}`} data-project-item className={`border-t pt-5 ${light ? "border-[#294368]/12" : "border-white/[.09]"} text-start`}><span className={`font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/27"}`}>{tag(blockNumber, "heading")}</span><h3 className={`mt-5 max-w-[18ch] text-[clamp(25px,3.8vw,48px)] font-[560] ${rtl ? "leading-[1.3]" : "leading-[.95] tracking-[-.03em]"}`}>{text(block.text, block.textFa)}</h3></div>;
       }
       if (block.type === "paragraph") {
-        return <div key={`${block.type}-${index}`} data-project-item className={`border-l pl-5 ${light ? "border-[#294368]/12" : "border-white/[.09]"} ${rtl ? "border-l-0 border-r pr-5 text-right [direction:rtl]" : "text-left"}`}><span className={`mb-3 block font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/30" : "text-white/24"}`}>BLOCK / {blockNumber} / TEXT</span><RichText html={text(block.text, block.textFa)} className={`max-w-[68ch] text-[clamp(14px,1.35vw,18px)] leading-[1.95] ${light ? "text-[#243b59]/64" : "text-white/55"}`} /></div>;
+        return <div key={`${block.type}-${index}`} data-project-item className={`border-s ps-5 text-start ${light ? "border-[#294368]/12" : "border-white/[.09]"}`}><span className={`mb-3 block font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/30" : "text-white/24"}`}>{tag(blockNumber, "text")}</span><RichText html={text(block.text, block.textFa)} className={`max-w-[68ch] text-[clamp(14px,1.35vw,18px)] leading-[1.95] ${light ? "text-[#243b59]/64" : "text-white/55"}`} /></div>;
       }
       if (block.type === "image") {
-        return <figure key={`${block.type}-${index}`} data-project-item className={`mx-auto w-full max-w-[920px] overflow-hidden rounded-[24px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><div className="relative aspect-[16/9] overflow-hidden"><Image src={block.src} alt={language === "fa" ? block.altFa : block.alt} fill sizes="(max-width: 900px) 100vw, 900px" className="object-cover transition-transform duration-700 hover:scale-[1.02]" /></div><figcaption className={`flex items-center justify-between gap-4 border-t px-5 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><span>{text(block.caption ?? `IMAGE / ${blockNumber}`, block.captionFa ?? block.caption ?? `IMAGE / ${blockNumber}`)}</span><span className="shrink-0 opacity-60">IMAGE / {blockNumber}</span></figcaption></figure>;
+        return <figure key={`${block.type}-${index}`} data-project-item className={`mx-auto w-full max-w-[920px] overflow-hidden rounded-[24px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><div className="relative aspect-[16/9] overflow-hidden"><Image src={block.src} alt={language === "fa" ? block.altFa : block.alt} fill sizes="(max-width: 900px) 100vw, 900px" className="object-cover transition-transform duration-700 hover:scale-[1.02]" /></div><figcaption className={`flex items-center justify-between gap-4 border-t px-5 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"} text-start`}><span>{text(block.caption ?? `IMAGE / ${blockNumber}`, block.captionFa ?? block.caption ?? `تصویر / ${blockNumber}`)}</span><span className="shrink-0 opacity-60">{copy.blockKinds.image} / {blockNumber}</span></figcaption></figure>;
       }
       if (block.type === "gallery") {
-        return <div key={`${block.type}-${index}`} data-project-item className={`grid gap-4 ${block.images.length > 1 ? "sm:grid-cols-2" : ""}`}><div className={`sm:col-span-full border-b pb-3 font-mono text-[7px] uppercase tracking-[.18em] ${light ? "border-[#294368]/10 text-[#294368]/35" : "border-white/[.08] text-white/26"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}>BLOCK / {blockNumber} / GALLERY / {String(block.images.length).padStart(2, "0")} ITEMS</div>{block.images.map((image, imageIndex) => <figure key={`${image.src}-${imageIndex}`} className={`overflow-hidden rounded-[20px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><div className="relative aspect-[4/3] overflow-hidden"><Image src={image.src} alt={language === "fa" ? image.altFa : image.alt} fill sizes="(max-width: 900px) 100vw, 600px" className="object-cover transition-transform duration-700 hover:scale-[1.02]" /></div>{(image.caption || image.captionFa) && <figcaption className={`border-t px-4 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}>{text(image.caption ?? "", image.captionFa ?? image.caption ?? "")}</figcaption>}</figure>)}</div>;
+        return <div key={`${block.type}-${index}`} data-project-item className={`grid gap-4 ${block.images.length > 1 ? "sm:grid-cols-2" : ""}`}><div className={`sm:col-span-full border-b pb-3 font-mono text-[7px] uppercase tracking-[.18em] ${light ? "border-[#294368]/10 text-[#294368]/35" : "border-white/[.08] text-white/26"} text-start`}>{tag(blockNumber, "gallery")} / {String(block.images.length).padStart(2, "0")} {copy.items}</div>{block.images.map((image, imageIndex) => <figure key={`${image.src}-${imageIndex}`} className={`overflow-hidden rounded-[20px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><div className="relative aspect-[4/3] overflow-hidden"><Image src={image.src} alt={language === "fa" ? image.altFa : image.alt} fill sizes="(max-width: 900px) 100vw, 600px" className="object-cover transition-transform duration-700 hover:scale-[1.02]" /></div>{(image.caption || image.captionFa) && <figcaption className={`border-t px-4 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"} text-start`}>{text(image.caption ?? "", image.captionFa ?? image.caption ?? "")}</figcaption>}</figure>)}</div>;
       }
       if (block.type === "quote") {
-        return <blockquote key={`${block.type}-${index}`} data-project-item className={`relative overflow-hidden rounded-[22px] border p-[clamp(24px,4vw,42px)] ${light ? "border-[#294368]/10 bg-white/52" : "border-white/[.07] bg-white/[.018]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><i className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: accent }} /><span className={`mb-6 block font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/32" : "text-white/25"}`}>BLOCK / {blockNumber} / QUOTE</span><p className="max-w-[48ch] text-[clamp(20px,2.7vw,34px)] font-[520] leading-[1.12] tracking-[-.035em]">“{text(block.text, block.textFa)}”</p>{(block.byline || block.bylineFa) && <cite className={`mt-6 block font-mono text-[8px] uppercase tracking-[.17em] not-italic ${light ? "text-[#294368]/40" : "text-white/30"}`}>{text(block.byline ?? "", block.bylineFa ?? block.byline ?? "")}</cite>}</blockquote>;
+        return <blockquote key={`${block.type}-${index}`} data-project-item className={`relative overflow-hidden rounded-[22px] border p-[clamp(24px,4vw,42px)] ${light ? "border-[#294368]/10 bg-white/52" : "border-white/[.07] bg-white/[.018]"} text-start`}><i className="absolute start-0 top-0 h-full w-1" style={{ backgroundColor: accent }} /><span className={`mb-6 block font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/32" : "text-white/25"}`}>{tag(blockNumber, "quote")}</span><p className={`max-w-[48ch] text-[clamp(20px,2.7vw,34px)] font-[520] ${rtl ? "leading-[1.6]" : "leading-[1.12] tracking-[-.035em]"}`}>{rtl ? `«${block.textFa}»` : `“${block.text}”`}</p>{(block.byline || block.bylineFa) && <cite className={`mt-6 block font-mono text-[8px] uppercase tracking-[.17em] not-italic ${light ? "text-[#294368]/40" : "text-white/30"}`}>{text(block.byline ?? "", block.bylineFa ?? block.byline ?? "")}</cite>}</blockquote>;
       }
       if (block.type === "video") {
         return block.src ? <figure key={`${block.type}-${index}`} data-project-item className={`overflow-hidden rounded-[24px] border ${light ? "border-[#294368]/10 bg-white/45" : "border-white/[.07] bg-white/[.018]"}`}><video src={block.src} poster={block.poster} controls className="aspect-video w-full object-cover" />{(block.caption || block.captionFa) && <figcaption className={`border-t px-5 py-3 font-mono text-[8px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/42" : "border-white/[.07] text-white/30"}`}>{text(block.caption ?? "", block.captionFa ?? block.caption ?? "")}</figcaption>}</figure> : <div key={`${block.type}-${index}`} data-project-item className={`flex min-h-[220px] flex-col items-center justify-center rounded-[24px] border border-dashed p-8 text-center ${light ? "border-[#294368]/20 text-[#294368]/40" : "border-white/[.12] text-white/30"}`}><span className="font-mono text-[9px] uppercase tracking-[.16em]">{copy.videoPlaceholder}</span><span className={`mt-3 max-w-[30ch] text-[11px] leading-6 ${light ? "text-[#294368]/50" : "text-white/38"}`}>{copy.contentEmpty}</span></div>;
       }
-      return block.url ? <a key={`${block.type}-${index}`} data-project-item href={block.url} target="_blank" rel="noreferrer" className={`group flex min-h-[110px] items-center justify-between rounded-[22px] border px-5 transition-transform hover:-translate-y-1 ${light ? "border-[#294368]/10 bg-white/52" : "border-white/[.07] bg-white/[.018]"}`}><div><span className={`block font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/27"}`}>BLOCK / {blockNumber} / EMBED</span><span className="mt-3 block text-[13px] font-medium">{text(block.label, block.labelFa)}</span></div><ArrowUpRight className="h-5 w-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={1.4} /></a> : <div key={`${block.type}-${index}`} data-project-item className={`flex min-h-[110px] flex-col items-center justify-center rounded-[22px] border border-dashed p-6 text-center ${light ? "border-[#294368]/20 text-[#294368]/40" : "border-white/[.12] text-white/30"}`}><span className="font-mono text-[9px] uppercase tracking-[.16em]">{copy.embedPlaceholder}</span><span className={`mt-3 text-[11px] ${light ? "text-[#294368]/50" : "text-white/38"}`}>{copy.contentEmpty}</span></div>;
+      return block.url ? <a key={`${block.type}-${index}`} data-project-item href={block.url} target="_blank" rel="noreferrer" className={`group flex min-h-[110px] items-center justify-between rounded-[22px] border px-5 transition-transform hover:-translate-y-1 ${light ? "border-[#294368]/10 bg-white/52" : "border-white/[.07] bg-white/[.018]"}`}><div><span className={`block font-mono text-[7px] uppercase tracking-[.18em] ${light ? "text-[#294368]/35" : "text-white/27"}`}>{tag(blockNumber, "embed")}</span><span className="mt-3 block text-[13px] font-medium">{text(block.label, block.labelFa)}</span></div><ArrowUpRight className="h-5 w-5 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" strokeWidth={1.4} /></a> : <div key={`${block.type}-${index}`} data-project-item className={`flex min-h-[110px] flex-col items-center justify-center rounded-[22px] border border-dashed p-6 text-center ${light ? "border-[#294368]/20 text-[#294368]/40" : "border-white/[.12] text-white/30"}`}><span className="font-mono text-[9px] uppercase tracking-[.16em]">{copy.embedPlaceholder}</span><span className={`mt-3 text-[11px] ${light ? "text-[#294368]/50" : "text-white/38"}`}>{copy.contentEmpty}</span></div>;
     })}
   </div>;
 }
@@ -296,8 +324,9 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
     document.documentElement.lang = language;
-    document.documentElement.dir = "ltr";
-  }, [language, theme]);
+    document.documentElement.dir = rtl ? "rtl" : "ltr";
+    document.documentElement.dataset.language = language;
+  }, [language, theme, rtl]);
 
   useLayoutEffect(() => {
     if (!rootRef.current) return;
@@ -350,56 +379,77 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
     setTheme(nextTheme);
     setCookie(DEVINSO_COOKIE.theme, nextTheme);
   };
-  const toggleLanguage = () => {
-    const nextLanguage = language === "en" ? "fa" : "en";
+  const changeLanguage = (nextLanguage: DevinsoLanguage) => {
     setLanguage(nextLanguage);
     setCookie(DEVINSO_COOKIE.language, nextLanguage);
   };
 
-  return (
-    <main ref={rootRef} className={`relative min-h-screen overflow-hidden transition-colors duration-500 ${light ? "bg-[#f4efe7] text-[#1c1a1b]" : "bg-[#101114] text-[#f1ede7]"}`} style={{ "--project-accent": project.accent } as CSSProperties}>
-      <div aria-hidden className={`project-backdrop-grid pointer-events-none fixed inset-0 z-0 ${light ? "opacity-[.52] [background-image:linear-gradient(rgba(74,61,53,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(74,61,53,.055)_1px,transparent_1px)]" : "opacity-[.62] [background-image:linear-gradient(rgba(255,255,255,.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.028)_1px,transparent_1px)]"} [background-size:48px_48px]`} />
-      <div className="pointer-events-none absolute -right-[20vw] top-[-18vw] h-[58vw] w-[58vw] rounded-full blur-3xl" style={{ backgroundColor: project.accentSoft }} />
+  const pick = (en: string, fa: string | null | undefined) => (rtl && fa ? fa : en);
+  const title = pick(project.title, project.titleFa);
+  const createdBy = pick(project.createdBy.fullName, project.createdBy.fullNameFa);
+  // API projects carry no numeric id (it maps to 0); a "0" label is noise.
+  const projectNumber = project.id > 0 ? String(project.id).padStart(2, "0") : null;
+  const sectionLabel = `font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`;
+  // Persian headings: the Latin display leading (.95) and negative tracking
+  // clip and crowd the script.
+  const display = rtl ? "leading-[1.25]" : "leading-[.95] tracking-[-.03em]";
 
-      <header className={`project-glass-header sticky top-0 z-50 border-b ${light ? "border-[#3b3430]/14 bg-[#f4efe7]/62" : "border-white/[.08] bg-[#101114]/58"}`}>
-        <div className="mx-auto flex h-[74px] w-[min(1440px,calc(100%_-_clamp(28px,6vw,96px)))] items-center justify-between gap-4">
-          <Link href="/" className="inline-flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[.17em]"><i className="h-[7px] w-[7px] rounded-full" style={{ backgroundColor: project.accent, boxShadow: `0 0 18px ${project.accent}` }} /><span>DEVINSO</span><span className={`hidden font-mono text-[8px] font-normal sm:inline ${light ? "text-[#294368]/38" : "text-white/25"}`}>{copy.page} / {String(project.id).padStart(2, "0")}</span></Link>
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={toggleLanguage} className={`inline-flex h-10 items-center gap-2 rounded-full border px-3 font-mono text-[8px] tracking-[.16em] ${light ? "border-[#294368]/10 bg-white/55 text-[#17263d]/70" : "border-white/[.08] bg-white/[.03] text-white/65"}`} aria-label="Change language"><Languages className="h-3.5 w-3.5" strokeWidth={1.5} />{language === "en" ? "FA" : "EN"}</button>
-            <button type="button" onClick={toggleTheme} className={`grid h-10 w-10 place-items-center rounded-full border ${light ? "border-[#294368]/10 bg-white/55 text-[#17263d]/70" : "border-white/[.08] bg-white/[.03] text-white/65"}`} aria-label="Toggle color theme">{light ? <Moon className="h-3.5 w-3.5" strokeWidth={1.5} /> : <Sun className="h-3.5 w-3.5" strokeWidth={1.5} />}</button>
-            <Link href="/#work" className={`inline-flex h-10 items-center gap-2 rounded-full border px-4 text-[8px] font-medium uppercase tracking-[.14em] max-sm:px-3 ${light ? "border-[#294368]/10 bg-[#17263d] text-white" : "border-white/[.1] bg-white/[.075] text-white/80"}`}><ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} /><span className="max-sm:hidden">{copy.back}</span></Link>
-          </div>
-        </div>
-      </header>
+  // The server sets the tab title from the cookie; keep it in step with the
+  // in-page language switch, which does not reload.
+  useEffect(() => {
+    document.title = `${title} · Devinso`;
+  }, [title]);
+
+  return (
+    <main
+      ref={rootRef}
+      lang={language}
+      dir={rtl ? "rtl" : "ltr"}
+      data-locale={language}
+      // overflow-clip, not overflow-hidden: hidden makes <main> a scroll
+      // container and the sticky header stops sticking to the viewport.
+      className={`relative min-h-screen overflow-clip transition-colors duration-500 ${light ? "bg-[#f4efe7] text-[#1c1a1b]" : "bg-[#101114] text-[#f1ede7]"}`} style={{ "--project-accent": project.accent } as CSSProperties}>
+      <div aria-hidden className={`project-backdrop-grid pointer-events-none fixed inset-0 z-0 ${light ? "opacity-[.52] [background-image:linear-gradient(rgba(74,61,53,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(74,61,53,.055)_1px,transparent_1px)]" : "opacity-[.62] [background-image:linear-gradient(rgba(255,255,255,.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.028)_1px,transparent_1px)]"} [background-size:48px_48px]`} />
+      <div className="pointer-events-none absolute -end-[20vw] top-[-18vw] h-[58vw] w-[58vw] rounded-full blur-3xl" style={{ backgroundColor: project.accentSoft }} />
+
+      <SubpageHeader
+        theme={theme}
+        language={language}
+        onLanguageChange={changeLanguage}
+        onToggleTheme={toggleTheme}
+        context={projectNumber ? `${copy.page} / ${projectNumber}` : copy.page}
+        backHref="/#work"
+        backLabel={copy.back}
+      />
 
       <article className="relative z-10">
         <section className="mx-auto grid w-[min(1440px,calc(100%_-_clamp(28px,6vw,96px)))] gap-12 pb-[clamp(48px,7vw,96px)] pt-[clamp(68px,9vw,130px)] lg:grid-cols-[1.25fr_.75fr] lg:items-end">
-          <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
-            <div data-project-intro className="flex items-center gap-3"><span className="rounded-full border px-3 py-2 font-mono text-[7px] tracking-[.16em]" style={{ borderColor: `${project.accent}55`, color: project.accent }}>{statusLabel(project.status, language)}</span><span className={`font-mono text-[8px] uppercase tracking-[.18em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>{typeLabel(project.type, language)} / ID {project.id}</span></div>
-            <FitTitle data-project-intro text={project.title} min={34} max={122} maxLines={3} leading={0.86} className="mt-7 font-[570] tracking-[-.075em] [direction:ltr]" />
+          <div className="text-start">
+            <div data-project-intro className="flex items-center gap-3"><span className="rounded-full border px-3 py-2 font-mono text-[7px] tracking-[.16em]" style={{ borderColor: `${project.accent}55`, color: project.accent }}>{statusLabel(project.status, language)}</span><span className={`font-mono text-[8px] uppercase tracking-[.18em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>{typeLabel(project.type, language)}{projectNumber ? ` / ${copy.id} ${projectNumber}` : ""}</span></div>
+            <FitTitle data-project-intro text={title} min={34} max={122} maxLines={3} leading={rtl ? 1.2 : 0.86} className={`mt-7 font-[570] ${rtl ? "" : "tracking-[-.03em]"}`} />
           </div>
-          <div data-project-intro className={rtl ? "text-right [direction:rtl]" : "text-left"}>
-            <p className={`max-w-[58ch] text-[14px] leading-8 ${light ? "text-[#243b59]/62" : "text-white/52"}`}>{language === "fa" ? project.descriptionFa : project.description}</p>
-            <div className={`mt-8 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.16em] ${light ? "border-[#294368]/10 text-[#294368]/38" : "border-white/[.08] text-white/28"}`}><span>{copy.createdBy} / {project.createdBy.fullName}</span><span>{project.techStack.length} / {copy.techStack}</span></div>
+          <div data-project-intro className="text-start">
+            <p className={`max-w-[58ch] ${rtl ? "text-[15px] leading-[2.1]" : "text-[14px] leading-8"} ${light ? "text-[#243b59]/62" : "text-white/52"}`}>{language === "fa" ? project.descriptionFa : project.description}</p>
+            <div className={`mt-8 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.16em] ${light ? "border-[#294368]/10 text-[#294368]/38" : "border-white/[.08] text-white/28"}`}><span>{copy.createdBy} / {createdBy}</span><span>{project.techStack.length} / {copy.techStack}</span></div>
           </div>
         </section>
 
         <section data-project-intro className="mx-auto w-[min(1560px,calc(100%_-_clamp(20px,4vw,64px)))]">
           <div className={`relative aspect-[16/8.1] min-h-[360px] overflow-hidden rounded-[clamp(20px,3vw,40px)] border max-md:aspect-[4/3] ${light ? "border-[#294368]/10 bg-[#dfe7f0] shadow-[0_40px_110px_rgba(34,50,76,.13)]" : "border-white/[.08] bg-[#080a0f] shadow-[0_44px_130px_rgba(0,0,0,.48)]"}`}>
-            <ProjectCover project={project} />
-            <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between border-t border-white/10 pt-4 font-mono text-[7px] tracking-[.16em] text-white/38"><span>PROJECT / {String(project.id).padStart(2, "0")}</span><span>{project.coverImage ? "COVER / LOADED" : "COVER / GENERATED PREVIEW"}</span></div>
+            <ProjectCover project={project} language={language} />
+            <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between border-t border-white/10 pt-4 font-mono text-[7px] tracking-[.16em] text-white/38"><span>{projectNumber ? `${copy.project} / ${projectNumber}` : copy.project}</span><span>{project.coverImage ? copy.coverLoaded : copy.coverGenerated}</span></div>
           </div>
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/16 bg-[#fff9ef]/92" : "border-white/[.09] bg-[#19181a]/96"}`}>
           <SectionAtmosphere accent={project.accent} light={light} variant="about" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
-          <div data-project-item><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>01 / ABOUT</span></div>
-          <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
-            <h2 data-project-item className="text-[clamp(32px,5vw,68px)] font-[560] leading-[.95] tracking-[-.055em]">{copy.about}</h2>
+          <div data-project-item><span className={sectionLabel}>{copy.sections.about}</span></div>
+          <div className="text-start">
+            <h2 data-project-item className={`text-[clamp(32px,5vw,68px)] font-[560] ${display}`}>{copy.about}</h2>
             <p data-project-item className={`mt-8 max-w-[65ch] text-[clamp(15px,1.5vw,19px)] leading-[1.9] ${light ? "text-[#243b59]/64" : "text-white/55"}`}>{language === "fa" ? project.descriptionFa : project.description}</p>
-            <dl data-project-item className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 [direction:ltr]">
-              <MetaItem label={copy.createdBy} value={project.createdBy.fullName} icon={<UserRound className="h-3.5 w-3.5" strokeWidth={1.5} />} light={light} />
+            <dl data-project-item className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <MetaItem label={copy.createdBy} value={createdBy} icon={<UserRound className="h-3.5 w-3.5" strokeWidth={1.5} />} light={light} />
               <MetaItem label={copy.type} value={typeLabel(project.type, language)} icon={project.type === "TEAM" ? <UsersRound className="h-3.5 w-3.5" strokeWidth={1.5} /> : <UserRound className="h-3.5 w-3.5" strokeWidth={1.5} />} light={light} />
               <MetaItem label={copy.createdAt} value={formatDate(project.createdAt, language)} icon={<CalendarDays className="h-3.5 w-3.5" strokeWidth={1.5} />} light={light} />
               <MetaItem label={copy.updatedAt} value={formatDate(project.updatedAt, language)} icon={<CalendarDays className="h-3.5 w-3.5" strokeWidth={1.5} />} light={light} />
@@ -411,9 +461,9 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         <section data-project-reveal className={`relative overflow-hidden border-b ${light ? "border-[#4a3d35]/14 bg-[#eee8df]/86" : "border-white/[.07] bg-[#121315]/96"}`}>
           <SectionAtmosphere accent={project.accent} light={light} variant="content" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
-          <aside data-project-item className="self-start lg:sticky lg:top-[112px]"><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>02 / CONTENT</span><div className={`mt-5 rounded-[18px] border p-4 ${light ? "border-[#294368]/10 bg-white/50" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-end justify-between gap-3"><strong className="text-3xl font-[560] tracking-[-.06em]">{String(project.content.length).padStart(2, "0")}</strong><span className={`font-mono text-[7px] uppercase tracking-[.15em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>BLOCKS</span></div><div className={`mt-4 h-px ${light ? "bg-[#294368]/10" : "bg-white/[.08]"}`} /><div className={`mt-3 font-mono text-[7px] uppercase leading-6 tracking-[.12em] ${light ? "text-[#294368]/40" : "text-white/28"}`}>TEXT / IMAGE / MEDIA</div></div></aside>
-          <div className={rtl ? "text-right [direction:rtl]" : "text-left"}>
-            <h2 data-project-item className="text-[clamp(32px,5vw,68px)] font-[560] leading-[.95] tracking-[-.055em]">{copy.fullDescription}</h2>
+          <aside data-project-item className="self-start lg:sticky lg:top-[112px]"><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>{copy.sections.content}</span><div className={`mt-5 rounded-[18px] border p-4 ${light ? "border-[#294368]/10 bg-white/50" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-end justify-between gap-3"><strong className="text-3xl font-[560] tracking-[-.03em]">{String(project.content.length).padStart(2, "0")}</strong><span className={`font-mono text-[7px] uppercase tracking-[.15em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>{copy.blocks}</span></div><div className={`mt-4 h-px ${light ? "bg-[#294368]/10" : "bg-white/[.08]"}`} /><div className={`mt-3 font-mono text-[7px] uppercase leading-6 tracking-[.12em] ${light ? "text-[#294368]/40" : "text-white/28"}`}>{copy.blockTypes}</div></div></aside>
+          <div className="text-start">
+            <h2 data-project-item className={`text-[clamp(32px,5vw,68px)] font-[560] ${display}`}>{copy.fullDescription}</h2>
             <div className="mt-9"><ProjectContent blocks={project.content} language={language} light={light} accent={project.accent} /></div>
           </div>
           </div>
@@ -422,34 +472,42 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#e3dbd1]/66" : "border-white/[.08] bg-[#202125]/96"}`}>
           <SectionAtmosphere accent={project.accent} light={light} variant="stack" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-12 py-[clamp(72px,9vw,126px)] lg:grid-cols-[.72fr_1.28fr]">
-            <div data-project-item className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>03 / STACK</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.techStack}</h2></div>
-            <div data-project-item className="grid content-start gap-3 sm:grid-cols-2">{project.techStack.map((technology, index) => <div key={technology} className={`project-interactive-card flex min-h-[82px] items-center justify-between rounded-2xl border px-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}><span className="text-[13px] font-medium">{technology}</span><span className="font-mono text-[8px]" style={{ color: project.accent }}>0{index + 1}</span></div>)}</div>
+            <div data-project-item className="text-start"><span className={sectionLabel}>{copy.sections.stack}</span><h2 className={`mt-5 text-[clamp(34px,5vw,62px)] font-[560] ${display}`}>{copy.techStack}</h2></div>
+            <div data-project-item className="grid content-start gap-3 sm:grid-cols-2">{project.techStack.map((technology, index) => <div key={technology} className={`project-interactive-card flex min-h-[82px] items-center justify-between rounded-2xl border px-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}><span lang="en" className="text-[13px] font-medium">{technology}</span><span className="font-mono text-[8px]" style={{ color: project.accent }}>0{index + 1}</span></div>)}</div>
           </div>
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#f9f3eb]/92" : "border-white/[.08] bg-[#1a191c]/96"}`}>
           <SectionAtmosphere accent={project.accent} light={light} variant="links" />
           <div className="relative z-10 mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(90px,11vw,150px)]">
-            <div data-project-item className={rtl ? "text-right [direction:rtl]" : "text-left"}><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>04 / URLS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.links}</h2></div>
-            <div data-project-item className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /></div>
+            <div data-project-item className="text-start"><span className={sectionLabel}>{copy.sections.links}</span><h2 className={`mt-5 text-[clamp(34px,5vw,62px)] font-[560] ${display}`}>{copy.links}</h2></div>
+            <div data-project-item className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} availableTag={copy.urlAvailable} nullTag={copy.urlNull} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} availableTag={copy.urlAvailable} nullTag={copy.urlNull} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /></div>
           </div>
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#dfd7ce]/64" : "border-white/[.08] bg-[#111214]/96"}`}>
           <SectionAtmosphere accent={project.accent} light={light} variant="members" />
           <div className="relative z-10 mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(80px,10vw,140px)]">
-            <div data-project-item className={`flex flex-col justify-between gap-5 border-b pb-7 md:flex-row md:items-end ${light ? "border-[#294368]/10" : "border-white/[.08]"} ${rtl ? "text-right [direction:rtl]" : "text-left"}`}><div><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>05 / MEMBERS</span><h2 className="mt-5 text-[clamp(34px,5vw,62px)] font-[560] tracking-[-.055em]">{copy.team}</h2></div><p className={`max-w-[44ch] text-[13px] leading-7 ${light ? "text-[#243b59]/55" : "text-white/45"}`}>{copy.teamIntro}</p></div>
+            <div data-project-item className={`flex flex-col justify-between gap-5 border-b pb-7 md:flex-row md:items-end ${light ? "border-[#294368]/10" : "border-white/[.08]"} text-start`}><div><span className={sectionLabel}>{copy.sections.members}</span><h2 className={`mt-5 text-[clamp(34px,5vw,62px)] font-[560] ${display}`}>{copy.team}</h2></div><p className={`max-w-[44ch] text-[13px] leading-7 ${light ? "text-[#243b59]/55" : "text-white/45"}`}>{copy.teamIntro}</p></div>
             <div data-project-item className="mt-7 grid gap-4 md:grid-cols-2">{project.members.map((member) => {
-              const initials = member.fullName.split(" ").map((part) => part[0]).join("").slice(0, 2);
-              return <article key={member.id} className={`project-interactive-card rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-start gap-4"><div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${project.accent}55`, backgroundColor: `${project.accent}18`, color: project.accent }}>{member.avatar ? <Image src={member.avatar} alt={member.fullName} width={56} height={56} className="h-full w-full object-cover" /> : initials}</div><div className={rtl ? "text-right [direction:rtl]" : "text-left"}><h3 className="text-[16px] font-[560]">{member.fullName}</h3><p className="mt-1 text-[10px] uppercase tracking-[.12em]" style={{ color: project.accent }}>{member.role}</p><div className="mt-2.5"><MemberRoleBadge roleType={member.roleType} label={copy.roles[member.roleType]} accent={project.accent} light={light} /></div></div></div>{member.description && <p className={`mt-6 text-[12px] leading-7 ${light ? "text-[#243b59]/58" : "text-white/48"} ${rtl ? "text-right [direction:rtl]" : ""}`}>{member.description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></article>;
+              const name = pick(member.fullName, member.fullNameFa);
+              const role = pick(member.role, member.roleFa);
+              const description = member.description ? pick(member.description, member.descriptionFa) : null;
+              const initials = member.fullName.split(" ").filter(Boolean).map((part) => part[0].toUpperCase()).join("").slice(0, 2);
+              const card = <><div className="flex items-start gap-4"><div className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${project.accent}55`, backgroundColor: `${project.accent}18`, color: project.accent }}><span lang="en">{initials}</span><MemberPhoto src={member.avatar} alt={name} size={56} /></div><div className="min-w-0 flex-1 text-start"><h3 className={`font-[560] ${rtl ? "text-[17px]" : "text-[16px]"}`}>{name}</h3>{role && <p className={`mt-1 uppercase ${rtl ? "text-[12px]" : "text-[10px] tracking-[.12em]"}`} style={{ color: project.accent }}>{role}</p>}<div className="mt-2.5"><MemberRoleBadge roleType={member.roleType} label={copy.roles[member.roleType]} accent={project.accent} light={light} /></div></div>{member.username && <ArrowUpRight className="h-4 w-4 shrink-0 opacity-40 transition-[opacity,translate] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-90 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" strokeWidth={1.4} />}</div>{description && <p className={`mt-6 leading-7 ${rtl ? "text-[13px]" : "text-[12px]"} ${light ? "text-[#243b59]/58" : "text-white/48"}`}>{description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{member.username ? copy.viewProfile : copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></>;
+              const cardClass = `project-interactive-card group block rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`;
+              // A member with a public profile opens it; others stay a static card.
+              return member.username
+                ? <Link key={member.id} href={`/member/${member.username}`} className={`${cardClass} outline-none transition-colors hover:border-[var(--project-accent)] focus-visible:ring-2 focus-visible:ring-[var(--project-accent)]`}>{card}</Link>
+                : <article key={member.id} className={cardClass}>{card}</article>;
             })}</div>
           </div>
         </section>
 
         <section data-project-reveal>
           <Link href={`/projects/${nextProject.slug}`} className="group mx-auto flex min-h-[330px] w-[min(1440px,calc(100%_-_clamp(28px,6vw,96px)))] flex-col justify-center py-16">
-            <span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>{copy.next} / {String(nextProject.id).padStart(2, "0")}</span>
-            <div className="mt-6 flex items-end justify-between gap-6"><h2 className="max-w-[13ch] text-[clamp(42px,7vw,102px)] font-[560] leading-[.84] tracking-[-.065em]">{language === "fa" ? nextProject.titleFa : nextProject.title}</h2><ArrowUpRight className="h-8 w-8 shrink-0 transition-transform duration-300 group-hover:-translate-y-2 group-hover:translate-x-2" strokeWidth={1.2} /></div>
+            <span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>{nextProject.id > 0 ? `${copy.next} / ${String(nextProject.id).padStart(2, "0")}` : copy.next}</span>
+            <div className="mt-6 flex items-end justify-between gap-6"><h2 className={`max-w-[13ch] text-[clamp(42px,7vw,102px)] font-[560] ${rtl ? "leading-[1.15]" : "leading-[.84] tracking-[-.03em]"}`}>{pick(nextProject.title, nextProject.titleFa)}</h2><ArrowUpRight className="h-8 w-8 shrink-0 transition-transform duration-300 group-hover:-translate-y-2 group-hover:translate-x-2 rtl:-scale-x-100 rtl:group-hover:-translate-x-2" strokeWidth={1.2} /></div>
             <span className="mt-8 text-[10px] uppercase tracking-[.15em]" style={{ color: nextProject.accent }}>{copy.viewNext}</span>
           </Link>
         </section>
