@@ -1,8 +1,10 @@
 import type { RefObject } from "react";
+import { BrandMark } from "@/components/Brand/BrandMark";
 import type { DevinsoLanguage, DevinsoTheme } from "@/lib/preferences";
 import type { HeroCopy } from "@/components/Hero/copy";
 
 type HeroHeaderProps = {
+  headerRef: RefObject<HTMLElement | null>;
   copy: HeroCopy;
   theme: DevinsoTheme;
   language: DevinsoLanguage;
@@ -13,7 +15,7 @@ type HeroHeaderProps = {
   onLanguageChange: (language: DevinsoLanguage) => void;
 };
 
-export function HeroHeader({ copy, theme, language, settingsOpen, settingsRef, onToggleSettings, onToggleTheme, onLanguageChange }: HeroHeaderProps) {
+export function HeroHeader({ headerRef, copy, theme, language, settingsOpen, settingsRef, onToggleSettings, onToggleTheme, onLanguageChange }: HeroHeaderProps) {
   const light = theme === "light";
   const rtl = language === "fa";
 
@@ -26,22 +28,32 @@ export function HeroHeader({ copy, theme, language, settingsOpen, settingsRef, o
     : "border-white/[.08] [background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.04))] text-white/85 hover:border-[#6ebcff]/25 hover:text-white hover:shadow-[0_0_24px_rgba(110,188,255,.06),inset_0_1px_rgba(255,255,255,.06)]";
 
   return (
-    <header className="hero-topline absolute left-[clamp(22px,4vw,56px)] right-[clamp(22px,4vw,56px)] top-[clamp(22px,4vw,42px)] z-20 flex items-center justify-between gap-4 max-[760px]:left-4 max-[760px]:right-4 max-[760px]:top-4 max-[540px]:left-3.5 max-[540px]:right-3.5 max-[540px]:min-h-10">
+    // Fixed to the viewport for the whole page. The bar itself lets clicks
+    // through (only the mark and nav catch them), and a soft scrim keeps it
+    // legible once content scrolls underneath.
+    <header
+      ref={headerRef}
+      className={`hero-topline pointer-events-none fixed inset-x-0 top-0 z-[999] flex items-center justify-between gap-4 px-[clamp(22px,4vw,56px)] pb-5 pt-[clamp(22px,4vw,42px)] before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-[calc(100%_+_28px)] before:backdrop-blur-[14px] before:[mask-image:linear-gradient(180deg,#000_58%,transparent)] max-[760px]:px-4 max-[760px]:pt-4 max-[540px]:min-h-10 max-[540px]:px-3.5 ${
+        light
+          ? "before:[background:linear-gradient(180deg,rgba(232,238,245,.9),rgba(232,238,245,.62)_60%,transparent)]"
+          : "before:[background:linear-gradient(180deg,rgba(5,5,8,.88),rgba(5,5,8,.6)_60%,transparent)]"
+      }`}
+    >
       <div
-        className={`studio-mark inline-flex items-center gap-3.5 text-[10px] font-semibold uppercase tracking-[.16em] max-[540px]:gap-2 max-[540px]:text-[9px] max-[540px]:tracking-[.12em] ${
+        className={`studio-mark pointer-events-auto inline-flex items-center gap-3.5 text-[10px] font-semibold uppercase tracking-[.16em] max-[540px]:gap-2 max-[540px]:text-[9px] max-[540px]:tracking-[.12em] ${
           light
             ? "rounded-full border border-white/80 [background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(255,255,255,.36))] px-3.5 py-2.5 text-[#152238]/90 shadow-[0_18px_36px_rgba(63,80,111,.08),inset_0_1px_0_rgba(255,255,255,.95)] backdrop-blur-2xl"
             : "text-white/95"
         }`}
         data-reveal
       >
-        <i className={`h-[7px] w-[7px] shrink-0 rounded-full not-italic ${light ? "bg-[#2397bb] shadow-[0_0_16px_rgba(35,151,187,.32)]" : "bg-[#59e1ee] shadow-[0_0_18px_rgba(89,225,238,.58)]"}`} />
-        <b className="font-[580]">DEVINSO</b>
-        <span className={`text-[8px] font-normal tracking-[.14em] max-[760px]:hidden ${light ? "text-[#263653]/45" : "text-white/25"}`}>{copy.studioTagline}</span>
+        <BrandMark light={light} />
+        <b className="font-[580] leading-none" aria-hidden="true">DEVINSO</b>
+        <span className={`text-[8px] font-normal max-[760px]:hidden ${rtl ? "text-[10px] tracking-normal" : "tracking-[.14em]"} ${light ? "text-[#263653]/45" : "text-white/25"}`}>{copy.studioTagline}</span>
       </div>
 
       <nav
-        className={`hero-nav flex items-center gap-[clamp(14px,2vw,24px)] rounded-full border px-4 py-2 text-[10px] uppercase tracking-[.16em] backdrop-blur-2xl transition-colors max-[760px]:gap-3 max-[760px]:text-[9px] max-[540px]:gap-0 max-[540px]:p-[5px] ${navGlass}`}
+        className={`hero-nav pointer-events-auto flex items-center gap-[clamp(14px,2vw,24px)] rounded-full border px-4 py-2 text-[10px] uppercase tracking-[.16em] backdrop-blur-2xl transition-colors max-[760px]:gap-3 max-[760px]:text-[9px] max-[540px]:gap-0 max-[540px]:p-[5px] ${navGlass}`}
         data-reveal
         aria-label={copy.nav.aria}
       >
@@ -79,9 +91,7 @@ export function HeroHeader({ copy, theme, language, settingsOpen, settingsRef, o
 
           {settingsOpen && (
             <div
-              className={`settings-popover absolute right-0 top-[calc(100%_+_12px)] z-40 w-[min(330px,calc(100vw_-_32px))] rounded-[18px] border p-4 normal-case tracking-normal backdrop-blur-[30px] [backdrop-filter:blur(30px)_saturate(145%)] max-[760px]:right-[-2px] max-[760px]:w-[min(310px,calc(100vw_-_28px))] max-[540px]:fixed max-[540px]:right-3.5 max-[540px]:top-[66px] max-[540px]:w-[min(320px,calc(100vw_-_28px))] max-[390px]:right-1.5 max-[390px]:w-[min(304px,calc(100vw_-_12px))] max-[390px]:p-3 ${
-                rtl ? "text-right [direction:rtl]" : "text-left [direction:ltr]"
-              } ${
+              className={`settings-popover absolute end-0 top-[calc(100%_+_12px)] z-40 w-[min(330px,calc(100vw_-_32px))] rounded-[18px] border p-4 text-start normal-case tracking-normal backdrop-blur-[30px] [backdrop-filter:blur(30px)_saturate(145%)] max-[760px]:end-[-2px] max-[760px]:w-[min(310px,calc(100vw_-_28px))] max-[540px]:fixed max-[540px]:end-3.5 max-[540px]:top-[66px] max-[540px]:w-[min(320px,calc(100vw_-_28px))] max-[390px]:end-1.5 max-[390px]:w-[min(304px,calc(100vw_-_12px))] max-[390px]:p-3 ${
                 light
                   ? "border-white/80 [background:radial-gradient(circle_at_88%_8%,rgba(38,151,190,.09),transparent_32%),linear-gradient(145deg,rgba(255,255,255,.72),rgba(244,248,253,.43)),rgba(221,229,240,.52)] text-[#182235] shadow-[0_30px_72px_rgba(50,67,96,.16),inset_0_1px_0_rgba(255,255,255,.96)]"
                   : "border-white/[.09] [background:radial-gradient(circle_at_88%_8%,rgba(110,188,255,.09),transparent_34%),linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025)),rgba(8,10,16,.84)] text-white/95 shadow-[0_28px_70px_rgba(0,0,0,.42),0_0_50px_rgba(110,188,255,.05),inset_0_1px_rgba(255,255,255,.06)]"

@@ -1,3 +1,14 @@
+// The labels drawn around the logo are technical readouts, not UI copy: they
+// stay in English (and LTR) in every language.
+const STAGE_GRID = { axis: "AXIS 639.43", original: "ORIGINAL CONSTRUCTION", guide: "GUIDE / 01" };
+
+// The formation notes cycle through these states: security → backend → frontend.
+const STAGE_NOTES = [
+  { topA: "Pentest status", topB: "passed", bottomA: "Vulnerability", bottomB: "exploited", rightA: "CVSS score", rightB: "9.8" },
+  { topA: "API gateway", topB: "connected", bottomA: "Dev branch", bottomB: "merged", rightA: "Server load", rightB: "12.4%" },
+  { topA: "DOM tree", topB: "mounted", bottomA: "UI components", bottomB: "rendered", rightA: "Render time", rightB: "14.2ms" },
+];
+
 export const UI_COPY = {
   en: {
     studioTagline: "Digital product team",
@@ -22,7 +33,7 @@ export const UI_COPY = {
       label: "IDENTITY CONSTRUCTION",
       subtitle: "Design × Development × Interaction",
       description:
-        "The DEVINSO mark reconstructed from its original design guides — the same geometry used to shape the identity, resolved into motion.",
+        "At DEVINSO, we think beyond just a beautiful user interface. Our focus is on developing digital products that, alongside modern design, are built on solid software architecture, robust security, and optimized code.",
       primaryAction: "Explore work",
       secondaryAction: "Start a project",
       services: ["Product", "Brand", "Creative dev"],
@@ -66,8 +77,14 @@ export const UI_COPY = {
         ['//', 'source: original-grid · alignment: preserved'],
       ],
     },
-    grid: { axis: "AXIS 639.43", original: "ORIGINAL CONSTRUCTION", guide: "GUIDE / 01" },
-    notes: { topA: "Original guides", topB: "aligned", rightA: "Center axis", rightB: "639.43", bottomA: "Identity", bottomB: "resolved" },
+    grid: STAGE_GRID,
+    notes: STAGE_NOTES,
+    workIntro: {
+      meta: "01 / SELECTED WORK",
+      titleA: "SELECTED",
+      titleB: "WORK",
+      tagline: "Design, technology and interaction — resolved into shipped work.",
+    },
   },
   fa: {
     studioTagline: "تیم طراحی محصول دیجیتال",
@@ -92,7 +109,7 @@ export const UI_COPY = {
       label: "ساخت هویت",
       subtitle: "طراحی × توسعه × تعامل",
       description:
-        "نشان DEVINSO با استفاده از گایدهای اصلی خود بازسازی شده؛ همان هندسه‌ای که هویت را شکل داده، اینجا به حرکت تبدیل شده است.",
+        "در DEVINSO، فراتر از یک رابط کاربری زیبا فکر می‌کنیم. تمرکز ما توسعه محصولات دیجیتالی است که در کنار طراحی مدرن، بر پایه معماری نرم‌افزاری مستحکم، امنیت بالا و کدی بهینه ساخته می‌شوند.",
       primaryAction: "مشاهده نمونه‌کارها",
       secondaryAction: "شروع پروژه",
       services: ["محصول", "برند", "توسعه خلاق"],
@@ -102,8 +119,9 @@ export const UI_COPY = {
       scroll: "برای ادامه اسکرول کنید",
       footerTag: "DEVINSO / سیستم ساخت اصلی",
       loader: {
-        status: "در حال آماده‌سازی رابط",
-        complete: "سیستم آماده است",
+        // Loader text stays English in both languages.
+        status: "INITIALIZING EXPERIENCE",
+        complete: "SYSTEM READY",
         lines: [
           "boot.sequence // start",
           "loading design.system",
@@ -136,8 +154,14 @@ export const UI_COPY = {
         ['//', 'منبع: گرید اصلی · هم‌ترازی: حفظ شده'],
       ],
     },
-    grid: { axis: "AXIS 639.43", original: "ساختار اصلی", guide: "گاید / 01" },
-    notes: { topA: "گایدهای اصلی", topB: "هم‌تراز", rightA: "محور مرکزی", rightB: "639.43", bottomA: "هویت", bottomB: "نهایی" },
+    grid: STAGE_GRID,
+    notes: STAGE_NOTES,
+    workIntro: {
+      meta: "01 / نمونه‌کارهای منتخب",
+      titleA: "نمونه‌کارهای",
+      titleB: "منتخب",
+      tagline: "طراحی، تکنولوژی و تعامل — تبدیل‌شده به محصولاتی که منتشر شده‌اند.",
+    },
   },
 } as const;
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
@@ -26,10 +27,10 @@ const AUTO_ADVANCE_MS = 5200;
 const COPY = {
   en: {
     eyebrow: "MEMBERS / REGISTRY",
-    titleA: "TEAM",
-    titleB: "MEMBERS",
+    titleA: "The",
+    titleB: "Team",
     intro:
-      "One frame, every seat. Step through the registry to read each member — or the vacancy waiting to be filled.",
+      "The people behind our digital products.",
     registry: "REGISTRY",
     of: "OF",
     status: "STATUS",
@@ -53,10 +54,10 @@ const COPY = {
   },
   fa: {
     eyebrow: "اعضا / فهرست",
-    titleA: "TEAM",
-    titleB: "MEMBERS",
+    titleA: "اعضای",
+    titleB: "تیم",
     intro:
-      "یک قاب، همه جایگاه‌ها. در فهرست حرکت کنید تا هر عضو را بخوانید — یا جایگاهی که هنوز خالی است.",
+      "اعضای تیم، تخصص‌ها و سوابق کاری",
     registry: "فهرست",
     of: "از",
     status: "وضعیت",
@@ -114,6 +115,13 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
     setLocked(true);
     setActive(index);
   }, []);
+
+  // Members with a published profile open it on click; open slots and
+  // members without a username have nowhere to go, so they only select.
+  const router = useRouter();
+  const profileHref = (row: TeamMember) =>
+    row.status !== "OPEN" && row.username ? `/member/${row.username}` : null;
+  const activeHref = profileHref(member);
 
   // The registry sits well below the fold, so track whether it is actually on
   // screen. Advancing a frame nobody is looking at still re-renders this whole
@@ -294,7 +302,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
 
       <div className="relative mx-auto max-w-[1440px]">
         {/* Header */}
-        <div className={`pb-10 ${rtl ? "text-right [direction:rtl]" : "text-left"}`}>
+        <div className="pb-10 text-start">
           <div
             data-registry-reveal
             className={`font-mono text-[10px] uppercase tracking-[.22em] ${light ? "text-[#294368]/38" : "text-white/30"}`}
@@ -303,12 +311,12 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
           </div>
           <div
             data-registry-reveal
-            className={`mt-3 inline-flex flex-wrap items-baseline gap-x-3 text-[clamp(34px,5.6vw,78px)] font-[560] leading-[.9] tracking-[-.075em] ${
+            className={`mt-3 inline-flex flex-wrap items-baseline gap-x-3 text-[clamp(34px,5.6vw,78px)] font-[560] ${rtl ? "leading-[1.25] tracking-normal" : "leading-[.9] tracking-[-.03em]"} ${
               light ? "text-[#16253d]" : "text-white/[.94]"
             }`}
           >
-            <span>{copy.titleA}</span>
-            <span className={light ? "text-[#345783]/28" : "text-white/16"}>{copy.titleB}</span>
+            <span className={light ? "text-[#345783]/28" : "text-white/16"}>{copy.titleA}</span>
+            <span >{copy.titleB}</span>
           </div>
           <p
             data-registry-reveal
@@ -327,9 +335,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
             }`}
           >
             <div
-              className={`flex items-center justify-between px-2.5 pb-3 pt-1.5 ${frameChrome} ${
-                rtl ? "flex-row-reverse" : ""
-              }`}
+              className={`flex items-center justify-between px-2.5 pb-3 pt-1.5 ${frameChrome}`}
             >
               <span>{copy.indexLabel}</span>
               <span style={{ color: accent.strong }}>
@@ -358,11 +364,19 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
                     aria-selected={isActive}
                     aria-controls="registry-panel"
                     tabIndex={isActive ? 0 : -1}
-                    onClick={() => select(index)}
-                    onMouseEnter={() => select(index)}
-                    className={`registry-row group relative flex items-center gap-4 rounded-[16px] px-3 py-4 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8be7ff] ${
-                      rtl ? "flex-row-reverse text-right [direction:rtl]" : ""
-                    } ${isActive ? "" : "opacity-[.52] hover:opacity-90"}`}
+                    onClick={() => {
+                      const href = profileHref(row);
+                      if (href) router.push(href);
+                      else select(index);
+                    }}
+                    onMouseEnter={() => {
+                      select(index);
+                      // Hover is the intent signal: warm the profile route so
+                      // the click that usually follows lands instantly.
+                      const href = profileHref(row);
+                      if (href) router.prefetch(href);
+                    }}
+                    className={`registry-row group relative flex cursor-pointer items-center gap-4 rounded-[16px] px-3 py-4 text-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8be7ff] ${isActive ? "" : "opacity-[.52] hover:opacity-90"}`}
                     style={{
                       transform: isActive ? `translateX(${rtl ? "-" : ""}6px)` : undefined,
                       backgroundColor: isActive ? (light ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.035)") : undefined,
@@ -426,6 +440,18 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
             } ${light ? "border-[#294368]/12 bg-white/[.44]" : "border-white/[.08] bg-white/[.014]"}`}
             style={{ boxShadow: open ? undefined : `0 34px 110px ${accent.soft}` }}
           >
+            {/* The whole frame opens the profile. Kept out of the tab order and
+                the accessibility tree: the "Profile" link in the record below
+                is the keyboard/screen-reader route to the same page. */}
+            {activeHref && (
+              <Link
+                href={activeHref}
+                tabIndex={-1}
+                aria-hidden="true"
+                className="absolute inset-0 z-10 cursor-pointer rounded-[28px]"
+              />
+            )}
+
             {/* Crosshair axes */}
             <div aria-hidden="true" className={`pointer-events-none absolute left-1/2 top-0 h-full w-px ${hairline} opacity-60`} />
             <div aria-hidden="true" className={`pointer-events-none absolute left-0 top-1/2 h-px w-full ${hairline} opacity-60`} />
@@ -515,7 +541,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
                     </div>
                   ) : (
                     <span
-                      className="col-start-1 row-start-1 text-[clamp(64px,11vw,132px)] font-[600] leading-none tracking-[-.09em]"
+                      className="col-start-1 row-start-1 text-[clamp(64px,11vw,132px)] font-[600] leading-none tracking-[-.04em]"
                       style={{ color: accent.strong }}
                     >
                       {initialsOf(member.fullName)}
@@ -532,8 +558,8 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
               </div>
 
               {/* Record */}
-              <div ref={recordRef} className={`flex flex-col ${rtl ? "text-right [direction:rtl]" : "text-left"}`}>
-                <div data-record-line className={`flex items-center gap-2.5 ${rtl ? "flex-row-reverse" : ""}`}>
+              <div ref={recordRef} className="flex flex-col text-start">
+                <div data-record-line className="flex items-center gap-2.5">
                   <span
                     className="rounded-full border px-2.5 py-1 font-mono text-[7px] uppercase tracking-[.16em]"
                     style={
@@ -556,7 +582,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
 
                 <h3
                   data-record-line
-                  className={`mt-5 text-[clamp(26px,3.4vw,42px)] font-[560] leading-[1.02] tracking-[-.05em] ${
+                  className={`mt-5 text-[clamp(26px,3.4vw,42px)] font-[560] leading-[1.02] tracking-[-.03em] ${
                     open ? (light ? "text-[#17263d]/44" : "text-white/34") : light ? "text-[#16253d]" : "text-white/[.94]"
                   }`}
                 >
@@ -579,7 +605,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
                 ) : (
                   <div data-record-line className="mt-7">
                     <span className={frameChrome}>{copy.focus}</span>
-                    <div className={`mt-3 flex flex-wrap gap-2 ${rtl ? "justify-end" : ""}`}>
+                    <div className="mt-3 flex flex-wrap gap-2">
                       {focus.map((item) => (
                         <span
                           key={item}
@@ -600,22 +626,22 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
                   data-record-line
                   className={`mt-auto flex items-center justify-between gap-3 border-t pt-5 ${
                     light ? "border-[#294368]/10" : "border-white/[.08]"
-                  } ${rtl ? "flex-row-reverse" : ""}`}
+                  }`}
                 >
                   <span className={frameChrome}>
                     {member.since ? `${copy.since} / ${member.since}` : copy.joining}
                   </span>
-                  {open || !member.username ? (
+                  {!activeHref ? (
                     <span className={frameChrome}>—</span>
                   ) : (
                     <Link
-                      href={`/member/${member.username}`}
-                      className="group inline-flex items-center gap-2 font-mono text-[8px] uppercase tracking-[.18em] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8be7ff]"
+                      href={activeHref}
+                      className="group relative z-20 inline-flex items-center gap-2 font-mono text-[8px] uppercase tracking-[.18em] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8be7ff]"
                       style={{ color: accent.strong }}
                     >
                       {copy.openProfile}
                       <ArrowUpRight
-                        className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                        className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
                         strokeWidth={1.6}
                       />
                     </Link>

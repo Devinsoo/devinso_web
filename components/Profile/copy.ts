@@ -19,6 +19,7 @@ export type ProfileCopy = {
     title: string;
     subtitle: string;
     current: string;
+    log: string;
   };
   skillsSection: {
     eyebrow: string;
@@ -51,6 +52,7 @@ export type ProfileCopy = {
     empty: string;
   };
   footer: { tag: string; cta: string; resume: string };
+  back: string;
 };
 
 export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
@@ -91,11 +93,12 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
       title: "SELECTED ROLES",
       subtitle: "A short record of the teams, responsibilities and systems that shaped the work.",
       current: "CURRENT",
+      log: "LOG",
     },
     skillsSection: {
       eyebrow: "03 / SKILL MATRIX",
       title: "SKILLS",
-      subtitle: "Sourced from member_skills — grouped by category, leveled BEGINNER → EXPERT.",
+      subtitle: "Grouped by discipline and rated from beginner to expert.",
       levelLabels: {
         BEGINNER: "BEGINNER",
         INTERMEDIATE: "INTERMEDIATE",
@@ -121,7 +124,7 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
     projectsSection: {
       eyebrow: "05 / PROJECT LOG",
       title: "PROJECTS",
-      subtitle: "Every row is a projects × project_members join — role first, output second.",
+      subtitle: "Shipped work, with the role this member played on each project.",
       typeLabel: { PERSONAL: "PERSONAL", TEAM: "TEAM" },
       statusLabel: { DRAFT: "DRAFT", PUBLISHED: "LIVE", ARCHIVED: "ARCHIVED" },
       role: "ROLE",
@@ -137,6 +140,7 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
       cta: "Start a project with this member",
       resume: "View CV",
     },
+    back: "BACK TO TEAM",
   },
   fa: {
     boot: {
@@ -147,9 +151,10 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
         "record.join(projects)",
         "record.compile() // ok",
       ],
-      status: "در حال کامپایل رکورد عضو",
-      ready: "رکورد آماده است",
-      skip: "رد کردن مقدمه",
+      // Shown in English in both languages (see MemberProfile).
+      status: "COMPILING MEMBER RECORD",
+      ready: "RECORD READY",
+      skip: "SKIP INTRO",
     },
     eyebrow: "رکورد عضو",
     roleLabel: { ADMIN: "مدیر", MEMBER: "عضو" },
@@ -175,11 +180,12 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
       title: "نقش‌های منتخب",
       subtitle: "مروری کوتاه بر تیم‌ها، مسئولیت‌ها و سیستم‌هایی که مسیر کاری را ساخته‌اند.",
       current: "فعلی",
+      log: "سابقه",
     },
     skillsSection: {
       eyebrow: "۰۳ / ماتریس مهارت",
       title: "مهارت‌ها",
-      subtitle: "برگرفته از member_skills — گروه‌بندی‌شده بر اساس دسته، با سطح از مبتدی تا خبره.",
+      subtitle: "دسته‌بندی‌شده بر اساس حوزه، با سطح‌بندی از مبتدی تا خبره.",
       levelLabels: {
         BEGINNER: "مبتدی",
         INTERMEDIATE: "متوسط",
@@ -205,7 +211,7 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
     projectsSection: {
       eyebrow: "۰۵ / سوابق پروژه",
       title: "پروژه‌ها",
-      subtitle: "هر ردیف یک اتصال projects × project_members است — نقش، سپس خروجی.",
+      subtitle: "کارهای انجام‌شده، همراه با نقشی که این عضو در هر پروژه داشته است.",
       typeLabel: { PERSONAL: "شخصی", TEAM: "تیمی" },
       statusLabel: { DRAFT: "پیش‌نویس", PUBLISHED: "منتشرشده", ARCHIVED: "بایگانی" },
       role: "نقش",
@@ -221,5 +227,6 @@ export const PROFILE_COPY: Record<"en" | "fa", ProfileCopy> = {
       cta: "شروع پروژه با این عضو",
       resume: "مشاهده رزومه",
     },
+    back: "بازگشت به تیم",
   },
 };

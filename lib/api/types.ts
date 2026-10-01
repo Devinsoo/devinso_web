@@ -169,6 +169,7 @@ export type ApiProjectMember = {
   role?: ApiProjectRole;
   /** The member's own job title. */
   jobTitle?: string;
+  jobTitleFa?: string;
   avatarUrl?: string;
 };
 

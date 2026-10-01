@@ -52,7 +52,7 @@ export function ProductWindow({ productRef }: ProductWindowProps) {
                 <span>Live intelligence · forming</span>
               </div>
 
-              <h1 className="m-0 text-[clamp(38px,5vw,72px)] font-[560] leading-[.98] tracking-[-.055em] text-white">
+              <h1 className="m-0 text-[clamp(38px,5vw,72px)] font-[560] leading-[.98] tracking-[-.03em] text-white">
                 See the signal
                 <span className="block [background:linear-gradient(110deg,#fff,#96c3ff_60%,#c6b4ff)] bg-clip-text text-transparent"> before the noise.</span>
               </h1>

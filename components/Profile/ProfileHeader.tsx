@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { MemberPhoto } from "@/components/Brand/MemberPhoto";
 
 import { useLayoutEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import gsap from "gsap";
@@ -114,19 +114,25 @@ export function ProfileHeader({ data, copy, language }: ProfileHeaderProps) {
     };
   }, []);
 
-  const joinedYear = new Date(profile ? user.createdAt : user.createdAt).getFullYear();
+  // Persian shows the Solar Hijri year, matching the record's Persian periods.
+  const joinedYear = isRTL
+    ? new Intl.DateTimeFormat("fa-IR", { year: "numeric" }).format(new Date(user.createdAt))
+    : new Date(user.createdAt).getFullYear();
   const recordId = String(user.id).padStart(4, "0");
 
   return (
     <div
       data-profile-hero
       data-profile-section
-      className={`relative z-10 mx-auto grid w-[min(1180px,calc(100%-40px))] grid-cols-[auto_1fr] items-start gap-[clamp(24px,4vw,56px)] pt-[clamp(120px,14vw,168px)] sm:w-[min(1180px,calc(100%-56px))] max-[760px]:grid-cols-1 max-[760px]:justify-items-center max-[760px]:text-center ${isRTL ? "direction-rtl" : ""}`}
+      className={`relative z-10 mx-auto grid w-[min(1180px,calc(100%-40px))] grid-cols-[auto_1fr] items-start gap-[clamp(24px,4vw,56px)] pt-[clamp(64px,9vw,112px)] sm:w-[min(1180px,calc(100%-56px))] max-[760px]:grid-cols-1 max-[760px]:justify-items-center max-[760px]:text-center`}
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 top-[clamp(60px,10vw,96px)] select-none font-mono text-[clamp(90px,13vw,190px)] font-bold leading-none tracking-[-.04em] text-white/[.035] max-[760px]:hidden"
+        dir="ltr"
+        // Physical side: the box is pinned LTR (so "№" leads), which would make
+        // a logical end-0 resolve to the right and land on the avatar.
+        className={`pointer-events-none absolute ${isRTL ? "left-0" : "right-0"} top-[clamp(16px,5vw,48px)] select-none font-mono text-[clamp(90px,13vw,190px)] font-bold leading-none tracking-[-.04em] text-white/[.035] max-[760px]:hidden`}
       >
         №{recordId}
       </div>
@@ -143,21 +149,14 @@ export function ProfileHeader({ data, copy, language }: ProfileHeaderProps) {
           className={`relative flex h-[132px] w-[132px] items-center justify-center rounded-[26px] border border-white/[.1] bg-white/[.03] font-mono text-[34px] font-semibold tracking-tight text-white/85 shadow-[0_30px_70px_rgba(0,0,0,.55)] backdrop-blur-sm [transform-style:preserve-3d] max-[520px]:h-[104px] max-[520px]:w-[104px] max-[520px]:text-[26px]`}
         >
           <div className="absolute inset-0 rounded-[26px] opacity-70 [background:radial-gradient(circle_at_30%_20%,rgba(var(--accent-a),.16),transparent_60%)]" />
-          {profile.avatar ? (
-            <Image
-              src={profile.avatar}
-              alt={displayName}
-              fill
-              // The box is a fixed 132px (104px on small screens), so the
-              // optimiser can serve a thumbnail instead of the full upload.
-              sizes="132px"
-              className="rounded-[26px] object-cover"
-            />
-          ) : (
-            <span className="relative">{initialsFrom(displayName)}</span>
-          )}
+          {/* Latin initials in both languages, matching the home page's team
+              frame. They sit under the photo and show through if it fails. */}
+          <span className="relative">{initialsFrom(profile.fullName)}</span>
+          {/* The box is a fixed 132px (104px on small screens), so the
+              optimiser can serve a thumbnail instead of the full upload. */}
+          <MemberPhoto src={profile.avatar} alt={displayName} size={132} className="rounded-[26px]" />
           <span
-            className={`hero-status-dot absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-[#050508] ${status.ring}`}
+            className={`hero-status-dot absolute -bottom-1.5 -end-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-[#050508] ${status.ring}`}
           >
             <span className={`h-2.5 w-2.5 rounded-full ${status.dot}`} />
           </span>
@@ -178,14 +177,14 @@ export function ProfileHeader({ data, copy, language }: ProfileHeaderProps) {
 
         <h1
           data-hero-reveal
-          className="mt-4 text-[clamp(34px,4.6vw,58px)] font-[560] leading-[.96] tracking-[-.03em] text-[#f4f6fb]"
+          className={`mt-4 text-[clamp(34px,4.6vw,58px)] font-[560] text-[#f4f6fb] ${isRTL ? "leading-[1.25]" : "leading-[.96] tracking-[-.03em]"}`}
         >
           {displayName}
         </h1>
 
         <p
           data-hero-reveal
-          className="mt-3 font-mono text-[clamp(14px,1.6vw,18px)] font-semibold uppercase tracking-[.13em]"
+          className={`mt-3 text-[clamp(14px,1.6vw,18px)] font-semibold uppercase ${isRTL ? "" : "font-mono tracking-[.13em]"}`}
           style={{
             color: "rgb(var(--accent-a))",
             textShadow: "0 0 22px rgba(var(--accent-a),.32)",
@@ -194,7 +193,7 @@ export function ProfileHeader({ data, copy, language }: ProfileHeaderProps) {
           {title}
         </p>
 
-        <p data-hero-reveal className="mt-5 max-w-[600px] text-[13.5px] leading-[1.85] text-white/52 max-[760px]:mx-auto">
+        <p data-hero-reveal className={`mt-5 max-w-[600px] text-white/52 max-[760px]:mx-auto ${isRTL ? "text-[14.5px] leading-[2]" : "text-[13.5px] leading-[1.85]"}`}>
           {bio}
         </p>
 

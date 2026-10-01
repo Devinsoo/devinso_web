@@ -44,6 +44,41 @@ function year(iso: string) {
   return Number.isNaN(parsed.getTime()) ? null : String(parsed.getFullYear());
 }
 
+const PERSIAN_YEAR = new Intl.DateTimeFormat("fa-IR", { year: "numeric" });
+
+/** The Solar Hijri year in Persian digits, which is how the Persian UI dates things. */
+function yearFa(iso: string) {
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime()) ? null : PERSIAN_YEAR.format(parsed);
+}
+
+/**
+ * The API stores spoken languages by English name only. The common ones get a
+ * Persian label here; anything unlisted shows as entered.
+ */
+const LANGUAGE_NAMES_FA: Record<string, string> = {
+  english: "انگلیسی",
+  persian: "فارسی",
+  farsi: "فارسی",
+  arabic: "عربی",
+  turkish: "ترکی",
+  azerbaijani: "ترکی آذربایجانی",
+  kurdish: "کردی",
+  german: "آلمانی",
+  french: "فرانسوی",
+  spanish: "اسپانیایی",
+  italian: "ایتالیایی",
+  russian: "روسی",
+  chinese: "چینی",
+  japanese: "ژاپنی",
+  korean: "کره‌ای",
+  hindi: "هندی",
+  urdu: "اردو",
+  armenian: "ارمنی",
+  dutch: "هلندی",
+  portuguese: "پرتغالی",
+};
+
 function toTeamMember(member: ApiMemberSummary, index: number): TeamMember {
   return {
     // Positional: the roster keys rows by their slot, not by database id.
@@ -159,6 +194,7 @@ function toProfileData(member: ApiMemberProfile): MemberProfileData {
       role: experience.position,
       roleFa: experience.positionFa,
       period: period(experience.startDate, experience.endDate, experience.isCurrent),
+      periodFa: periodFa(experience.startDate, experience.endDate, experience.isCurrent),
       description: experience.description ?? "",
       descriptionFa: experience.descriptionFa,
       current: experience.isCurrent,
@@ -173,6 +209,7 @@ function toProfileData(member: ApiMemberProfile): MemberProfileData {
     languages: member.languages.map((language, index) => ({
       id: index + 1,
       name: language.name,
+      nameFa: LANGUAGE_NAMES_FA[language.name.trim().toLowerCase()],
       // The API grades languages on the skill scale; the UI's proficiency
       // scale is the nearest equivalent.
       proficiency:
@@ -199,6 +236,7 @@ function toProfileData(member: ApiMemberProfile): MemberProfileData {
       field: entry.field ?? "",
       fieldFa: entry.fieldFa,
       period: period(entry.startDate, entry.endDate, false),
+      periodFa: periodFa(entry.startDate, entry.endDate, false),
     })),
 
     // No signals table yet; the panel renders empty rather than inventing rows.
@@ -217,6 +255,13 @@ function period(startDate: string, endDate: string | undefined, isCurrent: boole
   const from = year(startDate) ?? "";
   if (isCurrent || !endDate) return `${from} — NOW`;
   return `${from} — ${year(endDate) ?? ""}`;
+}
+
+/** The Persian twin of `period`: "۱۴۰۳ — اکنون" / "۱۴۰۱ — ۱۴۰۳". */
+function periodFa(startDate: string, endDate: string | undefined, isCurrent: boolean) {
+  const from = yearFa(startDate) ?? "";
+  if (isCurrent || !endDate) return `${from} — اکنون`;
+  return `${from} — ${yearFa(endDate) ?? ""}`;
 }
 
 /**

@@ -128,6 +128,7 @@ const MEMBERS: Record<string, MemberProfileData> = {
       {
         id: 21,
         title: "ALLIXRO / RED PROFILE",
+        titleFa: "الیکسرو / پروفایل قرمز",
         slug: "allixro-red-profile",
         description:
           "Art direction and cover system built around a fixed 16:9 media frame for member-replaceable covers.",
@@ -147,6 +148,7 @@ const MEMBERS: Record<string, MemberProfileData> = {
       {
         id: 22,
         title: "Automation Platform",
+        titleFa: "پلتفرم اتوماسیون",
         slug: "automation-platform",
         description:
           "Modular control surface for orchestrating flows and monitoring nodes while keeping technical clarity intact.",
@@ -162,6 +164,7 @@ const MEMBERS: Record<string, MemberProfileData> = {
       {
         id: 23,
         title: "Personal Site Rebuild",
+        titleFa: "بازسازی سایت شخصی",
         description: "A from-scratch rebuild of a personal portfolio with a construction/blueprint visual system.",
         descriptionFa: "بازسازی کامل یک نمونه‌کار شخصی با سیستم بصری الهام‌گرفته از بلوپرینت.",
         outcome: "A modular visual language reusable across profile and project pages.",
@@ -176,6 +179,7 @@ const MEMBERS: Record<string, MemberProfileData> = {
       {
         id: 24,
         title: "Realtime Kanban Engine",
+        titleFa: "موتور کانبان بلادرنگ",
         description: "In-progress board engine with optimistic sync and conflict-free drag ordering.",
         descriptionFa: "موتور بورد کانبان در حال توسعه با همگام‌سازی خوش‌بینانه و ترتیب بدون تداخل.",
         techStack: ["Go", "WebSocket", "React"],

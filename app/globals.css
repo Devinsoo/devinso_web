@@ -1,8 +1,18 @@
 @import "tailwindcss";
 
+/* Geist is the site face. Tailwind's default --font-sans is a system stack
+   (Segoe UI / Arial), and its `font-sans` utility is emitted after the body's
+   arbitrary font-family class, so it won — every Latin headline rendered in
+   the system face, and the tight display tracking (tuned for Geist's narrow
+   caps) made the letters collide. Pointing the theme token at Geist fixes
+   `font-sans`, the base `html` rule and the body in one place. */
+@theme inline {
+  --font-sans: var(--font-geist-sans), Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 92px;
+  scroll-padding-top: 116px; /* clears the fixed header */
 }
 
 body {
@@ -222,11 +232,58 @@ body {
   50% { transform: translateX(8%) scaleX(1); opacity: .76; }
 }
 
+/* Persian UI runs on Morabba. Unlayered on purpose so it outranks the
+   body's font utility. Morabba is restricted to Arabic-script code points
+   (see app/layout.tsx), so Latin letters and spaces in mixed text fall
+   through to Geist. Geist can't lead the stack — its Arial-based fallback
+   face would catch Persian glyphs before Morabba — so the Latin wordmarks
+   and the English-only logo stage opt back into Geist explicitly. */
+html[lang="fa"] body,
+[data-locale="fa"] {
+  font-family: var(--font-morabba), var(--font-geist-sans), Tahoma, ui-sans-serif, system-ui, sans-serif;
+}
+
+[data-locale="fa"] :is(.hero-title, .studio-mark b, [lang="en"]) {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Monospace labels keep their Latin face; Persian glyphs, which no system
+   mono font covers, drop to Morabba rather than a random system font. */
+html[lang="fa"] .font-mono,
+[data-locale="fa"] .font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, var(--font-morabba), monospace;
+}
+
+/* Readability floor for Persian. The interface leans on 7–9px uppercase mono
+   labels, which read fine in Latin caps but turn Persian script into specks.
+   English-only islands (`lang="en"`, e.g. the hero logo stage) keep the
+   original sizes. */
+[data-locale="fa"] :is(.text-\[7px\], .text-\[7\.5px\], .text-\[8px\], .text-\[8\.5px\]):not([lang="en"], [lang="en"] *) {
+  font-size: 10px;
+}
+
+[data-locale="fa"] :is(.text-\[9px\], .text-\[9\.5px\]):not([lang="en"], [lang="en"] *) {
+  font-size: 10.5px;
+}
+
+/* Hero formation notes: each state swap re-keys the text so this replays. */
+.formation-note-swap {
+  display: block;
+  animation: formation-note-swap .62s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes formation-note-swap {
+  0% { opacity: 0; transform: translateY(6px); filter: blur(4px); clip-path: inset(0 100% 0 0); }
+  55% { filter: blur(0); }
+  100% { opacity: 1; transform: none; filter: none; clip-path: inset(0 0 0 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
+  .formation-note-swap,
   .case-flow-line,
   .case-orbit,
   .registry-orbit,

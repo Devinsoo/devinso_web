@@ -118,6 +118,7 @@ export type MemberSkill = {
 export type MemberProject = {
   id: number;
   title: string;
+  titleFa?: string;
   /**
    * Route key for the project detail page. Optional because a bundled fixture
    * may describe a project that has no detail page behind it; the card falls

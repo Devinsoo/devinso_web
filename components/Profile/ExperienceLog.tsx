@@ -122,11 +122,11 @@ export function ExperienceLog({ experiences, copy, language }: ExperienceLogProp
 
                 <div className="pt-5 font-mono">
                   <div className="text-[10px] uppercase tracking-[.17em] text-[rgba(var(--accent-a),.72)]">{period}</div>
-                  <div className="mt-2 text-[9px] uppercase tracking-[.16em] text-white/30">LOG / {String(index + 1).padStart(2, "0")}</div>
+                  <div className="mt-2 text-[9px] uppercase tracking-[.16em] text-white/30">{copy.experienceSection.log} / {String(index + 1).padStart(2, "0")}</div>
                 </div>
 
                 <div className="group relative overflow-hidden rounded-[20px] border border-white/[.08] bg-white/[.018] p-6 transition-colors duration-500 hover:border-[rgba(var(--accent-a),.3)] sm:p-7">
-                  <div className="absolute inset-y-0 left-0 w-[2px] origin-top scale-y-0 bg-[rgba(var(--accent-a),.8)] transition-transform duration-500 group-hover:scale-y-100" />
+                  <div className="absolute inset-y-0 start-0 w-[2px] origin-top scale-y-0 bg-[rgba(var(--accent-a),.8)] transition-transform duration-500 group-hover:scale-y-100" />
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <span className="font-mono text-[10px] uppercase tracking-[.2em] text-white/38">{experience.company}</span>
                     {experience.current ? (

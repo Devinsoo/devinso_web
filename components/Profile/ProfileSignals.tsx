@@ -128,7 +128,8 @@ export function ProfileSignals({ languages, tools, education, signals, copy, lan
                       {copy.signalsSection.proficiencyLabels[item.proficiency]}
                     </span>
                   </div>
-                  <div className="mt-2.5 h-px overflow-hidden bg-white/[.07]">
+                  {/* Mirrored in RTL so the bar fills from the reading start. */}
+                  <div className="mt-2.5 h-px overflow-hidden bg-white/[.07] rtl:-scale-x-100">
                     <span
                       className="block h-full origin-left bg-[linear-gradient(90deg,rgba(var(--accent-a),.8),rgba(var(--accent-b),.38))] transition-transform duration-700 group-hover:scale-x-105"
                       style={{ width: `${LANGUAGE_WIDTH[item.proficiency]}%` }}
@@ -141,7 +142,7 @@ export function ProfileSignals({ languages, tools, education, signals, copy, lan
         </div>
 
         <div className="signal-panel relative overflow-hidden rounded-[22px] border border-white/[.08] bg-white/[.018] p-6 sm:p-7">
-          <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[rgba(var(--accent-a),.08)] blur-[65px]" />
+          <div className="pointer-events-none absolute -end-16 -top-20 h-52 w-52 rounded-full bg-[rgba(var(--accent-a),.08)] blur-[65px]" />
           <PanelLabel icon={<Wrench size={15} strokeWidth={1.6} />}>{copy.signalsSection.tools}</PanelLabel>
           <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             {tools.map((tool, index) => (
@@ -150,10 +151,10 @@ export function ProfileSignals({ languages, tools, education, signals, copy, lan
                 tabIndex={0}
                 className="tool-chip group relative overflow-hidden rounded-[14px] border border-white/[.08] bg-black/15 px-3 py-4 outline-none transition-[transform,border-color,background-color] duration-300 hover:-translate-y-1 hover:border-[rgba(var(--accent-a),.34)] hover:bg-[rgba(var(--accent-a),.045)] focus-visible:border-[rgba(var(--accent-a),.7)] focus-visible:ring-2 focus-visible:ring-[rgba(var(--accent-a),.18)]"
               >
-                <span className="absolute right-2 top-1.5 font-mono text-[8px] text-white/12">{String(index + 1).padStart(2, "0")}</span>
+                <span className="absolute end-2 top-1.5 font-mono text-[8px] text-white/12">{String(index + 1).padStart(2, "0")}</span>
                 <div className="font-mono text-[8px] uppercase tracking-[.15em] text-[rgba(var(--accent-a),.58)]">{tool.category}</div>
                 <div className="mt-2 text-[13px] font-medium text-white/76 transition-colors group-hover:text-white">{tool.name}</div>
-                <span className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-[rgba(var(--accent-a),.72)] transition-transform duration-500 group-hover:scale-x-100 group-focus-visible:scale-x-100" />
+                <span className="absolute bottom-0 start-0 h-px w-full origin-left scale-x-0 rtl:origin-right bg-[rgba(var(--accent-a),.72)] transition-transform duration-500 group-hover:scale-x-100 group-focus-visible:scale-x-100" />
               </div>
             ))}
           </div>

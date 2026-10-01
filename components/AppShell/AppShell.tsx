@@ -55,7 +55,7 @@ export function AppShell({ initialTheme, initialLanguage, members, work, setting
   useEffect(() => {
     document.documentElement.dataset.language = language;
     document.documentElement.lang = language;
-    document.documentElement.dir = "ltr";
+    document.documentElement.dir = language === "fa" ? "rtl" : "ltr";
   }, [language]);
 
   return (

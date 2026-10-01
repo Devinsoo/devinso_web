@@ -20,11 +20,16 @@ export type ProjectContentBlock =
 export type ProjectMember = {
   id: number;
   fullName: string;
+  fullNameFa?: string;
+  /** Profile route key; when present the member card links to /member/[username]. */
+  username?: string;
   /** Structured role used for the badge on the member card. */
   roleType: ProjectMemberRole;
   /** Free-text job title shown under the member name. */
   role: string;
+  roleFa?: string;
   description: string | null;
+  descriptionFa?: string | null;
   avatar: string | null;
   joinedAt: string | null;
 };
@@ -39,6 +44,7 @@ export type ProjectDetail = {
   content: ProjectContentBlock[];
   coverImage: string | null;
   coverAlt: string | null;
+  coverAltFa?: string | null;
   projectUrl: string | null;
   githubUrl: string | null;
   techStack: string[];
@@ -47,6 +53,7 @@ export type ProjectDetail = {
   createdBy: {
     id: number;
     fullName: string;
+    fullNameFa?: string;
   };
   members: ProjectMember[];
   createdAt: string;
@@ -59,9 +66,13 @@ export type ProjectDetail = {
 const ARMAN: ProjectMember = {
   id: 1,
   fullName: "Arman Kian",
+  fullNameFa: "آرمان کیان",
+  username: "arman-kian",
   roleType: "LEAD",
   role: "Creative Full-Stack Engineer",
+  roleFa: "مهندس خلاق فول‌استک",
   description: "Product architecture, interaction development, and implementation.",
+  descriptionFa: "معماری محصول، توسعه تعاملی و پیاده‌سازی.",
   avatar: null,
   joinedAt: "2026-01-18",
 };
@@ -114,7 +125,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     techStack: ["Cover Design", "Motion", "UI System"],
     type: "PERSONAL",
     status: "PUBLISHED",
-    createdBy: { id: 1, fullName: "Arman Kian" },
+    createdBy: { id: 1, fullName: "Arman Kian", fullNameFa: "آرمان کیان" },
     members: [ARMAN],
     createdAt: "2026-01-18",
     updatedAt: "2026-08-20",
@@ -147,9 +158,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     techStack: ["React", "REST API", "Realtime", "Design System"],
     type: "TEAM",
     status: "PUBLISHED",
-    createdBy: { id: 1, fullName: "Arman Kian" },
+    createdBy: { id: 1, fullName: "Arman Kian", fullNameFa: "آرمان کیان" },
     members: [
-      { ...ARMAN, roleType: "DEVELOPER", role: "System Design + Development" },
+      { ...ARMAN, roleType: "DEVELOPER", role: "System Design + Development", roleFa: "طراحی سیستم + توسعه" },
     ],
     createdAt: "2026-02-06",
     updatedAt: "2026-08-18",
@@ -187,9 +198,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     techStack: ["Brand System", "GSAP", "Web", "Typography"],
     type: "PERSONAL",
     status: "PUBLISHED",
-    createdBy: { id: 1, fullName: "Arman Kian" },
+    createdBy: { id: 1, fullName: "Arman Kian", fullNameFa: "آرمان کیان" },
     members: [
-      { ...ARMAN, roleType: "DESIGNER", role: "Identity + Creative Development" },
+      { ...ARMAN, roleType: "DESIGNER", role: "Identity + Creative Development", roleFa: "هویت بصری + توسعه خلاق" },
     ],
     createdAt: "2026-03-12",
     updatedAt: "2026-08-22",

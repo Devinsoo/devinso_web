@@ -59,6 +59,7 @@ function toWorkProject(project: ApiProjectSummary, index: number): WorkProject {
     roleFa: rolesFa,
     stack: stack.length > 0 ? stack : [EMPTY],
     year: toDateOnly(project.createdAt).slice(0, 4),
+    yearFa: new Intl.DateTimeFormat("fa-IR", { year: "numeric" }).format(new Date(project.createdAt)),
     accent: ACCENTS[index % ACCENTS.length],
     morph: MORPHS[index % MORPHS.length],
     layout: LAYOUTS[index % LAYOUTS.length],

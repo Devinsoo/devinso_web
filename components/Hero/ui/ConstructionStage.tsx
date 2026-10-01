@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
 import type { CSSProperties, RefObject } from "react";
 import type { HeroCopy } from "@/components/Hero/copy";
-import type { DevinsoLanguage, DevinsoTheme } from "@/lib/preferences";
+import type { DevinsoTheme } from "@/lib/preferences";
 import {
   CONSTRUCTION_SETTINGS,
   GRID_CENTER_X,
@@ -13,7 +14,6 @@ import {
 type ConstructionStageProps = {
   copy: HeroCopy;
   theme: DevinsoTheme;
-  language: DevinsoLanguage;
   stageRef: RefObject<HTMLDivElement | null>;
   coreRef: RefObject<HTMLDivElement | null>;
   logoDirectionalLightRef: RefObject<SVGLinearGradientElement | null>;
@@ -23,11 +23,21 @@ type ConstructionStageProps = {
 
 const technicalLine = "fill-none [vector-effect:non-scaling-stroke] [stroke-linecap:round]";
 const mono = "font-mono";
+const NOTE_CYCLE_MS = 3800;
+
+function NoteContent({ label, value, valueClass, delay }: { label: string; value: string; valueClass: string; delay: number }) {
+  const style = { animationDelay: `${delay}ms` } as CSSProperties;
+  return (
+    <>
+      <span className="formation-note-swap text-[8px] tracking-[.16em]" style={style}>{label}</span>
+      <b className={`formation-note-swap text-[10px] font-medium tracking-[.08em] ${valueClass}`} style={style}>{value}</b>
+    </>
+  );
+}
 
 export function ConstructionStage({
   copy,
   theme,
-  language,
   stageRef,
   coreRef,
   logoDirectionalLightRef,
@@ -35,7 +45,16 @@ export function ConstructionStage({
   logoFresnelRef,
 }: ConstructionStageProps) {
   const light = theme === "light";
-  const rtl = language === "fa";
+  const [noteIndex, setNoteIndex] = useState(0);
+  const note = copy.notes[noteIndex % copy.notes.length];
+  const noteValueClass = light ? "text-[#1b2840]/85" : "text-[#e8efff]/90";
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (!document.hidden) setNoteIndex((index) => (index + 1) % copy.notes.length);
+    }, NOTE_CYCLE_MS);
+    return () => window.clearInterval(id);
+  }, [copy.notes.length]);
   const logoTransform = `translate(${CONSTRUCTION_SETTINGS.logo.x} ${CONSTRUCTION_SETTINGS.logo.y}) scale(${CONSTRUCTION_SETTINGS.logo.scale}) translate(-498.28 -285.13)`;
   const logoDepthTransform = `translate(${CONSTRUCTION_SETTINGS.logo.x + CONSTRUCTION_SETTINGS.depth.logoShadowX} ${CONSTRUCTION_SETTINGS.logo.y + CONSTRUCTION_SETTINGS.depth.logoShadowY}) scale(${CONSTRUCTION_SETTINGS.logo.scale}) translate(-498.28 -285.13)`;
   const gridTransform = `translate(${CONSTRUCTION_SETTINGS.grid.x} ${CONSTRUCTION_SETTINGS.grid.y}) translate(${GRID_CENTER_X} ${GRID_CENTER_Y}) scale(${CONSTRUCTION_SETTINGS.grid.scale}) translate(${-GRID_CENTER_X} ${-GRID_CENTER_Y})`;
@@ -58,9 +77,7 @@ export function ConstructionStage({
   const gridLineClass = `${technicalLine} construction-grid-line [stroke-width:1] ${light ? "stroke-[rgba(52,70,103,.30)] [filter:drop-shadow(0_0_5px_rgba(47,106,157,.035))]" : "stroke-[rgba(197,210,234,.34)] [filter:drop-shadow(0_0_6px_rgba(255,255,255,.04))]"}`;
   const primaryGridClass = light ? "construction-grid-primary stroke-[rgba(29,120,169,.46)] [stroke-width:1.05]" : "construction-grid-primary stroke-[rgba(150,195,255,.48)] [stroke-width:1.05]";
   const formationLineClass = `${technicalLine} formation-line [stroke-width:1.15] ${light ? "stroke-[rgba(25,132,179,.46)] [filter:drop-shadow(0_0_6px_rgba(31,137,182,.10))]" : "stroke-[rgba(150,195,255,.64)] [filter:drop-shadow(0_0_7px_rgba(113,135,255,.28))]"}`;
-  const noteClass = `formation-note formation-caption absolute grid gap-[5px] rounded-xl border px-3.5 py-3 text-[10px] uppercase tracking-[.16em] opacity-0 backdrop-blur-xl [transform:translateY(12px)_translateZ(38px)] [will-change:transform] ${
-    rtl ? "[direction:rtl] text-right" : "[direction:ltr] text-left"
-  } ${
+  const noteClass = `formation-note formation-caption absolute grid gap-[5px] rounded-xl border px-3.5 py-3 text-[10px] uppercase tracking-[.16em] opacity-0 backdrop-blur-xl [transform:translateY(12px)_translateZ(38px)] [will-change:transform] text-left ${
     light
       ? "border-white/75 [background:linear-gradient(145deg,rgba(76,121,194,.055),transparent_58%),linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.22)),rgba(217,227,240,.24)] text-[#2a3954]/50 shadow-[0_18px_40px_rgba(55,73,103,.10),inset_0_1px_rgba(255,255,255,.96)]"
       : "border-[#96c3ff]/10 [background:linear-gradient(145deg,rgba(113,135,255,.07),transparent_58%),rgba(12,13,19,.62)] text-white/35 shadow-[0_20px_42px_rgba(0,0,0,.3),0_0_30px_rgba(113,135,255,.035)]"
@@ -74,9 +91,15 @@ export function ConstructionStage({
     // was fixed — stuck at full opacity, never dimming across the hero again.
     // Nothing is lost visually: everything inside the stage (the logo, code
     // panels, grid lines and captions) animates in on its own.
+    //
+    // Pinned to LTR + English in both languages: the stage is a technical
+    // drawing (grid, axis readouts, code), not reading copy, so it must not
+    // mirror or translate along with the rest of the Persian page.
     <div
       ref={stageRef}
-      className={`hero-logo-stage relative z-10 grid min-h-[620px] ${rtl ? "min-[961px]:order-1" : "min-[961px]:order-2"} min-w-0 place-items-center [perspective:1600px] [isolation:isolate] max-[1240px]:min-h-[560px] max-[960px]:w-full max-[960px]:min-h-[clamp(480px,64vw,560px)] max-[540px]:mt-3 max-[540px]:flex max-[540px]:min-h-0 max-[540px]:flex-col max-[540px]:items-center max-[540px]:justify-start max-[540px]:gap-4 max-[540px]:overflow-visible max-[540px]:[perspective:none] max-[390px]:mt-2.5 max-[390px]:gap-3.5`}
+      dir="ltr"
+      lang="en"
+      className={`hero-logo-stage relative z-10 grid min-h-[620px] min-[961px]:order-2 min-w-0 place-items-center [perspective:1600px] [isolation:isolate] max-[1240px]:min-h-[560px] max-[960px]:w-full max-[960px]:min-h-[clamp(480px,64vw,560px)] max-[540px]:mt-3 max-[540px]:flex max-[540px]:min-h-0 max-[540px]:flex-col max-[540px]:items-center max-[540px]:justify-start max-[540px]:gap-4 max-[540px]:overflow-visible max-[540px]:[perspective:none] max-[390px]:mt-2.5 max-[390px]:gap-3.5`}
     >
       {light && (
         <>
@@ -320,17 +343,15 @@ export function ConstructionStage({
           </g>
         </svg>
 
-        <div className={`${noteClass} formation-note-top left-[5%] top-[17%] max-[960px]:left-[2%] max-[960px]:top-[10%]`}>
-          <span className="text-[8px] tracking-[.16em]">{copy.notes.topA}</span>
-          <b className={`text-[10px] font-medium tracking-[.08em] ${light ? "text-[#1b2840]/85" : "text-[#e8efff]/90"}`}>{copy.notes.topB}</b>
+        {/* Keyed by state so each swap remounts the text and replays its entrance; the boxes themselves stay put for GSAP. */}
+        <div className={`${noteClass} formation-note-top left-[5%] top-[17%] max-[960px]:left-[2%] max-[960px]:top-[10%]`} aria-live="off">
+          <NoteContent key={`top-${noteIndex}`} label={note.topA} value={note.topB} valueClass={noteValueClass} delay={0} />
         </div>
-        <div className={`${noteClass} formation-note-right right-[2%] top-[42%] max-[960px]:right-[1%] max-[960px]:top-[41%]`}>
-          <span className="text-[8px] tracking-[.16em]">{copy.notes.rightA}</span>
-          <b className={`text-[10px] font-medium tracking-[.08em] ${light ? "text-[#1b2840]/85" : "text-[#e8efff]/90"}`}>{copy.notes.rightB}</b>
+        <div className={`${noteClass} formation-note-right right-[2%] top-[42%] max-[960px]:right-[1%] max-[960px]:top-[41%]`} aria-live="off">
+          <NoteContent key={`right-${noteIndex}`} label={note.rightA} value={note.rightB} valueClass={`${noteValueClass} normal-case`} delay={140} />
         </div>
-        <div className={`${noteClass} formation-note-bottom bottom-[10%] left-[16%] max-[960px]:bottom-[5%] max-[960px]:left-[9%]`}>
-          <span className="text-[8px] tracking-[.16em]">{copy.notes.bottomA}</span>
-          <b className={`text-[10px] font-medium tracking-[.08em] ${light ? "text-[#1b2840]/85" : "text-[#e8efff]/90"}`}>{copy.notes.bottomB}</b>
+        <div className={`${noteClass} formation-note-bottom bottom-[10%] left-[16%] max-[960px]:bottom-[5%] max-[960px]:left-[9%]`} aria-live="off">
+          <NoteContent key={`bottom-${noteIndex}`} label={note.bottomA} value={note.bottomB} valueClass={noteValueClass} delay={280} />
         </div>
       </div>
     </div>
