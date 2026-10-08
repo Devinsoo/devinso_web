@@ -6,6 +6,7 @@ import { useLayoutEffect, useRef, type PointerEvent as ReactPointerEvent } from 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { DevinsoLanguage, DevinsoTheme } from "@/lib/preferences";
+import { accentFor, type AccentKey } from "@/lib/accents";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,7 +38,7 @@ export type WorkProject = {
   year: string;
   /** Solar Hijri year for the Persian view; falls back to `year`. */
   yearFa?: string;
-  accent: "crimson" | "violet" | "ice";
+  accent: AccentKey;
   morph: MorphMode;
   preview?: "automation" | "identity";
   coverImage?: string;
@@ -62,7 +63,7 @@ const PROJECTS: WorkProject[] = [
     roleFa: "آرت دایرکشن + سیستم کاور",
     stack: ["Cover", "Motion", "UI"],
     year: "2026",
-    accent: "crimson",
+    accent: "red",
     morph: "expand",
     coverImage: "/projects/allixro-cover-1920x1080.jpg",
     coverAlt: "Allixro red profile project cover",
@@ -84,7 +85,7 @@ const PROJECTS: WorkProject[] = [
     roleFa: "طراحی سیستم + توسعه",
     stack: ["React", "API", "Realtime"],
     year: "2026",
-    accent: "violet",
+    accent: "purple",
     morph: "split",
     preview: "automation",
     layout: "media-left",
@@ -105,7 +106,7 @@ const PROJECTS: WorkProject[] = [
     roleFa: "هویت بصری + توسعه خلاق",
     stack: ["Brand", "GSAP", "Web"],
     year: "2026",
-    accent: "ice",
+    accent: "blue",
     morph: "depth",
     preview: "identity",
     layout: "stacked",
@@ -159,27 +160,6 @@ const COPY = {
 
 /** Resting transform for the follower pill: off-screen, slightly shrunk. */
 const CURSOR_PARKED = "translate3d(-100px, -100px, 0) translate(-50%, -50%) scale(.82)";
-
-const ACCENTS = {
-  crimson: {
-    glow: "rgba(255,65,92,.18)",
-    strong: "#ff566f",
-    soft: "rgba(255,86,111,.12)",
-    wash: "linear-gradient(135deg, rgba(110,6,18,.20), rgba(255,86,111,.08))",
-  },
-  violet: {
-    glow: "rgba(145,122,255,.20)",
-    strong: "#a996ff",
-    soft: "rgba(169,150,255,.12)",
-    wash: "linear-gradient(135deg, rgba(76,44,160,.18), rgba(169,150,255,.06))",
-  },
-  ice: {
-    glow: "rgba(150,195,255,.18)",
-    strong: "#a7ceff",
-    soft: "rgba(167,206,255,.11)",
-    wash: "linear-gradient(135deg, rgba(63,108,187,.16), rgba(167,206,255,.06))",
-  },
-} as const;
 
 function AutomationPreview({ light }: { light: boolean }) {
   return (
@@ -264,7 +244,7 @@ function ProjectPreview({ project, light }: { project: WorkProject; light: boole
 }
 
 function SceneChrome({ project, light }: { project: WorkProject; light: boolean }) {
-  const accent = ACCENTS[project.accent];
+  const accent = accentFor(project.accent, light);
   return (
     <>
       <div data-project-ambient className="pointer-events-none absolute inset-[-8%] opacity-0" style={{ background: `radial-gradient(circle at 50% 50%, ${accent.glow} 0%, transparent 62%)` }} />
@@ -280,7 +260,7 @@ function SceneChrome({ project, light }: { project: WorkProject; light: boolean 
 function ProjectScene({ project, theme, language, index }: { project: WorkProject; theme: DevinsoTheme; language: DevinsoLanguage; index: number }) {
   const light = theme === "light";
   const copy = COPY[language];
-  const accent = ACCENTS[project.accent];
+  const accent = accentFor(project.accent, light);
   const isStacked = project.layout === "stacked";
   const mediaFirst = project.layout === "media-left";
 
@@ -356,7 +336,7 @@ function ProjectScene({ project, theme, language, index }: { project: WorkProjec
 function SceneText({ project, theme, language }: { project: WorkProject; theme: DevinsoTheme; language: DevinsoLanguage }) {
   const light = theme === "light";
   const copy = COPY[language];
-  const accent = ACCENTS[project.accent];
+  const accent = accentFor(project.accent, light);
   return (
     <div className="space-y-5 text-start">
       <div data-project-detail className={`text-[13px] ${light ? "text-[#294368]/55" : "text-white/54"}`}>

@@ -319,6 +319,9 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
   const [language, setLanguage] = useState<DevinsoLanguage>(initialLanguage);
   const copy = COPY[language];
   const light = theme === "light";
+  // Bright accents wash out on the light theme, so text there uses the deeper tone.
+  const accent = light ? project.accentDeep ?? project.accent : project.accent;
+  const nextAccent = light ? nextProject.accentDeep ?? nextProject.accent : nextProject.accent;
   const rtl = language === "fa";
 
   useLayoutEffect(() => {
@@ -409,7 +412,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
       data-locale={language}
       // overflow-clip, not overflow-hidden: hidden makes <main> a scroll
       // container and the sticky header stops sticking to the viewport.
-      className={`relative min-h-screen overflow-clip transition-colors duration-500 ${light ? "bg-[#f4efe7] text-[#1c1a1b]" : "bg-[#101114] text-[#f1ede7]"}`} style={{ "--project-accent": project.accent } as CSSProperties}>
+      className={`relative min-h-screen overflow-clip transition-colors duration-500 ${light ? "bg-[#f4efe7] text-[#1c1a1b]" : "bg-[#101114] text-[#f1ede7]"}`} style={{ "--project-accent": accent } as CSSProperties}>
       <div aria-hidden className={`project-backdrop-grid pointer-events-none fixed inset-0 z-0 ${light ? "opacity-[.52] [background-image:linear-gradient(rgba(74,61,53,.055)_1px,transparent_1px),linear-gradient(90deg,rgba(74,61,53,.055)_1px,transparent_1px)]" : "opacity-[.62] [background-image:linear-gradient(rgba(255,255,255,.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.028)_1px,transparent_1px)]"} [background-size:48px_48px]`} />
       <div className="pointer-events-none absolute -end-[20vw] top-[-18vw] h-[58vw] w-[58vw] rounded-full blur-3xl" style={{ backgroundColor: project.accentSoft }} />
 
@@ -426,7 +429,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
       <article className="relative z-10">
         <section className="mx-auto grid w-[min(1440px,calc(100%_-_clamp(28px,6vw,96px)))] gap-12 pb-[clamp(48px,7vw,96px)] pt-[clamp(68px,9vw,130px)] lg:grid-cols-[1.25fr_.75fr] lg:items-end">
           <div className="min-w-0 text-start">
-            <div data-project-intro className="flex items-center gap-3"><span className="rounded-full border px-3 py-2 font-mono text-[7px] tracking-[.16em]" style={{ borderColor: `${project.accent}55`, color: project.accent }}>{statusLabel(project.status, language)}</span><span className={`font-mono text-[8px] uppercase tracking-[.18em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>{typeLabel(project.type, language)}{projectNumber ? ` / ${copy.id} ${projectNumber}` : ""}</span></div>
+            <div data-project-intro className="flex items-center gap-3"><span className="rounded-full border px-3 py-2 font-mono text-[7px] tracking-[.16em]" style={{ borderColor: `${accent}55`, color: accent }}>{statusLabel(project.status, language)}</span><span className={`font-mono text-[8px] uppercase tracking-[.18em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>{typeLabel(project.type, language)}{projectNumber ? ` / ${copy.id} ${projectNumber}` : ""}</span></div>
             <FitTitle data-project-intro text={title} min={34} max={122} maxLines={3} leading={rtl ? 1.2 : 0.86} className={`mt-7 font-[570] ${rtl ? "" : "tracking-[-.03em]"}`} />
           </div>
           <div data-project-intro className="text-start">
@@ -443,7 +446,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/16 bg-[#fff9ef]/92" : "border-white/[.09] bg-[#19181a]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} variant="about" />
+          <SectionAtmosphere accent={accent} light={light} variant="about" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
           <div data-project-item><span className={sectionLabel}>{copy.sections.about}</span></div>
           <div className="text-start">
@@ -460,34 +463,34 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-b ${light ? "border-[#4a3d35]/14 bg-[#eee8df]/86" : "border-white/[.07] bg-[#121315]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} variant="content" />
+          <SectionAtmosphere accent={accent} light={light} variant="content" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-10 py-[clamp(90px,12vw,170px)] lg:grid-cols-[.34fr_1fr]">
           <aside data-project-item className="self-start lg:sticky lg:top-[112px]"><span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/40" : "text-white/30"}`}>{copy.sections.content}</span><div className={`mt-5 rounded-[18px] border p-4 ${light ? "border-[#294368]/10 bg-white/50" : "border-white/[.07] bg-white/[.018]"}`}><div className="flex items-end justify-between gap-3"><strong className="text-3xl font-[560] tracking-[-.03em]">{String(project.content.length).padStart(2, "0")}</strong><span className={`font-mono text-[7px] uppercase tracking-[.15em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>{copy.blocks}</span></div><div className={`mt-4 h-px ${light ? "bg-[#294368]/10" : "bg-white/[.08]"}`} /><div className={`mt-3 font-mono text-[7px] uppercase leading-6 tracking-[.12em] ${light ? "text-[#294368]/40" : "text-white/28"}`}>{copy.blockTypes}</div></div></aside>
           <div className="text-start">
             <h2 data-project-item className={`text-[clamp(32px,5vw,68px)] font-[560] ${display}`}>{copy.fullDescription}</h2>
-            <div className="mt-9"><ProjectContent blocks={project.content} language={language} light={light} accent={project.accent} /></div>
+            <div className="mt-9"><ProjectContent blocks={project.content} language={language} light={light} accent={accent} /></div>
           </div>
           </div>
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#e3dbd1]/66" : "border-white/[.08] bg-[#202125]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} variant="stack" />
+          <SectionAtmosphere accent={accent} light={light} variant="stack" />
           <div className="relative z-10 mx-auto grid w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] gap-12 py-[clamp(72px,9vw,126px)] lg:grid-cols-[.72fr_1.28fr]">
             <div data-project-item className="text-start"><span className={sectionLabel}>{copy.sections.stack}</span><h2 className={`mt-5 text-[clamp(34px,5vw,62px)] font-[560] ${display}`}>{copy.techStack}</h2></div>
-            <div data-project-item className="grid content-start gap-3 sm:grid-cols-2">{project.techStack.map((technology, index) => <div key={technology} className={`project-interactive-card flex min-h-[82px] items-center justify-between rounded-2xl border px-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}><span lang="en" className="text-[13px] font-medium">{technology}</span><span className="font-mono text-[8px]" style={{ color: project.accent }}>0{index + 1}</span></div>)}</div>
+            <div data-project-item className="grid content-start gap-3 sm:grid-cols-2">{project.techStack.map((technology, index) => <div key={technology} className={`project-interactive-card flex min-h-[82px] items-center justify-between rounded-2xl border px-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.02]"}`}><span lang="en" className="text-[13px] font-medium">{technology}</span><span className="font-mono text-[8px]" style={{ color: accent }}>0{index + 1}</span></div>)}</div>
           </div>
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#f9f3eb]/92" : "border-white/[.08] bg-[#1a191c]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} variant="links" />
+          <SectionAtmosphere accent={accent} light={light} variant="links" />
           <div className="relative z-10 mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(90px,11vw,150px)]">
             <div data-project-item className="text-start"><span className={sectionLabel}>{copy.sections.links}</span><h2 className={`mt-5 text-[clamp(34px,5vw,62px)] font-[560] ${display}`}>{copy.links}</h2></div>
-            <div data-project-item className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} availableTag={copy.urlAvailable} nullTag={copy.urlNull} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} availableTag={copy.urlAvailable} nullTag={copy.urlNull} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={project.accent} light={light} /></div>
+            <div data-project-item className="mt-8 grid gap-4 md:grid-cols-2"><ProjectLinkCard href={project.projectUrl} label={copy.liveProject} unavailable={copy.unavailable} availableTag={copy.urlAvailable} nullTag={copy.urlNull} icon={<Globe className="h-5 w-5" strokeWidth={1.3} />} accent={accent} light={light} /><ProjectLinkCard href={project.githubUrl} label={copy.sourceCode} unavailable={copy.unavailable} availableTag={copy.urlAvailable} nullTag={copy.urlNull} icon={<Code className="h-5 w-5" strokeWidth={1.3} />} accent={accent} light={light} /></div>
           </div>
         </section>
 
         <section data-project-reveal className={`relative overflow-hidden border-y ${light ? "border-[#4a3d35]/14 bg-[#dfd7ce]/64" : "border-white/[.08] bg-[#111214]/96"}`}>
-          <SectionAtmosphere accent={project.accent} light={light} variant="members" />
+          <SectionAtmosphere accent={accent} light={light} variant="members" />
           <div className="relative z-10 mx-auto w-[min(1240px,calc(100%_-_clamp(28px,8vw,128px)))] py-[clamp(80px,10vw,140px)]">
             <div data-project-item className={`flex flex-col justify-between gap-5 border-b pb-7 md:flex-row md:items-end ${light ? "border-[#294368]/10" : "border-white/[.08]"} text-start`}><div><span className={sectionLabel}>{copy.sections.members}</span><h2 className={`mt-5 text-[clamp(34px,5vw,62px)] font-[560] ${display}`}>{copy.team}</h2></div><p className={`max-w-[44ch] text-[13px] leading-7 ${light ? "text-[#243b59]/55" : "text-white/45"}`}>{copy.teamIntro}</p></div>
             <div data-project-item className="mt-7 grid gap-4 md:grid-cols-2">{project.members.map((member) => {
@@ -495,7 +498,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
               const role = pick(member.role, member.roleFa);
               const description = member.description ? pick(member.description, member.descriptionFa) : null;
               const initials = member.fullName.split(" ").filter(Boolean).map((part) => part[0].toUpperCase()).join("").slice(0, 2);
-              const card = <><div className="flex items-start gap-4"><div className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${project.accent}55`, backgroundColor: `${project.accent}18`, color: project.accent }}><span lang="en">{initials}</span><MemberPhoto src={member.avatar} alt={name} size={56} /></div><div className="min-w-0 flex-1 text-start"><h3 className={`font-[560] ${rtl ? "text-[17px]" : "text-[16px]"}`}>{name}</h3>{role && <p className={`mt-1 uppercase ${rtl ? "text-[12px]" : "text-[10px] tracking-[.12em]"}`} style={{ color: project.accent }}>{role}</p>}<div className="mt-2.5"><MemberRoleBadge roleType={member.roleType} label={copy.roles[member.roleType]} accent={project.accent} light={light} /></div></div>{member.username && <ArrowUpRight className="h-4 w-4 shrink-0 opacity-40 transition-[opacity,translate] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-90 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" strokeWidth={1.4} />}</div>{description && <p className={`mt-6 leading-7 ${rtl ? "text-[13px]" : "text-[12px]"} ${light ? "text-[#243b59]/58" : "text-white/48"}`}>{description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{member.username ? copy.viewProfile : copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></>;
+              const card = <><div className="flex items-start gap-4"><div className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border font-mono text-[12px]" style={{ borderColor: `${accent}55`, backgroundColor: `${accent}18`, color: accent }}><span lang="en">{initials}</span><MemberPhoto src={member.avatar} alt={name} size={56} /></div><div className="min-w-0 flex-1 text-start"><h3 className={`font-[560] ${rtl ? "text-[17px]" : "text-[16px]"}`}>{name}</h3>{role && <p className={`mt-1 uppercase ${rtl ? "text-[12px]" : "text-[10px] tracking-[.12em]"}`} style={{ color: accent }}>{role}</p>}<div className="mt-2.5"><MemberRoleBadge roleType={member.roleType} label={copy.roles[member.roleType]} accent={accent} light={light} /></div></div>{member.username && <ArrowUpRight className="h-4 w-4 shrink-0 opacity-40 transition-[opacity,translate] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-90 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" strokeWidth={1.4} />}</div>{description && <p className={`mt-6 leading-7 ${rtl ? "text-[13px]" : "text-[12px]"} ${light ? "text-[#243b59]/58" : "text-white/48"}`}>{description}</p>}<div className={`mt-6 flex items-center justify-between border-t pt-4 font-mono text-[7px] uppercase tracking-[.14em] ${light ? "border-[#294368]/10 text-[#294368]/36" : "border-white/[.08] text-white/28"}`}><span>{member.username ? copy.viewProfile : copy.joinedAt}</span><span>{member.joinedAt ? formatDate(member.joinedAt, language) : "—"}</span></div></>;
               const cardClass = `project-interactive-card group block rounded-[22px] border p-5 ${light ? "border-[#294368]/10 bg-white/55" : "border-white/[.07] bg-white/[.018]"}`;
               // A member with a public profile opens it; others stay a static card.
               return member.username
@@ -509,7 +512,7 @@ export function ProjectDetailPage({ project, nextProject, initialTheme, initialL
           <Link href={`/projects/${nextProject.slug}`} className="group mx-auto flex min-h-[330px] w-[min(1440px,calc(100%_-_clamp(28px,6vw,96px)))] flex-col justify-center py-16">
             <span className={`font-mono text-[8px] uppercase tracking-[.2em] ${light ? "text-[#294368]/38" : "text-white/28"}`}>{nextProject.id > 0 ? `${copy.next} / ${String(nextProject.id).padStart(2, "0")}` : copy.next}</span>
             <div className="mt-6 flex items-end justify-between gap-6"><h2 className={`max-w-[13ch] text-[clamp(42px,7vw,102px)] font-[560] ${rtl ? "leading-[1.15]" : "leading-[.84] tracking-[-.03em]"}`}>{pick(nextProject.title, nextProject.titleFa)}</h2><ArrowUpRight className="h-8 w-8 shrink-0 transition-transform duration-300 group-hover:-translate-y-2 group-hover:translate-x-2 rtl:-scale-x-100 rtl:group-hover:-translate-x-2" strokeWidth={1.2} /></div>
-            <span className="mt-8 text-[10px] uppercase tracking-[.15em]" style={{ color: nextProject.accent }}>{copy.viewNext}</span>
+            <span className="mt-8 text-[10px] uppercase tracking-[.15em]" style={{ color: nextAccent }}>{copy.viewNext}</span>
           </Link>
         </section>
       </article>

@@ -1,9 +1,12 @@
-// A member's `member_profiles.theme_id` points at a row in `themes`
-// (name, description, preview_image, css_path). Rather than treat that as a
-// label, this maps each theme slug to the two accent RGB triplets that drive
-// every glow, ring, and highlight on the profile — so two members with
-// different themes visibly differ while the page shell (grid, layout,
-// typography) stays identical to the rest of Devinso.
+import { ACCENTS, ACCENT_KEYS } from "@/lib/accents";
+
+// A member's theme slug maps to the two accent RGB triplets that drive every
+// glow, ring, and highlight on the profile — so two members with different
+// themes visibly differ while the page shell (grid, layout, typography) stays
+// identical to the rest of Devinso.
+//
+// Live profiles use their accent colour's key ("red", "blue", ...) as the
+// slug; the named themes below remain for the bundled fixtures.
 
 export type ThemeAccent = {
   slug: string;
@@ -16,7 +19,15 @@ export type ThemeAccent = {
   solid: string;
 };
 
+const ACCENT_THEMES: Record<string, ThemeAccent> = Object.fromEntries(
+  ACCENT_KEYS.map((key) => [
+    key,
+    { slug: key, label: ACCENTS[key].label, a: ACCENTS[key].rgb, b: ACCENTS[key].rgbB, solid: ACCENTS[key].strong },
+  ]),
+);
+
 export const THEME_ACCENTS: Record<string, ThemeAccent> = {
+  ...ACCENT_THEMES,
   "aurora-dark": { slug: "aurora-dark", label: "Aurora Dark", a: "110,188,255", b: "169,128,255", solid: "#9fd4ff" },
   "verdant-signal": { slug: "verdant-signal", label: "Verdant Signal", a: "110,238,180", b: "89,225,238", solid: "#8ff5c9" },
   "crimson-forge": { slug: "crimson-forge", label: "Crimson Forge", a: "255,120,110", b: "255,190,90", solid: "#ffb199" },

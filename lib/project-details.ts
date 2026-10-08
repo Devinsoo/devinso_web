@@ -59,6 +59,8 @@ export type ProjectDetail = {
   createdAt: string;
   updatedAt: string;
   accent: string;
+  /** Darker accent for text on the light theme; falls back to `accent`. */
+  accentDeep?: string;
   accentSoft: string;
   preview: ProjectPreviewKind;
 };

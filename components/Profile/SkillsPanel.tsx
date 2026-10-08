@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { MemberSkill } from "@/components/Profile/types";
 import type { ProfileCopy } from "@/components/Profile/copy";
+import { ProfileWatermark } from "@/components/Profile/ProfileWatermark";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -94,12 +95,7 @@ export function SkillsPanel({ skills, copy, language }: SkillsPanelProps) {
       data-profile-section
       className="relative z-10 mx-auto mt-[clamp(74px,10vw,124px)] w-[min(1180px,calc(100%-40px))] sm:w-[min(1180px,calc(100%-56px))]"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-[clamp(28px,5vw,54px)] left-1/2 -translate-x-1/2 select-none whitespace-nowrap font-mono text-[clamp(70px,11vw,150px)] font-bold tracking-[-.04em] text-white/[.03]"
-      >
-        MATRIX
-      </div>
+      <ProfileWatermark text="03" variant="section" />
 
       <div data-section-reveal className="relative flex items-end justify-between gap-6 border-b border-white/[.08] pb-5 max-[640px]:flex-col max-[640px]:items-start">
         <div>

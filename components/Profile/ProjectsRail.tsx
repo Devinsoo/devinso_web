@@ -10,6 +10,8 @@ import { ArrowUpRight } from "lucide-react";
 import { GithubMark } from "@/components/Profile/BrandIcons";
 import type { MemberProject } from "@/components/Profile/types";
 import type { ProfileCopy } from "@/components/Profile/copy";
+import { ACCENTS } from "@/lib/accents";
+import { ProfileWatermark } from "@/components/Profile/ProfileWatermark";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,20 +21,27 @@ type ProjectsRailProps = {
   language: "en" | "fa";
 };
 
-const TYPE_ACCENT: Record<MemberProject["type"], { glow: string; text: string; border: string; wash: string }> = {
+type CardAccent = { glow: string; text: string; wash: string };
+
+/** Fallback for bundled fixtures, which carry no colour of their own. */
+const TYPE_ACCENT: Record<MemberProject["type"], CardAccent> = {
   TEAM: {
     glow: "rgba(169,128,255,.24)",
-    text: "text-[#c9b8ff]",
-    border: "border-[rgba(169,128,255,.28)]",
+    text: "#c9b8ff",
     wash: "linear-gradient(135deg, rgba(169,128,255,.14), rgba(110,188,255,.05))",
   },
   PERSONAL: {
     glow: "rgba(110,188,255,.24)",
-    text: "text-[#9fd4ff]",
-    border: "border-[rgba(110,188,255,.28)]",
+    text: "#9fd4ff",
     wash: "linear-gradient(135deg, rgba(110,188,255,.14), rgba(89,225,238,.05))",
   },
 };
+
+function cardAccent(project: MemberProject): CardAccent {
+  if (!project.accent) return TYPE_ACCENT[project.type];
+  const palette = ACCENTS[project.accent];
+  return { glow: palette.glow, text: palette.strong, wash: palette.wash };
+}
 
 function ProjectCover({
   project,
@@ -93,7 +102,7 @@ function ProjectCard({
   index: number;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const accent = TYPE_ACCENT[project.type];
+  const accent = cardAccent(project);
   const description = isRTL && project.descriptionFa ? project.descriptionFa : project.description;
   const outcome = isRTL && project.outcomeFa ? project.outcomeFa : project.outcome;
   const role = isRTL && project.membership.roleFa ? project.membership.roleFa : project.membership.role;
@@ -135,7 +144,7 @@ function ProjectCard({
       <div className="relative flex flex-1 flex-col px-2 pt-5">
         <div className="flex items-center justify-between gap-3">
           <span className="flex items-center gap-2">
-            <span className={`font-mono text-[9px] uppercase tracking-[.18em] ${accent.text}`}>
+            <span className="font-mono text-[9px] uppercase tracking-[.18em]" style={{ color: accent.text }}>
               {copy.projectsSection.typeLabel[project.type]}
             </span>
             {project.featured ? (
@@ -262,12 +271,7 @@ export function ProjectsRail({ projects, copy, language }: ProjectsRailProps) {
       data-profile-section
       className="relative z-10 mx-auto mt-[clamp(74px,10vw,124px)] w-[min(1180px,calc(100%-40px))] pb-[clamp(90px,12vw,140px)] sm:w-[min(1180px,calc(100%-56px))]"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-[clamp(30px,5.5vw,58px)] left-1/2 -translate-x-1/2 select-none whitespace-nowrap font-mono text-[clamp(70px,11vw,150px)] font-bold tracking-[-.04em] text-white/[.03]"
-      >
-        PROJECT LOG
-      </div>
+      <ProfileWatermark text="05" variant="section" />
 
       <div data-section-reveal className="relative flex items-end justify-between gap-6 border-b border-white/[.08] pb-5 max-[640px]:flex-col max-[640px]:items-start">
         <div>

@@ -1,21 +1,22 @@
 import { fetchProjects } from "@/lib/api/devinso";
 import type { ApiProjectSummary } from "@/lib/api/types";
 import { toDateOnly } from "@/lib/content/dates";
+import { toAccentKey } from "@/lib/accents";
 import type { WorkProject } from "@/components/Work/SelectedWork";
 
 /**
  * The home page work rail: published team projects, mapped onto the card shape
  * the rail already renders.
  *
- * Four of those fields describe how a card behaves rather than what it says —
- * `accent`, `morph`, `layout` and the fallback `preview`. The database holds
- * none of them, so they cycle by position, which reproduces the rhythm the
- * section was designed with (expand, then split, then depth) and keeps going
- * for a fourth project and beyond. Cycling by position rather than by slug
- * matters here: neighbouring cards must differ, or the rail reads as repetitive.
+ * The accent is the colour picked for each project in the admin panel. Three
+ * more fields describe how a card behaves rather than what it says — `morph`,
+ * `layout` and the fallback `preview`. The database holds none of them, so they
+ * cycle by position, which reproduces the rhythm the section was designed with
+ * (expand, then split, then depth) and keeps going for a fourth project and
+ * beyond. Cycling by position rather than by slug matters here: neighbouring
+ * cards must differ, or the rail reads as repetitive.
  */
 
-const ACCENTS = ["crimson", "violet", "ice"] as const;
 const MORPHS = ["expand", "split", "depth"] as const;
 const LAYOUTS = ["media-right", "media-left", "stacked"] as const;
 const PREVIEWS = ["automation", "identity"] as const;
@@ -60,7 +61,7 @@ function toWorkProject(project: ApiProjectSummary, index: number): WorkProject {
     stack: stack.length > 0 ? stack : [EMPTY],
     year: toDateOnly(project.createdAt).slice(0, 4),
     yearFa: new Intl.DateTimeFormat("fa-IR", { year: "numeric" }).format(new Date(project.createdAt)),
-    accent: ACCENTS[index % ACCENTS.length],
+    accent: toAccentKey(project.accent),
     morph: MORPHS[index % MORPHS.length],
     layout: LAYOUTS[index % LAYOUTS.length],
 

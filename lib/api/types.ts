@@ -10,7 +10,11 @@
  */
 
 export type ApiAvailability = "Available" | "Limited" | "Unavailable";
-export type ApiAccent = "Crimson" | "Violet" | "Ice";
+/**
+ * A member's or project's theme colour. Older API builds sent the original
+ * three names (Crimson, Violet, Ice); `toAccentKey` still reads those.
+ */
+export type ApiAccent = "Red" | "Blue" | "Purple" | "Orange" | "Pink" | "Green";
 export type ApiProjectType = "Personal" | "Team";
 export type ApiSkillLevel = "Beginner" | "Intermediate" | "Advanced" | "Expert";
 export type ApiProjectRole =
@@ -117,6 +121,7 @@ export type ApiMemberProject = {
   descriptionFa?: string;
   type: ApiProjectType;
   isFeatured: boolean;
+  accent: ApiAccent;
   coverImageUrl?: string;
   projectUrl?: string;
   repositoryUrl?: string;
@@ -134,6 +139,7 @@ export type ApiProjectSummary = {
   titleFa?: string;
   type: ApiProjectType;
   isFeatured: boolean;
+  accent: ApiAccent;
   memberCount: number;
   coverImageUrl?: string;
   description?: string;

@@ -8,6 +8,7 @@ import type {
 } from "@/lib/api/types";
 import type { MemberProject } from "@/components/Profile/types";
 import { toDateOnly } from "@/lib/content/dates";
+import { ACCENTS, toAccentKey } from "@/lib/accents";
 import type {
   ProjectContentBlock,
   ProjectDetail,
@@ -17,10 +18,9 @@ import type {
 /**
  * Maps API projects onto the shapes the project UI already speaks.
  *
- * Three presentation fields have no column behind them - `accent`,
- * `accentSoft` and `preview`. Rather than inventing content, the accent is
- * taken from the project lead's own accent colour, and the preview treatment is
- * chosen from the slug so a given project always renders the same way.
+ * The accent is the colour picked for the project in the admin panel. The
+ * preview treatment has no column behind it, so it is chosen from the slug and
+ * a given project always renders the same way.
  */
 
 const ROLES: Record<ApiProjectRole, ProjectMemberRole> = {
@@ -34,12 +34,6 @@ const ROLES: Record<ApiProjectRole, ProjectMemberRole> = {
   QA: "CONTRIBUTOR",
   Contributor: "CONTRIBUTOR",
 };
-
-const ACCENT_PALETTE = {
-  crimson: { accent: "#ff5147", accentSoft: "rgba(255,81,71,.16)" },
-  violet: { accent: "#8d7dff", accentSoft: "rgba(141,125,255,.16)" },
-  ice: { accent: "#8be7ff", accentSoft: "rgba(139,231,255,.14)" },
-} as const;
 
 const PREVIEWS = ["allixro", "automation", "identity"] as const;
 
@@ -118,13 +112,13 @@ function memberFor(member: ApiProjectMember, index: number) {
   };
 }
 
-function toProjectDetail(project: ApiProjectDetail, accentKey: keyof typeof ACCENT_PALETTE): ProjectDetail {
+function toProjectDetail(project: ApiProjectDetail): ProjectDetail {
   // The lead is whoever holds the lead role; failing that, the first member
   // credited on the project.
   const lead = project.members.find((member) => member.role === "Lead" || member.role === "Creator")
     ?? project.members[0];
 
-  const palette = ACCENT_PALETTE[accentKey];
+  const palette = ACCENTS[toAccentKey(project.accent)];
 
   return {
     id: 0,
@@ -153,8 +147,9 @@ function toProjectDetail(project: ApiProjectDetail, accentKey: keyof typeof ACCE
     members: project.members.map(memberFor),
     createdAt: toDateOnly(project.createdAt),
     updatedAt: toDateOnly(project.updatedAt ?? project.createdAt),
-    accent: palette.accent,
-    accentSoft: palette.accentSoft,
+    accent: palette.strong,
+    accentDeep: palette.deep,
+    accentSoft: palette.soft,
     preview: previewFor(project.slug),
   };
 }
@@ -169,6 +164,7 @@ export function toMemberProjects(projects: ApiMemberProject[]): MemberProject[] 
     description: project.description ?? "",
     descriptionFa: project.descriptionFa,
     featured: project.isFeatured,
+    accent: toAccentKey(project.accent),
     coverImage: project.coverImageUrl,
     projectUrl: project.projectUrl,
     githubUrl: project.repositoryUrl,
@@ -186,27 +182,11 @@ export function toMemberProjects(projects: ApiMemberProject[]): MemberProject[] 
 
 /**
  * One project by slug, or null when it is unpublished, unknown, or the API is
- * down. The accent comes from the lead member's own colour, which is why the
- * roster is consulted alongside the project.
+ * down.
  */
-export async function loadProjectDetail(
-  slug: string,
-  accentByUsername:
-    | Map<string, keyof typeof ACCENT_PALETTE>
-    | Promise<Map<string, keyof typeof ACCENT_PALETTE>> = new Map(),
-): Promise<ProjectDetail | null> {
-  // The roster is only needed to pick the accent, so it does not have to wait
-  // for the project. Accepting a promise lets the caller start both reads at
-  // once and turns two serial round trips into one.
-  const [project, accents] = await Promise.all([fetchProject(slug), accentByUsername]);
-  if (!project) return null;
-
-  const lead = project.members.find((member) => member.role === "Lead" || member.role === "Creator")
-    ?? project.members[0];
-
-  const accentKey = (lead?.username && accents.get(lead.username)) || "crimson";
-
-  return toProjectDetail(project, accentKey);
+export async function loadProjectDetail(slug: string): Promise<ProjectDetail | null> {
+  const project = await fetchProject(slug);
+  return project ? toProjectDetail(project) : null;
 }
 
 /** Published project slugs, for the next/previous link on a project page. */
