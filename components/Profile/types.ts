@@ -1,3 +1,5 @@
+import type { AccentKey } from "@/lib/accents";
+
 // Types mirror the Devinso ERD tables (users, member_profiles, skills,
 // member_skills, projects, project_members) so the profile UI is a direct
 // reflection of the schema rather than an invented shape.
@@ -130,6 +132,8 @@ export type MemberProject = {
   outcome?: string;
   outcomeFa?: string;
   featured?: boolean;
+  /** Colour picked for the project in the admin panel; bundled fixtures omit it. */
+  accent?: AccentKey;
   coverImage?: string;
   projectUrl?: string;
   githubUrl?: string;

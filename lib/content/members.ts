@@ -1,6 +1,7 @@
 import { fetchMember, fetchMembers } from "@/lib/api/devinso";
-import type { ApiAccent, ApiMemberProfile, ApiMemberSummary, ApiSkillLevel } from "@/lib/api/types";
-import { TEAM_ROSTER, type TeamAccent, type TeamAvailability, type TeamMember } from "@/lib/team";
+import type { ApiMemberProfile, ApiMemberSummary, ApiSkillLevel } from "@/lib/api/types";
+import { ACCENTS, toAccentKey } from "@/lib/accents";
+import { TEAM_ROSTER, type TeamAvailability, type TeamMember } from "@/lib/team";
 import type { MemberProfileData, SkillLevel } from "@/components/Profile/types";
 import { toMemberProjects } from "@/lib/content/projects";
 import { toDateOnly } from "@/lib/content/dates";
@@ -9,12 +10,6 @@ import { toDateOnly } from "@/lib/content/dates";
  * Maps the API onto the shapes the member UI already speaks, so the components
  * stay untouched and keep working when the API is down.
  */
-
-const ACCENTS: Record<ApiAccent, TeamAccent> = {
-  Crimson: "crimson",
-  Violet: "violet",
-  Ice: "ice",
-};
 
 const AVAILABILITY: Record<string, TeamAvailability> = {
   Available: "AVAILABLE",
@@ -92,7 +87,7 @@ function toTeamMember(member: ApiMemberSummary, index: number): TeamMember {
     focus: member.focus.map((item) => item.text),
     focusFa: member.focus.map((item) => item.textFa ?? item.text),
     avatar: member.avatarUrl ?? null,
-    accent: ACCENTS[member.accent] ?? "crimson",
+    accent: toAccentKey(member.accent),
     status: "ACTIVE",
     availability: AVAILABILITY[member.availability] ?? "AVAILABLE",
     since: year(member.createdAt),
@@ -135,22 +130,9 @@ export async function loadRoster(): Promise<TeamMember[]> {
   return [...active, ...filled];
 }
 
-/**
- * Accent colour per member username. A project has no accent of its own, so a
- * project page tints itself with its lead member's colour.
- */
-export async function loadAccentsByUsername(): Promise<Map<string, TeamAccent>> {
-  const members = await fetchMembers();
-  const accents = new Map<string, TeamAccent>();
-
-  for (const member of members ?? []) {
-    if (member.username) accents.set(member.username, ACCENTS[member.accent] ?? "crimson");
-  }
-
-  return accents;
-}
-
 function toProfileData(member: ApiMemberProfile): MemberProfileData {
+  const accent = toAccentKey(member.accent);
+
   return {
     user: {
       // The public API exposes no account data, by design. What the header
@@ -184,8 +166,12 @@ function toProfileData(member: ApiMemberProfile): MemberProfileData {
       linkedin: socialLink(member, "linkedin"),
       website: socialLink(member, "website"),
 
+      // The member's accent drives every glow and highlight on the profile;
+      // its key doubles as the theme slug (see components/Profile/theme.ts).
+      theme: { id: 0, name: ACCENTS[accent].label, slug: accent },
+
       // No columns behind these yet: the header hides each when absent.
-      // phone, resumeUrl and theme are deliberately left unset.
+      // phone and resumeUrl are deliberately left unset.
     },
 
     experiences: member.experiences.map((experience, index) => ({

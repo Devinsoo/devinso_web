@@ -12,7 +12,6 @@ import {
   type DevinsoLanguage,
   type DevinsoTheme,
 } from "@/lib/preferences";
-import { loadAccentsByUsername } from "@/lib/content/members";
 import { loadProjectDetail } from "@/lib/content/projects";
 import { loadNextProject } from "@/lib/content/navigation";
 
@@ -23,14 +22,9 @@ type ProjectPageProps = {
 /**
  * Live project first, bundled project second — same rule as the member page, so
  * the site keeps rendering while the API is stopped.
- *
- * A project carries no accent colour of its own, so the lead member's accent is
- * used; that is why the roster is fetched alongside it.
  */
 async function resolveProject(slug: string): Promise<ProjectDetail | undefined> {
-  // The roster read is started without awaiting it, so it overlaps the project
-  // read rather than queueing behind it; `loadProjectDetail` awaits both.
-  const live = await loadProjectDetail(slug, loadAccentsByUsername());
+  const live = await loadProjectDetail(slug);
 
   return live ?? getProjectDetail(slug);
 }

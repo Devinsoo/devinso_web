@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { GraduationCap, Languages, Wrench } from "lucide-react";
 import type { MemberEducation, MemberTool, ProfileSignal, SpokenLanguage } from "@/components/Profile/types";
 import type { ProfileCopy } from "@/components/Profile/copy";
+import { ProfileWatermark } from "@/components/Profile/ProfileWatermark";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -99,12 +100,7 @@ export function ProfileSignals({ languages, tools, education, signals, copy, lan
       dir={isRTL ? "rtl" : "ltr"}
       className="relative z-10 mx-auto mt-[clamp(74px,10vw,124px)] w-[min(1180px,calc(100%-40px))] sm:w-[min(1180px,calc(100%-56px))]"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-[clamp(30px,5vw,58px)] left-1/2 -translate-x-1/2 select-none whitespace-nowrap font-mono text-[clamp(60px,10vw,138px)] font-bold tracking-[-.05em] text-white/[.028]"
-      >
-        SIGNAL
-      </div>
+      <ProfileWatermark text="04" variant="section" />
 
       <div data-section-reveal className="relative flex items-end justify-between gap-6 border-b border-white/[.08] pb-5 max-[640px]:flex-col max-[640px]:items-start">
         <div>

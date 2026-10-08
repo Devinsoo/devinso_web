@@ -9,6 +9,7 @@ import { GithubMark, LinkedinMark } from "@/components/Profile/BrandIcons";
 import type { MemberProfileData } from "@/components/Profile/types";
 import { ProfileIdentityFrame } from "@/components/Profile/ProfileIdentityFrame";
 import type { ProfileCopy } from "@/components/Profile/copy";
+import { ProfileWatermark } from "@/components/Profile/ProfileWatermark";
 
 type ProfileHeaderProps = {
   data: MemberProfileData;
@@ -127,15 +128,8 @@ export function ProfileHeader({ data, copy, language }: ProfileHeaderProps) {
       className={`relative z-10 mx-auto grid w-[min(1180px,calc(100%-40px))] grid-cols-[auto_1fr] items-start gap-[clamp(24px,4vw,56px)] pt-[clamp(64px,9vw,112px)] sm:w-[min(1180px,calc(100%-56px))] max-[760px]:grid-cols-1 max-[760px]:justify-items-center max-[760px]:text-center`}
       dir={isRTL ? "rtl" : "ltr"}
     >
-      <div
-        aria-hidden="true"
-        dir="ltr"
-        // Physical side: the box is pinned LTR (so "№" leads), which would make
-        // a logical end-0 resolve to the right and land on the avatar.
-        className={`pointer-events-none absolute ${isRTL ? "left-0" : "right-0"} top-[clamp(16px,5vw,48px)] select-none font-mono text-[clamp(90px,13vw,190px)] font-bold leading-none tracking-[-.04em] text-white/[.035] max-[760px]:hidden`}
-      >
-        №{recordId}
-      </div>
+      {/* The member's initials, on the side away from the avatar. */}
+      <ProfileWatermark text={initialsFrom(profile.fullName)} variant="hero" />
 
       <div
         data-hero-reveal

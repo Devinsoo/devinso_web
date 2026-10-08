@@ -4,9 +4,9 @@
  * Three layers, each covering a hole the next one leaves:
  *
  * 1. **In-flight dedupe.** Two components asking for `/members` while the first
- *    request is still open share that one promise. `loadRoster` and
- *    `loadAccentsByUsername` both call `fetchMembers`, and a project page walks
- *    the project list twice; without this, one render is several identical
+ *    request is still open share that one promise. the home page and
+ *    a member page can both call `fetchMembers`, and a project page walks the
+ *    project list twice; without this, one render is several identical
  *    round trips.
  * 2. **Process memory, with a TTL.** Survives between requests, so a second
  *    visitor inside the window is served without touching the API. This is the

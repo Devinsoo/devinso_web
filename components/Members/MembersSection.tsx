@@ -7,7 +7,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { TEAM_ROSTER, initialsOf, type TeamAccent, type TeamMember } from "@/lib/team";
+import { TEAM_ROSTER, initialsOf, type TeamMember } from "@/lib/team";
+import { accentFor } from "@/lib/accents";
 import type { DevinsoLanguage, DevinsoTheme } from "@/lib/preferences";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -81,11 +82,6 @@ const COPY = {
   },
 } as const;
 
-const ACCENTS: Record<TeamAccent, { strong: string; soft: string; glow: string }> = {
-  crimson: { strong: "#ff566f", soft: "rgba(255,86,111,.13)", glow: "rgba(255,65,92,.20)" },
-  violet: { strong: "#a996ff", soft: "rgba(169,150,255,.13)", glow: "rgba(145,122,255,.20)" },
-  ice: { strong: "#a7ceff", soft: "rgba(167,206,255,.12)", glow: "rgba(150,195,255,.18)" },
-};
 
 export function MembersSection({ theme, language, members }: MembersSectionProps) {
   const roster = members && members.length > 0 ? members : TEAM_ROSTER;
@@ -105,7 +101,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
   const copy = COPY[language];
 
   const member = roster[active];
-  const accent = ACCENTS[member.accent];
+  const accent = accentFor(member.accent, light);
   const open = member.status === "OPEN";
   const name = rtl ? member.fullNameFa : member.fullName;
   const title = rtl ? member.titleFa : member.title;
@@ -352,7 +348,7 @@ export function MembersSection({ theme, language, members }: MembersSectionProps
               className="mt-2 flex flex-col"
             >
               {roster.map((row, index) => {
-                const rowAccent = ACCENTS[row.accent];
+                const rowAccent = accentFor(row.accent, light);
                 const isActive = index === active;
                 const rowOpen = row.status === "OPEN";
                 return (

@@ -311,3 +311,38 @@ html[lang="fa"] .font-mono,
     transition: none;
   }
 }
+
+/* Member profile watermark: outline-only lettering in the member's accent
+   (--accent-a, set on the profile root), dissolving towards the bottom. */
+.profile-watermark {
+  position: absolute;
+  inset-inline-end: 0;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(var(--accent-a), .13);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .45) 45%, transparent 85%);
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .45) 45%, transparent 85%);
+}
+
+/* Beside the header, on the side away from the avatar. */
+.profile-watermark--hero {
+  top: clamp(4px, 3vw, 32px);
+  font-size: clamp(140px, 20vw, 300px);
+}
+
+/* Behind a section title, lifted so it straddles the heading. */
+.profile-watermark--section {
+  top: calc(-1 * clamp(26px, 4.5vw, 52px));
+  font-size: clamp(110px, 16vw, 220px);
+}
+
+@media (max-width: 760px) {
+  .profile-watermark--hero {
+    display: none;
+  }
+}

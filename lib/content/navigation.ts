@@ -1,6 +1,7 @@
 import { fetchProjects } from "@/lib/api/devinso";
 import type { ProjectDetail } from "@/lib/project-details";
 import { toDateOnly } from "@/lib/content/dates";
+import { ACCENTS, toAccentKey } from "@/lib/accents";
 
 /**
  * The "next project" teaser at the bottom of a project page reads four fields:
@@ -16,6 +17,7 @@ export async function loadNextProject(currentSlug: string): Promise<ProjectDetai
 
   const next = projects[(index + 1) % projects.length];
   const position = ((index + 1) % projects.length) + 1;
+  const palette = ACCENTS[toAccentKey(next.accent)];
 
   // Only the fields the teaser reads are meaningful here; the rest satisfy the
   // shared ProjectDetail shape and are never rendered on that link.
@@ -38,8 +40,9 @@ export async function loadNextProject(currentSlug: string): Promise<ProjectDetai
     members: [],
     createdAt: toDateOnly(next.createdAt),
     updatedAt: toDateOnly(next.createdAt),
-    accent: "#ff5147",
-    accentSoft: "rgba(255,81,71,.16)",
+    accent: palette.strong,
+    accentDeep: palette.deep,
+    accentSoft: palette.soft,
     preview: "identity",
   };
 }

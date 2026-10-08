@@ -10,7 +10,9 @@
 // renders them as vacant rather than as people. Fill one in by giving it a real
 // name and title and pointing `username` at its profile record.
 
-export type TeamAccent = "crimson" | "violet" | "ice";
+import type { AccentKey } from "@/lib/accents";
+
+export type TeamAccent = AccentKey;
 export type TeamSlotStatus = "ACTIVE" | "OPEN";
 export type TeamAvailability = "AVAILABLE" | "LIMITED" | "UNAVAILABLE";
 
@@ -47,7 +49,7 @@ export const TEAM_ROSTER: TeamMember[] = [
     focus: ["Interaction systems", "Realtime interfaces", "Creative infrastructure"],
     focusFa: ["سیستم‌های تعاملی", "رابط‌های بلادرنگ", "زیرساخت خلاق"],
     avatar: null,
-    accent: "crimson",
+    accent: "red",
     status: "ACTIVE",
     availability: "AVAILABLE",
     since: "2024",
@@ -63,7 +65,7 @@ export const TEAM_ROSTER: TeamMember[] = [
     focus: [],
     focusFa: [],
     avatar: null,
-    accent: "violet",
+    accent: "purple",
     status: "OPEN",
     availability: null,
     since: null,
@@ -79,7 +81,7 @@ export const TEAM_ROSTER: TeamMember[] = [
     focus: [],
     focusFa: [],
     avatar: null,
-    accent: "ice",
+    accent: "blue",
     status: "OPEN",
     availability: null,
     since: null,
@@ -95,7 +97,7 @@ export const TEAM_ROSTER: TeamMember[] = [
     focus: [],
     focusFa: [],
     avatar: null,
-    accent: "violet",
+    accent: "purple",
     status: "OPEN",
     availability: null,
     since: null,
